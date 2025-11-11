@@ -14,13 +14,27 @@
           // Initialize dropdown after navbar is loaded
           setTimeout(function() {
             const button = document.getElementById('nav-portfolio-button');
+            const chevron = document.getElementById('portfolio-chevron');
+            
+            // Ensure chevron is visible
+            if (chevron) {
+              chevron.style.display = 'inline-block';
+              chevron.style.visibility = 'visible';
+            }
+            
+            // Ensure onclick handler is set
             if (button && window.togglePortfolioDropdown) {
-              // Ensure onclick handler is set
               button.onclick = function(e) {
                 window.togglePortfolioDropdown(e);
               };
             }
-          }, 100);
+            
+            // Re-initialize dropdown functionality by calling initDropdown if available
+            // This will be called by dropdown.js after a delay, but we can also trigger it here
+            if (window.initDropdown) {
+              setTimeout(window.initDropdown, 100);
+            }
+          }, 200);
         }
       })
       .catch(error => {

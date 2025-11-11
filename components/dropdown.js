@@ -87,7 +87,7 @@
   };
 
   // Initialize dropdown functionality
-  function initDropdown() {
+  window.initDropdown = function() {
     const container = document.getElementById('portfolio-dropdown-container');
     const dropdown = document.getElementById('portfolio-dropdown');
     const chevron = document.getElementById('portfolio-chevron');
@@ -112,16 +112,48 @@
     container.addEventListener('mouseenter', function() {
       if (window.innerWidth >= 768 && dropdown && chevron) {
         dropdown.classList.remove('opacity-0', 'invisible');
+        dropdown.style.opacity = '1';
+        dropdown.style.visibility = 'visible';
+        dropdown.style.display = 'block';
         chevron.style.transform = 'rotate(180deg)';
+        chevron.style.display = 'inline-block';
       }
     });
     
     container.addEventListener('mouseleave', function() {
       if (window.innerWidth >= 768 && dropdown && chevron) {
-        dropdown.classList.add('opacity-0', 'invisible');
-        chevron.style.transform = 'rotate(0deg)';
+        // Small delay to allow moving to dropdown
+        setTimeout(function() {
+          if (!container.matches(':hover') && !dropdown.matches(':hover')) {
+            dropdown.classList.add('opacity-0', 'invisible');
+            dropdown.style.opacity = '';
+            dropdown.style.visibility = '';
+            chevron.style.transform = 'rotate(0deg)';
+          }
+        }, 100);
       }
     });
+    
+    // Also handle hover on dropdown itself
+    if (dropdown) {
+      dropdown.addEventListener('mouseenter', function() {
+        if (window.innerWidth >= 768) {
+          dropdown.classList.remove('opacity-0', 'invisible');
+          dropdown.style.opacity = '1';
+          dropdown.style.visibility = 'visible';
+          dropdown.style.display = 'block';
+        }
+      });
+      
+      dropdown.addEventListener('mouseleave', function() {
+        if (window.innerWidth >= 768) {
+          dropdown.classList.add('opacity-0', 'invisible');
+          dropdown.style.opacity = '';
+          dropdown.style.visibility = '';
+          if (chevron) chevron.style.transform = 'rotate(0deg)';
+        }
+      });
+    }
   }
   
   // Initialize when DOM is ready

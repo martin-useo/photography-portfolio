@@ -27,10 +27,26 @@
         class="w-full h-0 transition-all ease-out duration-500 md:transition-none md:w-auto md:flex-grow md:flex md:items-center">
         <ul id="ulMenu"
           class="flex flex-col duration-300 ease-out md:space-x-5 sm:transition-none mt-5 md:flex-row md:items-center md:ml-auto md:mt-0 md:pt-0 md:border-0">
-          <li class="group transition duration-300">
-            <a href="index.html" id="nav-portfolio-link" class="font-signika text-2xl tap-highlight-transparent">PORTFOLIO
-              <span id="nav-portfolio-underline" class="hidden md:block h-0.5 bg-black dark:bg-white"></span>
-            </a>
+          <li class="group transition duration-300 relative" id="portfolio-dropdown-container">
+            <button id="nav-portfolio-button" class="font-signika text-2xl tap-highlight-transparent flex items-center relative" onclick="togglePortfolioDropdown(event)">
+              PORTFOLIO
+              <svg class="w-4 h-4 ml-1 transition-transform duration-300" id="portfolio-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+              <span id="nav-portfolio-underline" class="hidden md:block h-0.5 bg-black dark:bg-white absolute bottom-0 left-0 right-0"></span>
+            </button>
+            <!-- Dropdown Menu (Desktop) -->
+            <div id="portfolio-dropdown" class="hidden md:block absolute top-full left-0 mt-2 w-48 bg-white dark:bg-black border border-gray-200 dark:border-gray-800 shadow-lg rounded-md py-2 z-50 opacity-0 invisible transition-all duration-200">
+              <a href="index.html" id="nav-portfolio-all-link" class="block px-4 py-2 text-lg font-signika hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors">Tous les photos</a>
+              <a href="dist/portfolio/nature.html" id="nav-portfolio-nature-link" class="block px-4 py-2 text-lg font-signika hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors">Nature</a>
+              <a href="dist/portfolio/portraits.html" id="nav-portfolio-portraits-link" class="block px-4 py-2 text-lg font-signika hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors">Portraits</a>
+            </div>
+            <!-- Mobile Dropdown Menu -->
+            <div id="portfolio-dropdown-mobile" class="md:hidden hidden mt-2 pl-4">
+              <a href="index.html" id="nav-portfolio-all-link-mobile" onclick="closePortfolioDropdown()" class="block py-2 text-xl font-signika">Tous les photos</a>
+              <a href="dist/portfolio/nature.html" id="nav-portfolio-nature-link-mobile" onclick="closePortfolioDropdown()" class="block py-2 text-xl font-signika">Nature</a>
+              <a href="dist/portfolio/portraits.html" id="nav-portfolio-portraits-link-mobile" onclick="closePortfolioDropdown()" class="block py-2 text-xl font-signika">Portraits</a>
+            </div>
           </li>
           <li class="group transition duration-300">
             <a href="dist/about_me.html" id="nav-about-link" class="font-signika text-2xl tap-highlight-transparent">ABOUT ME

@@ -5,13 +5,13 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Martin USEO - Portfolio</title>
+  <title>Martin USEO - Portrait Photography</title>
   <meta name="description"
-    content="Hello there, I'm Martin USEO – a freelance photographer based in Paris, France. Welcome to my portfolio." />
+    content="Portrait photography portfolio by Martin USEO – a freelance photographer based in Paris, France." />
   <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="dist/assets/favicon.ico" />
-  <link rel="stylesheet" href="dist/output.css" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" type="image/x-icon" href="../assets/favicon.ico" />
+  <link rel="stylesheet" href="../output.css" />
+  <link rel="stylesheet" href="../styles.css" />
   <!-- Alpine.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <!-- Start - Fonts -->
@@ -28,30 +28,28 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      content: ["./dist/*.{html,js}"],
+      content: ["../dist/*.{html,js}"],
       theme: {
-        extend:
-                {
-                  fontFamily: {
-                    'nothingyoucoulddo': ['Nothing You Could Do', 'cursive'],
-                    'signika': ['Signika', 'sans-serif'],
-                  },
-                },
+        extend: {
+          fontFamily: {
+            'signika': ['Signika', 'sans-serif'],
+          },
+        },
       },
       plugins: [],
     }
   </script>
-  <script src="components/loader.js"></script>
-  <script src="components/dropdown.js"></script>
+  <script src="../../components/loader.js"></script>
+  <script src="../../components/dropdown.js"></script>
 </head>
 
 <body
   class="dark:bg-black bg-white h-screen text-black dark:text-white px-5 md:px-20 opacity-0 animate-fade-in transition duration-500">
   <!-- Navbar -->
-  <div id="navbar-container" data-path="components/navbar.html"></div>
+  <div id="navbar-container" data-path="../../components/navbar.html"></div>
   <!-- Content -->
   <div class="container mx-auto">
-    <h1 class="text-4xl pt-10 pb-8 font-bold">PORTFOLIO</h1>
+    <h1 class="text-4xl pt-10 pb-8 font-bold">PORTRAITS</h1>
     <section class="text-neutral-700">
       <div class="container w-full">
         <div class="flex flex-wrap w-full" id="portfolio-grid">
@@ -59,24 +57,16 @@
       </div>
     </section>
   </div>
-  <!-- <script src="dist/images-config.js"></script>
-  <script src="dist/fade_in.js"></script>
-  <script src="dist/menu.js"></script> -->
   <script>
-    const portfolioImages = [
-      { src: './dist/assets/images/ThéoNoJitensha-1.jpg', alt: 'a person standing in front of a rock formation', size: 'md:w-1/2' },
-      { src: './dist/assets/images/ThéoNoJitensha-2.jpg', alt: 'a cat laying on top of a sidewalk next to the ocean', size: 'md:w-1/2' },
-      { src: './dist/assets/images/ThéoNoJitensha-3.jpg', alt: 'a man standing on a beach next to the ocean', size: 'w-full' },
-      { src: './dist/assets/images/ThéoNoJitensha-4.jpg', alt: 'a snow covered mountain with trees on the side', size: 'w-full' },
-      { src: './dist/assets/images/ThéoNoJitensha-5.jpg', alt: 'a branch of a plant floating in a body of water', size: 'md:w-1/2' },
-      { src: './dist/assets/images/ThéoNoJitensha-6.jpg', alt: 'a blue sky with a lot of red and orange clouds', size: 'md:w-1/2' },
-      { src: './dist/assets/images/ThéoNoJitensha-7.jpg', alt: 'a view of the ocean from the top of a hill', size: 'md:w-1/2' }
+    const portraitImages = [
+      { src: '../assets/images/ThéoNoJitensha-1.jpg', alt: 'a person standing in front of a rock formation', size: 'md:w-1/2' },
+      { src: '../assets/images/ThéoNoJitensha-2.jpg', alt: 'a cat laying on top of a sidewalk next to the ocean', size: 'md:w-1/2' }
     ];
 
-    // Fonction pour générer la galerie
+    // Function to generate the gallery
     function renderPortfolio() {
       const grid = document.getElementById('portfolio-grid');
-      const images = portfolioImages;
+      const images = portraitImages;
       
       images.forEach((img, index) => {
         const item = document.createElement('div');
@@ -93,21 +83,22 @@
         grid.appendChild(item);
       });
       
-      // Réinitialiser Fancybox après avoir inséré les images
+      // Reinitialize Fancybox after inserting images
       Fancybox.bind("[data-fancybox]", {});
     }
     
-    // Appeler la fonction au chargement
+    // Call the function on load
     document.addEventListener('DOMContentLoaded', renderPortfolio);
   </script>
   <!-- Footer -->
-  <div id="footer-container" data-path="components/footer.html"></div>
+  <div id="footer-container" data-path="../../components/footer.html"></div>
   <!-- Script for the LightBox -->
   <script>
     Fancybox.bind("[data-fancybox]", {});
   </script>
-  <script src="dist/fade_in.js"></script>
-  <script src="dist/menu.js"></script>
+  <script src="../fade_in.js"></script>
+  <script src="../menu.js"></script>
 </body>
 
 </html>
+

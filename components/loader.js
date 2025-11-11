@@ -10,6 +10,17 @@
         // After loading navbar, adjust paths based on current page location
         if (elementId === 'navbar-container') {
           adjustNavbarPaths();
+          
+          // Initialize dropdown after navbar is loaded
+          setTimeout(function() {
+            const button = document.getElementById('nav-portfolio-button');
+            if (button && window.togglePortfolioDropdown) {
+              // Ensure onclick handler is set
+              button.onclick = function(e) {
+                window.togglePortfolioDropdown(e);
+              };
+            }
+          }, 100);
         }
       })
       .catch(error => {
@@ -22,42 +33,80 @@
     const currentPath = window.location.pathname;
     const currentPage = window.location.pathname.split('/').pop() || window.location.pathname.split('\\').pop() || 'index.html';
     const isInDist = currentPath.includes('/dist/') || currentPath.includes('\\dist\\') || currentPage === 'about_me.html' || currentPage === 'contact.html';
+    const isInPortfolio = currentPath.includes('/portfolio/') || currentPath.includes('\\portfolio\\') || currentPage === 'nature.html' || currentPage === 'portraits.html';
     
     const homeLink = document.getElementById('nav-home-link');
-    const portfolioLink = document.getElementById('nav-portfolio-link');
     const aboutLink = document.getElementById('nav-about-link');
     const contactLink = document.getElementById('nav-contact-link');
     
-    if (isInDist) {
+    // Dropdown links
+    const portfolioAllLink = document.getElementById('nav-portfolio-all-link');
+    const portfolioAllLinkMobile = document.getElementById('nav-portfolio-all-link-mobile');
+    const portfolioNatureLink = document.getElementById('nav-portfolio-nature-link');
+    const portfolioNatureLinkMobile = document.getElementById('nav-portfolio-nature-link-mobile');
+    const portfolioPortraitsLink = document.getElementById('nav-portfolio-portraits-link');
+    const portfolioPortraitsLinkMobile = document.getElementById('nav-portfolio-portraits-link-mobile');
+    
+    if (isInPortfolio) {
+      // If we're in the portfolio subfolder, adjust paths
+      if (homeLink) homeLink.href = '../../index.html';
+      if (aboutLink) aboutLink.href = '../about_me.html';
+      if (contactLink) contactLink.href = '../contact.html';
+      
+      // Portfolio dropdown links
+      if (portfolioAllLink) portfolioAllLink.href = '../../index.html';
+      if (portfolioAllLinkMobile) portfolioAllLinkMobile.href = '../../index.html';
+      if (portfolioNatureLink) portfolioNatureLink.href = 'nature.html';
+      if (portfolioNatureLinkMobile) portfolioNatureLinkMobile.href = 'nature.html';
+      if (portfolioPortraitsLink) portfolioPortraitsLink.href = 'portraits.html';
+      if (portfolioPortraitsLinkMobile) portfolioPortraitsLinkMobile.href = 'portraits.html';
+      
+      // Update active page indicator
+      updateActivePage(currentPage, true);
+    } else if (isInDist) {
       // If we're in the dist folder, adjust paths
       if (homeLink) homeLink.href = '../index.html';
-      if (portfolioLink) portfolioLink.href = '../index.html';
       if (aboutLink) aboutLink.href = 'about_me.html';
       if (contactLink) contactLink.href = 'contact.html';
       
+      // Portfolio dropdown links
+      if (portfolioAllLink) portfolioAllLink.href = '../index.html';
+      if (portfolioAllLinkMobile) portfolioAllLinkMobile.href = '../index.html';
+      if (portfolioNatureLink) portfolioNatureLink.href = 'portfolio/nature.html';
+      if (portfolioNatureLinkMobile) portfolioNatureLinkMobile.href = 'portfolio/nature.html';
+      if (portfolioPortraitsLink) portfolioPortraitsLink.href = 'portfolio/portraits.html';
+      if (portfolioPortraitsLinkMobile) portfolioPortraitsLinkMobile.href = 'portfolio/portraits.html';
+      
       // Update active page indicator
-      updateActivePage(currentPage);
+      updateActivePage(currentPage, false);
     } else {
       // If we're in the root, use original paths
       if (homeLink) homeLink.href = 'index.html';
-      if (portfolioLink) portfolioLink.href = 'index.html';
       if (aboutLink) aboutLink.href = 'dist/about_me.html';
       if (contactLink) contactLink.href = 'dist/contact.html';
       
+      // Portfolio dropdown links
+      if (portfolioAllLink) portfolioAllLink.href = 'index.html';
+      if (portfolioAllLinkMobile) portfolioAllLinkMobile.href = 'index.html';
+      if (portfolioNatureLink) portfolioNatureLink.href = 'dist/portfolio/nature.html';
+      if (portfolioNatureLinkMobile) portfolioNatureLinkMobile.href = 'dist/portfolio/nature.html';
+      if (portfolioPortraitsLink) portfolioPortraitsLink.href = 'dist/portfolio/portraits.html';
+      if (portfolioPortraitsLinkMobile) portfolioPortraitsLinkMobile.href = 'dist/portfolio/portraits.html';
+      
       // Update active page indicator
-      updateActivePage(currentPage === '' || currentPage === '/' || currentPage === 'index.html' ? 'index.html' : currentPage);
+      updateActivePage(currentPage === '' || currentPage === '/' || currentPage === 'index.html' ? 'index.html' : currentPage, false);
     }
   }
 
   // Function to update active page indicator
-  function updateActivePage(currentPage) {
+  function updateActivePage(currentPage, isInPortfolio) {
     // Reset all underlines
     const portfolioUnderline = document.getElementById('nav-portfolio-underline');
     const aboutUnderline = document.getElementById('nav-about-underline');
     const contactUnderline = document.getElementById('nav-contact-underline');
     
     if (portfolioUnderline) {
-      portfolioUnderline.className = 'hidden md:block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-black dark:bg-white';
+      portfolioUnderline.className = 'hidden md:block h-0.5 bg-black dark:bg-white';
     }
     if (aboutUnderline) {
       aboutUnderline.className = 'hidden md:block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-black dark:bg-white';
@@ -67,7 +116,7 @@
     }
     
     // Set active page underline
-    if (currentPage === 'index.html' || currentPage === '' || currentPage === '/') {
+    if (isInPortfolio || currentPage === 'index.html' || currentPage === '' || currentPage === '/') {
       if (portfolioUnderline) {
         portfolioUnderline.className = 'hidden md:block h-0.5 bg-black dark:bg-white';
       }

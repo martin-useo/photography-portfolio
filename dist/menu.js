@@ -1,3 +1,16 @@
+// Initialize mobile menu to closed state on page load
+function initMobileMenu() {
+  const menu = document.getElementById('menu');
+  const ulMenu = document.getElementById('ulMenu');
+  
+  if (menu && ulMenu && window.innerWidth < 768) {
+    // Ensure mobile menu is closed on page load
+    menu.style.height = '0px';
+    menu.style.overflow = 'hidden';
+    ulMenu.style.opacity = '0';
+  }
+}
+
 // Menu toggle function for mobile navigation
 function menuToggle() {
   const menu = document.getElementById('menu');
@@ -42,4 +55,16 @@ function menuToggle() {
     }
   }
 }
+
+// Initialize menu on page load
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(initMobileMenu, 100);
+  });
+} else {
+  setTimeout(initMobileMenu, 100);
+}
+
+// Also initialize after a delay to catch dynamically loaded content
+setTimeout(initMobileMenu, 500);
 

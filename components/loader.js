@@ -11,6 +11,32 @@
         if (elementId === 'navbar-container') {
           adjustNavbarPaths();
           
+          // Initialize mobile menu state - ensure it's closed on load
+          setTimeout(function() {
+            const menu = document.getElementById('menu');
+            const ulMenu = document.getElementById('ulMenu');
+            
+            // Ensure mobile menu is closed on page load
+            if (menu && ulMenu) {
+              if (window.innerWidth < 768) {
+                // Mobile: close menu
+                menu.style.height = '0px';
+                menu.style.overflow = 'hidden';
+                ulMenu.style.opacity = '0';
+              } else {
+                // Desktop: ensure menu is visible
+                menu.style.height = '';
+                menu.style.overflow = '';
+                ulMenu.style.opacity = '1';
+              }
+            }
+            
+            // Also call initMobileMenu if available (from menu.js)
+            if (typeof initMobileMenu === 'function') {
+              initMobileMenu();
+            }
+          }, 50);
+          
           // Initialize dropdown after navbar is loaded
           setTimeout(function() {
             const button = document.getElementById('nav-portfolio-button');

@@ -168,6 +168,7 @@
     document.addEventListener('DOMContentLoaded', function() {
       const navbarContainer = document.getElementById('navbar-container');
       const footerContainer = document.getElementById('footer-container');
+      const scrollToTopContainer = document.getElementById('scroll-to-top-container');
       
       if (navbarContainer) {
         const navbarPath = navbarContainer.getAttribute('data-path') || 'components/navbar.html';
@@ -178,11 +179,17 @@
         const footerPath = footerContainer.getAttribute('data-path') || 'components/footer.html';
         loadComponent('footer-container', footerPath);
       }
+      
+      if (scrollToTopContainer) {
+        const scrollToTopPath = scrollToTopContainer.getAttribute('data-path') || 'components/scroll-to-top.html';
+        loadComponent('scroll-to-top-container', scrollToTopPath);
+      }
     });
   } else {
     // DOM is already loaded
     const navbarContainer = document.getElementById('navbar-container');
     const footerContainer = document.getElementById('footer-container');
+    const scrollToTopContainer = document.getElementById('scroll-to-top-container');
     
     if (navbarContainer) {
       const navbarPath = navbarContainer.getAttribute('data-path') || 'components/navbar.html';
@@ -192,6 +199,11 @@
     if (footerContainer) {
       const footerPath = footerContainer.getAttribute('data-path') || 'components/footer.html';
       loadComponent('footer-container', footerPath);
+    }
+    
+    if (scrollToTopContainer) {
+      const scrollToTopPath = scrollToTopContainer.getAttribute('data-path') || 'components/scroll-to-top.html';
+      loadComponent('scroll-to-top-container', scrollToTopPath);
     }
   }
 })();

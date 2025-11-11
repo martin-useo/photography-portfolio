@@ -11,6 +11,14 @@
   <!-- Favicon -->
   <link rel="icon" type="image/x-icon" href="dist/assets/favicon.ico" />
   <link rel="stylesheet" href="dist/output.css" />
+  <style>
+    /* Transition fluide style Apple pour le changement de langue */
+    #button-text-fr,
+    #button-text-en {
+      transition: opacity 800ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      will-change: opacity;
+    }
+  </style>
   <!-- Alpine.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <!-- Start - Fonts -->
@@ -52,8 +60,10 @@
       MARTIN USEO
     </h1>
     <a href="dist/portfolio/nature.html" 
-       class="px-8 md:px-12 py-4 md:py-6 bg-white/70 dark:bg-white/10 backdrop-blur-sm text-black dark:text-white text-xl md:text-2xl font-signika font-bold rounded-lg shadow-lg hover:bg-white/80 dark:hover:bg-white/20 transition-all duration-300 transform hover:scale-105 active:scale-100 md:hover:scale-105 border-2 border-black/20 dark:border-white/20">
-      DÉCOUVRIR LE PORTFOLIO
+       id="portfolio-button"
+       class="px-8 md:px-12 py-4 md:py-6 bg-white/70 dark:bg-white/10 backdrop-blur-sm text-black dark:text-white text-xl md:text-2xl font-signika font-bold rounded-lg shadow-lg hover:bg-white/80 dark:hover:bg-white/20 transition-all duration-300 transform hover:scale-105 active:scale-100 md:hover:scale-105 border-2 border-black/20 dark:border-white/20 relative">
+      <span id="button-text-fr">DÉCOUVRIR LE PORTFOLIO</span>
+      <span id="button-text-en" class="absolute inset-0 flex items-center justify-center opacity-0">DISCOVER THE PORTFOLIO</span>
     </a>
   </div>
 
@@ -544,15 +554,65 @@
         clearInterval(cycleInterval);
       }
       
-      // Changer une image toutes les 2 secondes, indéfiniment
+      // Changer une image toutes les 2.5 secondes, indéfiniment
       cycleInterval = setInterval(() => {
         cycleNextImage();
-      }, 2000); // Changer une image toutes les 2 secondes
+      }, 2500); // Changer une image toutes les 2.5 secondes
     }
     
     // Fonction pour démarrer le cycle automatique (ancienne version, gardée pour compatibilité)
     function startAutoCycle() {
       startProgressiveCycle();
+    }
+    
+    // Fonction pour faire alterner la langue du bouton
+    let currentLanguage = 'fr'; // 'fr' ou 'en'
+    let languageInterval = null;
+    
+    function cycleLanguage() {
+      const buttonTextFr = document.getElementById('button-text-fr');
+      const buttonTextEn = document.getElementById('button-text-en');
+      
+      if (!buttonTextFr || !buttonTextEn) return;
+      
+      if (currentLanguage === 'fr') {
+        // Transition vers l'anglais : crossfade fluide style Apple
+        // Le nouveau texte commence à apparaître légèrement avant que l'ancien ne disparaisse
+        // Cela crée un chevauchement doux et naturel
+        requestAnimationFrame(() => {
+          buttonTextEn.style.opacity = '1'; // Fade in anglais
+          // Démarrer le fade out du français avec un léger délai pour un crossfade parfait
+          setTimeout(() => {
+            requestAnimationFrame(() => {
+              buttonTextFr.style.opacity = '0'; // Fade out français
+            });
+          }, 150); // Délai optimisé pour un crossfade fluide
+        });
+        currentLanguage = 'en';
+      } else {
+        // Transition vers le français : crossfade fluide style Apple
+        requestAnimationFrame(() => {
+          buttonTextFr.style.opacity = '1'; // Fade in français
+          // Démarrer le fade out de l'anglais avec un léger délai pour un crossfade parfait
+          setTimeout(() => {
+            requestAnimationFrame(() => {
+              buttonTextEn.style.opacity = '0'; // Fade out anglais
+            });
+          }, 150); // Délai optimisé pour un crossfade fluide
+        });
+        currentLanguage = 'fr';
+      }
+    }
+    
+    function startLanguageCycle() {
+      if (languageInterval) {
+        clearInterval(languageInterval);
+      }
+      
+      // Alterner la langue toutes les 5 secondes
+      languageInterval = setInterval(() => {
+        cycleLanguage();
+      }, 5000);
     }
     
     // Attendre que le DOM soit chargé et que le script de configuration soit disponible
@@ -568,6 +628,8 @@
           renderBackgroundCanvas().then(() => {
             // Démarrer le cycle automatique après le premier rendu
             startAutoCycle();
+            // Démarrer le cycle de langue
+            startLanguageCycle();
           });
         };
         script.onerror = function() {
@@ -578,6 +640,8 @@
         renderBackgroundCanvas().then(() => {
           // Démarrer le cycle automatique après le premier rendu
           startAutoCycle();
+          // Démarrer le cycle de langue
+          startLanguageCycle();
         });
       }
     });

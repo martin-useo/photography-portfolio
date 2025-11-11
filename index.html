@@ -609,10 +609,17 @@
         clearInterval(languageInterval);
       }
       
-      // Alterner la langue toutes les 5 secondes
-      languageInterval = setInterval(() => {
+      // Alterner la langue avec un délai variable pour éviter la synchronisation avec les images
+      // Utiliser un délai initial aléatoire entre 3 et 7 secondes
+      const initialDelay = 3000 + Math.random() * 4000; // Entre 3 et 7 secondes
+      
+      setTimeout(() => {
         cycleLanguage();
-      }, 5000);
+        // Ensuite, alterner toutes les 4.7 secondes (durée non multiple de 2.5s pour éviter la sync)
+        languageInterval = setInterval(() => {
+          cycleLanguage();
+        }, 4700); // 4.7 secondes (pas un multiple de 2.5s)
+      }, initialDelay);
     }
     
     // Attendre que le DOM soit chargé et que le script de configuration soit disponible

@@ -13,8 +13,8 @@
   <link rel="stylesheet" href="output.css" />
   <!-- Alpine.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <!-- EmailJS -->
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <script src="config.js" onerror="console.warn('config.js not found')"></script>
   <!-- Start - Fonts -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -95,16 +95,8 @@
   <div id="footer-container" data-path="../components/footer.html"></div>
 
   <script>
-    // Configuration EmailJS
-    const EMAILJS_CONFIG = {
-      publicKey: "***REMOVED***",
-      serviceId: "***REMOVED***",
-      templateId: "***REMOVED***"
-    };
-
-    // Initialiser EmailJS seulement si la clé est configurée
-    if (EMAILJS_CONFIG.publicKey && EMAILJS_CONFIG.publicKey !== "YOUR_PUBLIC_KEY") {
-      emailjs.init(EMAILJS_CONFIG.publicKey);
+    if (typeof CONFIG !== 'undefined' && CONFIG.emailjs && CONFIG.emailjs.publicKey && CONFIG.emailjs.publicKey !== "YOUR_PUBLIC_KEY") {
+      emailjs.init(CONFIG.emailjs.publicKey);
     }
 
     function showAlert(message, isSuccess) {
@@ -154,10 +146,10 @@
     async function handleContactForm(event) {
       event.preventDefault();
       
-      // Vérifier si EmailJS est configuré
-      if (EMAILJS_CONFIG.publicKey === "YOUR_PUBLIC_KEY" || 
-          EMAILJS_CONFIG.serviceId === "YOUR_SERVICE_ID" || 
-          EMAILJS_CONFIG.templateId === "YOUR_TEMPLATE_ID") {
+      if (typeof CONFIG === 'undefined' || !CONFIG.emailjs || 
+          CONFIG.emailjs.publicKey === "YOUR_PUBLIC_KEY" || 
+          CONFIG.emailjs.serviceId === "YOUR_SERVICE_ID" || 
+          CONFIG.emailjs.templateId === "YOUR_TEMPLATE_ID") {
         showAlert('Le formulaire n\'est pas encore configuré. Contactez-moi directement à martin.useo@gmail.com', false);
         return;
       }
@@ -170,8 +162,8 @@
       
       try {
         const response = await emailjs.send(
-          EMAILJS_CONFIG.serviceId,
-          EMAILJS_CONFIG.templateId,
+          CONFIG.emailjs.serviceId,
+          CONFIG.emailjs.templateId,
           {
             to_email: 'martin.useo@gmail.com',
             from_email: email,

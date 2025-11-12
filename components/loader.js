@@ -13,7 +13,11 @@
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(function() {
               const currentPage = window.location.pathname.split('/').pop() || window.location.pathname.split('\\').pop() || 'index.html';
-              const isInPortfolio = window.location.pathname.includes('/portfolio/') || window.location.pathname.includes('\\portfolio\\') || currentPage === 'nature.html' || currentPage === 'portraits.html';
+              const isInPortfolio = window.location.pathname.includes('/portfolio/') || window.location.pathname.includes('\\portfolio\\') ||
+                currentPage === 'nature.html' || currentPage === 'portraits.html' ||
+                currentPage === 'interieur.html' || currentPage === 'vehicules.html' ||
+                currentPage === 'nourriture.html' || currentPage === 'travaux.html' ||
+                currentPage === 'urbain.html' || currentPage === 'animaux.html';
               if (isInPortfolio) {
                 updateActivePage(currentPage, true);
               }
@@ -71,44 +75,107 @@
     const currentPath = window.location.pathname;
     const currentPage = window.location.pathname.split('/').pop() || window.location.pathname.split('\\').pop() || 'index.html';
     const isInDist = currentPath.includes('/dist/') || currentPath.includes('\\dist\\') || currentPage === 'about_me.html' || currentPage === 'contact.html';
-    const isInPortfolio = currentPath.includes('/portfolio/') || currentPath.includes('\\portfolio\\') || currentPage === 'nature.html' || currentPage === 'portraits.html';
+    const isInPortfolio = currentPath.includes('/portfolio/') || currentPath.includes('\\portfolio\\') || 
+      currentPage === 'nature.html' || currentPage === 'portraits.html' || 
+      currentPage === 'interieur.html' || currentPage === 'vehicules.html' || 
+      currentPage === 'nourriture.html' || currentPage === 'travaux.html' || 
+      currentPage === 'urbain.html' || currentPage === 'animaux.html';
     
     const homeLink = document.getElementById('nav-home-link');
     const aboutLink = document.getElementById('nav-about-link');
     const contactLink = document.getElementById('nav-contact-link');
-    const portfolioNatureLink = document.getElementById('nav-portfolio-nature-link');
-    const portfolioNatureLinkMobile = document.getElementById('nav-portfolio-nature-link-mobile');
-    const portfolioPortraitsLink = document.getElementById('nav-portfolio-portraits-link');
-    const portfolioPortraitsLinkMobile = document.getElementById('nav-portfolio-portraits-link-mobile');
+    
+    const portfolioLinks = {
+      nature: {
+        desktop: document.getElementById('nav-portfolio-nature-link'),
+        mobile: document.getElementById('nav-portfolio-nature-link-mobile')
+      },
+      portraits: {
+        desktop: document.getElementById('nav-portfolio-portraits-link'),
+        mobile: document.getElementById('nav-portfolio-portraits-link-mobile')
+      },
+      interieur: {
+        desktop: document.getElementById('nav-portfolio-interieur-link'),
+        mobile: document.getElementById('nav-portfolio-interieur-link-mobile')
+      },
+      vehicules: {
+        desktop: document.getElementById('nav-portfolio-vehicules-link'),
+        mobile: document.getElementById('nav-portfolio-vehicules-link-mobile')
+      },
+      nourriture: {
+        desktop: document.getElementById('nav-portfolio-nourriture-link'),
+        mobile: document.getElementById('nav-portfolio-nourriture-link-mobile')
+      },
+      travaux: {
+        desktop: document.getElementById('nav-portfolio-travaux-link'),
+        mobile: document.getElementById('nav-portfolio-travaux-link-mobile')
+      },
+      urbain: {
+        desktop: document.getElementById('nav-portfolio-urbain-link'),
+        mobile: document.getElementById('nav-portfolio-urbain-link-mobile')
+      },
+      animaux: {
+        desktop: document.getElementById('nav-portfolio-animaux-link'),
+        mobile: document.getElementById('nav-portfolio-animaux-link-mobile')
+      }
+    };
     
     if (isInPortfolio) {
       if (homeLink) homeLink.href = '../../index.html';
       if (aboutLink) aboutLink.href = '../about_me.html';
       if (contactLink) contactLink.href = '../contact.html';
-      if (portfolioNatureLink) portfolioNatureLink.href = 'nature.html';
-      if (portfolioNatureLinkMobile) portfolioNatureLinkMobile.href = 'nature.html';
-      if (portfolioPortraitsLink) portfolioPortraitsLink.href = 'portraits.html';
-      if (portfolioPortraitsLinkMobile) portfolioPortraitsLinkMobile.href = 'portraits.html';
+      
+      Object.keys(portfolioLinks).forEach(category => {
+        const link = portfolioLinks[category];
+        if (link.desktop) link.desktop.href = `${category}.html`;
+        if (link.mobile) link.mobile.href = `${category}.html`;
+      });
+      
       updateActivePage(currentPage, true);
     } else if (isInDist) {
       if (homeLink) homeLink.href = '../index.html';
       if (aboutLink) aboutLink.href = 'about_me.html';
       if (contactLink) contactLink.href = 'contact.html';
-      if (portfolioNatureLink) portfolioNatureLink.href = 'portfolio/nature.html';
-      if (portfolioNatureLinkMobile) portfolioNatureLinkMobile.href = 'portfolio/nature.html';
-      if (portfolioPortraitsLink) portfolioPortraitsLink.href = 'portfolio/portraits.html';
-      if (portfolioPortraitsLinkMobile) portfolioPortraitsLinkMobile.href = 'portfolio/portraits.html';
+      
+      Object.keys(portfolioLinks).forEach(category => {
+        const link = portfolioLinks[category];
+        if (link.desktop) link.desktop.href = `portfolio/${category}.html`;
+        if (link.mobile) link.mobile.href = `portfolio/${category}.html`;
+      });
+      
       updateActivePage(currentPage, false);
     } else {
       if (homeLink) homeLink.href = 'index.html';
       if (aboutLink) aboutLink.href = 'dist/about_me.html';
       if (contactLink) contactLink.href = 'dist/contact.html';
-      if (portfolioNatureLink) portfolioNatureLink.href = 'dist/portfolio/nature.html';
-      if (portfolioNatureLinkMobile) portfolioNatureLinkMobile.href = 'dist/portfolio/nature.html';
-      if (portfolioPortraitsLink) portfolioPortraitsLink.href = 'dist/portfolio/portraits.html';
-      if (portfolioPortraitsLinkMobile) portfolioPortraitsLinkMobile.href = 'dist/portfolio/portraits.html';
+      
+      Object.keys(portfolioLinks).forEach(category => {
+        const link = portfolioLinks[category];
+        if (link.desktop) link.desktop.href = `dist/portfolio/${category}.html`;
+        if (link.mobile) link.mobile.href = `dist/portfolio/${category}.html`;
+      });
+      
       updateActivePage(currentPage === '' || currentPage === '/' || currentPage === 'index.html' ? 'index.html' : currentPage, false);
     }
+    
+    hideCurrentPageFromDropdown(currentPage);
+  }
+
+  function hideCurrentPageFromDropdown(currentPage) {
+    const categories = ['nature', 'portraits', 'interieur', 'vehicules', 'nourriture', 'travaux', 'urbain', 'animaux'];
+    
+    categories.forEach(category => {
+      const desktopLink = document.getElementById(`nav-portfolio-${category}-link`);
+      const mobileLink = document.getElementById(`nav-portfolio-${category}-link-mobile`);
+      
+      if (currentPage === `${category}.html` || currentPage.includes(category)) {
+        if (desktopLink) desktopLink.style.display = 'none';
+        if (mobileLink) mobileLink.style.display = 'none';
+      } else {
+        if (desktopLink) desktopLink.style.display = 'block';
+        if (mobileLink) mobileLink.style.display = 'block';
+      }
+    });
   }
 
   function updateActivePage(currentPage, isInPortfolio) {
@@ -134,23 +201,26 @@
     if (isInPortfolio) {
       const isDesktop = window.innerWidth >= 768;
       
-      if (currentPage === 'nature.html' || currentPage.includes('nature')) {
-        if (portfolioText && isDesktop) {
-          portfolioText.textContent = 'NATURE';
-        }
-        if (portfolioUnderline) {
-          portfolioUnderline.className = 'hidden md:block h-0.5 bg-black dark:bg-white absolute bottom-0 left-0 right-0';
-        }
-      } else if (currentPage === 'portraits.html' || currentPage.includes('portraits')) {
-        if (portfolioText && isDesktop) {
-          portfolioText.textContent = 'PORTRAITS';
-        }
-        if (portfolioUnderline) {
-          portfolioUnderline.className = 'hidden md:block h-0.5 bg-black dark:bg-white absolute bottom-0 left-0 right-0';
-        }
-      } else {
-        if (portfolioUnderline) {
-          portfolioUnderline.className = 'hidden md:block h-0.5 bg-black dark:bg-white absolute bottom-0 left-0 right-0';
+      const pageNames = {
+        'nature': 'NATURE',
+        'portraits': 'PORTRAITS',
+        'interieur': 'INTÉRIEUR',
+        'vehicules': 'VÉHICULES',
+        'nourriture': 'NOURRITURE',
+        'travaux': 'TRAVAUX',
+        'urbain': 'URBAIN',
+        'animaux': 'ANIMAUX'
+      };
+      
+      for (const [key, value] of Object.entries(pageNames)) {
+        if (currentPage === `${key}.html` || currentPage.includes(key)) {
+          if (portfolioText && isDesktop) {
+            portfolioText.textContent = value;
+          }
+          if (portfolioUnderline) {
+            portfolioUnderline.className = 'hidden md:block h-0.5 bg-black dark:bg-white absolute bottom-0 left-0 right-0';
+          }
+          break;
         }
       }
     } else if (currentPage === 'about_me.html' || currentPage.includes('about')) {

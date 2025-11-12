@@ -51,36 +51,22 @@
     <h1 class="text-4xl pt-10 pb-8 font-bold md:hidden">PORTRAITS</h1>
     <section class="text-neutral-700 pt-10 md:pt-10">
       <div class="container w-full">
-        <div class="flex flex-wrap w-full" id="portfolio-grid">
+        <div class="flex flex-col w-full" id="portfolio-grid">
         </div>
       </div>
     </section>
   </div>
   <script src="../../js/images-config.js"></script>
+  <script src="../../js/portfolio-layout.js"></script>
   <script>
-    // Function to generate the gallery
-    function renderPortfolio() {
+    // Function to generate the gallery with intelligent layout
+    async function renderPortfolio() {
       const grid = document.getElementById('portfolio-grid');
       // Charger les images de portraits depuis la configuration centralisée
       const images = IMAGES_CONFIG.getPortraitImages('../../');
       
-      images.forEach((img, index) => {
-        const item = document.createElement('div');
-        item.className = `w-full ${img.size} p-1`;
-        item.innerHTML = `
-          <div class="overflow-hidden h-full w-full">
-            <a href="${img.src}" data-fancybox="gallery">
-              <img alt="${img.alt}"
-                class="block h-full w-full object-cover object-center opacity-0 animate-fade-in transition duration-500 transform scale-100 hover:scale-110"
-                src="${img.src}" />
-            </a>
-          </div>
-        `;
-        grid.appendChild(item);
-      });
-      
-      // Reinitialize Fancybox after inserting images
-      Fancybox.bind("[data-fancybox]", {});
+      // Utiliser le module PortfolioLayout pour générer le portfolio
+      await PortfolioLayout.generatePortfolio(images, grid);
     }
     
     // Call the function on load
@@ -96,8 +82,6 @@
   </script>
   <script src="../../js/fade_in.js"></script>
   <script src="../../js/menu.js"></script>
-  <script src="../../js/scroll-to-top.js"></script>
 </body>
 
 </html>
-

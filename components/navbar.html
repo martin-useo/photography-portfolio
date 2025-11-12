@@ -1,4 +1,3 @@
-<!-- Navbar -->
 <style>
   .dropdown-link:hover .underline-span {
     width: 100%;
@@ -12,8 +11,7 @@
       </div>
       <div class="ml-auto md:hidden flex items-center justify-start">
         <button onclick="menuToggle()" @click="open = !open"
-          class="tap-highlight-transparent text-black dark:text-white w-5 h-5 relative focus:outline-none"
-          @click="open = !open">
+          class="tap-highlight-transparent text-black dark:text-white w-5 h-5 relative focus:outline-none">
           <span class="sr-only">Open main menu</span>
           <div class="block w-5 absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
             <span aria-hidden="true"
@@ -40,7 +38,6 @@
               </svg>
               <span id="nav-portfolio-underline" class="hidden md:block h-0.5 bg-black dark:bg-white absolute bottom-0 left-0 right-0"></span>
             </button>
-            <!-- Dropdown Menu (Desktop) -->
             <div id="portfolio-dropdown" class="hidden md:block absolute top-full left-0 mt-2 w-48 bg-white dark:bg-black border border-gray-200 dark:border-gray-800 shadow-lg rounded-md py-2 opacity-0 invisible transition-all duration-200" style="z-index: 9999; position: absolute;">
               <a href="dist/portfolio/nature.html" id="nav-portfolio-nature-link" class="dropdown-link block px-4 py-2 text-xl font-signika">
                 <span class="relative inline-block">
@@ -55,7 +52,6 @@
                 </span>
               </a>
             </div>
-            <!-- Mobile Dropdown Menu -->
             <div id="portfolio-dropdown-mobile" class="md:hidden hidden mt-2 pl-4">
               <a href="dist/portfolio/nature.html" id="nav-portfolio-nature-link-mobile" onclick="closePortfolioDropdown()" class="block py-2 text-xl font-signika">
                 Nature

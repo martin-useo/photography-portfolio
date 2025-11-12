@@ -130,77 +130,54 @@
       });
     }
 
-    // Fonction pour précharger toutes les images
     async function preloadAllImages(images) {
       const preloadPromises = images.map(img => 
-        preloadImage(img.src).catch(err => {
-          console.warn(`Image failed to load: ${img.src}`, err);
-          return null; // Retourner null pour les images qui échouent
-        })
+        preloadImage(img.src).catch(() => null)
       );
       return Promise.all(preloadPromises);
     }
 
-    // Fonction pour sélectionner un layout aléatoire
     function getRandomLayout() {
       return LAYOUTS[Math.floor(Math.random() * LAYOUTS.length)];
     }
 
-    // Fonction pour organiser les images selon un layout
     function organizeImagesForLayout(images, layout) {
       const shuffledImages = [...images].sort(() => Math.random() - 0.5);
       
-      // Séparer les images par format (portrait/landscape) plutôt que par catégorie
       const portraitImages = shuffledImages.filter(img => img.format === 'portrait');
       const landscapeImages = shuffledImages.filter(img => img.format === 'landscape');
-      
-      // Si format n'est pas défini, utiliser la catégorie comme fallback
       const portraits = portraitImages.length > 0 ? portraitImages : shuffledImages.filter(img => img.category === 'portraits');
       const landscapes = landscapeImages.length > 0 ? landscapeImages : shuffledImages.filter(img => img.category === 'nature');
       
       const organized = [];
-      const usedImages = new Set(); // Pour éviter les doublons
+      const usedImages = new Set();
       let portraitIndex = 0;
       let landscapeIndex = 0;
       let allImagesIndex = 0;
       
-      console.log(`Organizing images for layout: ${layout.name}`);
-      console.log(`- Portrait images available: ${portraits.length}`);
-      console.log(`- Landscape images available: ${landscapes.length}`);
-      console.log(`- Total images: ${shuffledImages.length}`);
-      console.log(`- Layout structure has ${layout.structure.length} cells`);
-      
       layout.structure.forEach((cell, index) => {
         let selectedImage;
         
-        // Pour le layout "portrait-left-landscape-right", on force le portrait à gauche
         if (layout.name === 'portrait-left-landscape-right') {
           if (index === 0) {
-            // Première position : portrait à gauche (format portrait)
             if (portraits.length > 0) {
               selectedImage = portraits[portraitIndex % portraits.length];
               portraitIndex++;
             } else {
-              // Fallback si pas de portraits disponibles
               selectedImage = shuffledImages[allImagesIndex % shuffledImages.length];
               allImagesIndex++;
             }
           } else {
-            // Positions suivantes : paysages à droite (format landscape)
             if (landscapes.length > 0) {
               selectedImage = landscapes[landscapeIndex % landscapes.length];
               landscapeIndex++;
             } else {
-              // Fallback si pas de paysages disponibles
               selectedImage = shuffledImages[allImagesIndex % shuffledImages.length];
               allImagesIndex++;
             }
           }
-        } 
-        // Pour le layout "landscape-top-portrait-bottom", paysages en haut, portrait en bas
-        else if (layout.name === 'landscape-top-portrait-bottom') {
+        } else if (layout.name === 'landscape-top-portrait-bottom') {
           if (index < 2) {
-            // Deux premières positions : paysages en haut (format landscape)
             if (landscapes.length > 0) {
               selectedImage = landscapes[landscapeIndex % landscapes.length];
               landscapeIndex++;
@@ -209,7 +186,6 @@
               allImagesIndex++;
             }
           } else {
-            // Dernière position : portrait en bas (format portrait)
             if (portraits.length > 0) {
               selectedImage = portraits[portraitIndex % portraits.length];
               portraitIndex++;
@@ -218,13 +194,7 @@
               allImagesIndex++;
             }
           }
-        }
-        // Pour les autres layouts, utiliser toutes les images de manière aléatoire
-        else {
-          // Sélectionner une image différente pour chaque cellule
-          // Garantir qu'on a toujours une image, même si on doit réutiliser
-          
-          // D'abord, essayer de trouver une image non utilisée
+        } else {
           let foundImage = false;
           for (let i = 0; i < shuffledImages.length; i++) {
             const candidate = shuffledImages[(index + i) % shuffledImages.length];
@@ -236,10 +206,8 @@
             }
           }
           
-          // Si toutes les images sont déjà utilisées, réutiliser une image
           if (!foundImage) {
             selectedImage = shuffledImages[index % shuffledImages.length];
-            console.warn(`  Reusing image for cell ${index + 1}: ${selectedImage.filename}`);
           }
         }
         
@@ -248,35 +216,27 @@
             ...selectedImage,
             layoutCell: cell
           });
-          console.log(`  Cell ${index + 1}: ${selectedImage.filename} (format: ${selectedImage.format || selectedImage.category})`);
-        } else {
-          console.warn(`  Cell ${index + 1}: No image selected!`);
         }
       });
       
-      console.log(`Organized ${organized.length} images for layout ${layout.name} (structure has ${layout.structure.length} cells)`);
       return organized;
     }
 
-    // Variable pour stocker toutes les images (évite de les recharger à chaque fois)
     let cachedImages = null;
     let currentLayout = null;
-    let currentImageIndices = []; // Indices des images actuellement affichées
+    let currentImageIndices = [];
     let cycleInterval = null;
-    let lastChangedCell = -1; // Dernière cellule modifiée (pour éviter de modifier deux fois de suite la même)
+    let lastChangedCell = -1;
     
-    // Fonction pour créer la structure du layout avec images superposées
     function createLayoutStructure(layout, organizedImages) {
       const grid = document.getElementById('portfolio-grid');
       if (!grid) return;
       
       grid.innerHTML = '';
       
-      // Appliquer le style approprié selon le layout
       if (layout.useColumns) {
         grid.className = 'flex w-full h-full';
         
-        // Déterminer les largeurs des colonnes
         let leftWidth, rightWidth;
         if (layout.name === 'two-left-one-right') {
           leftWidth = 'md:w-1/2';
@@ -299,11 +259,9 @@
           cellContainer.className = `w-full ${img.layoutCell.height} relative overflow-hidden`;
           cellContainer.dataset.cellIndex = index;
           
-          // Créer un conteneur pour les images superposées
           const imageStack = document.createElement('div');
           imageStack.className = 'absolute inset-0';
           
-          // Image initiale (visible)
           const imgElement = document.createElement('img');
           imgElement.src = img.src;
           imgElement.alt = img.alt || 'Portfolio image';
@@ -371,7 +329,6 @@
       }
     }
     
-    // Fonction pour changer une image dans une cellule spécifique
     function changeImageInCell(cellIndex, newImage) {
       const grid = document.getElementById('portfolio-grid');
       if (!grid) return;
@@ -382,7 +339,6 @@
       const imageStack = cellContainer.querySelector('div');
       if (!imageStack) return;
       
-      // Créer la nouvelle image (invisible au début)
       const newImgElement = document.createElement('img');
       newImgElement.src = newImage.src;
       newImgElement.alt = newImage.alt || 'Portfolio image';
@@ -391,7 +347,6 @@
       
       imageStack.appendChild(newImgElement);
       
-      // Fade out l'ancienne image et fade in la nouvelle
       const oldImg = imageStack.querySelector('img:not(:last-child)');
       if (oldImg) {
         oldImg.style.opacity = '0';
@@ -400,13 +355,11 @@
         }, 1000);
       }
       
-      // Fade in la nouvelle image
       setTimeout(() => {
         newImgElement.style.opacity = '1';
       }, 50);
     }
     
-    // Fonction pour générer le canvas d'images en arrière-plan
     async function renderBackgroundCanvas(useTransition = false) {
       try {
         const grid = document.getElementById('portfolio-grid');
@@ -421,7 +374,6 @@
           return;
         }
         
-        // Charger toutes les images depuis la configuration centralisée (ou utiliser le cache)
         if (!cachedImages) {
           cachedImages = IMAGES_CONFIG.getAllImages('./dist/');
           
@@ -430,37 +382,27 @@
             return;
           }
           
-          console.log(`Loading ${cachedImages.length} images...`);
-          
-          // Précharger toutes les images (avec timeout pour éviter de bloquer)
           try {
             await Promise.race([
               preloadAllImages(cachedImages),
               new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
             ]);
           } catch (err) {
-            console.warn('Some images failed to preload, continuing anyway:', err);
+            // Continue even if some images fail to preload
           }
         }
         
         const allImages = cachedImages;
         
-        // Ajouter une transition de fade-out si demandé
         if (useTransition) {
           grid.style.opacity = '0';
           grid.style.transition = 'opacity 0.5s ease-in-out';
-          
-          // Attendre la fin de la transition avant de changer le contenu
           await new Promise(resolve => setTimeout(resolve, 500));
         }
         
-        grid.innerHTML = ''; // Nettoyer le contenu précédent
+        grid.innerHTML = '';
         
-        // Sélectionner un layout aléatoire
         const selectedLayout = getRandomLayout();
-        console.log('Selected layout:', selectedLayout.name);
-        
-        // Organiser les images selon le layout
         const organizedImages = organizeImagesForLayout(allImages, selectedLayout);
         
         if (!organizedImages || organizedImages.length === 0) {
@@ -468,22 +410,15 @@
           return;
         }
         
-        // Stocker le layout et les indices d'images actuels
         currentLayout = selectedLayout;
         currentImageIndices = organizedImages.map((img, idx) => 
           allImages.findIndex(ai => ai.src === img.src)
         );
         
-        // Réinitialiser la dernière cellule modifiée
         lastChangedCell = -1;
-        
-        // Créer la structure du layout
         createLayoutStructure(selectedLayout, organizedImages);
-        
-        console.log('Background canvas rendered successfully');
       } catch (error) {
         console.error('Error rendering background canvas:', error);
-        // Afficher un message d'erreur ou une image par défaut
         const grid = document.getElementById('portfolio-grid');
         if (grid) {
           grid.innerHTML = '<div class="w-full h-full bg-gray-800 flex items-center justify-center text-white">Erreur de chargement des images</div>';
@@ -491,13 +426,11 @@
       }
     }
     
-    // Fonction pour changer une image dans le layout actuel
     function cycleNextImage() {
       if (!currentLayout || !cachedImages || currentImageIndices.length === 0) {
         return;
       }
       
-      // Trouver une cellule différente de la dernière modifiée
       let availableCells = [];
       for (let i = 0; i < currentImageIndices.length; i++) {
         if (i !== lastChangedCell) {
@@ -505,16 +438,13 @@
         }
       }
       
-      // Si on n'a qu'une seule cellule, on peut quand même la modifier
       if (availableCells.length === 0) {
         availableCells = [0];
       }
       
-      // Sélectionner une cellule aléatoire parmi celles disponibles
       const cellIndex = availableCells[Math.floor(Math.random() * availableCells.length)];
       const currentImageIndex = currentImageIndices[cellIndex];
       
-      // Trouver une nouvelle image différente qui n'est pas déjà utilisée dans le layout
       const usedImageIndices = new Set(currentImageIndices);
       let newImageIndex;
       let attempts = 0;
@@ -523,50 +453,36 @@
       do {
         newImageIndex = Math.floor(Math.random() * cachedImages.length);
         attempts++;
-        // Éviter la même image de la cellule ET les images déjà utilisées dans le layout
       } while ((newImageIndex === currentImageIndex || usedImageIndices.has(newImageIndex)) && attempts < maxAttempts);
       
-      // Si on n'a pas trouvé d'image non utilisée (peu probable avec 7 images), 
-      // prendre au moins une image différente de celle de la cellule actuelle
       if (attempts >= maxAttempts) {
-        // Chercher une image qui n'est pas celle de la cellule actuelle
         do {
           newImageIndex = Math.floor(Math.random() * cachedImages.length);
         } while (newImageIndex === currentImageIndex);
-        
-        // Si cette image est déjà utilisée ailleurs, on la remplace quand même
-        // (mieux que de bloquer le cycle)
-        console.warn(`Could not find unused image, reusing image ${newImageIndex} (may create duplicate)`);
       }
       
       const newImage = cachedImages[newImageIndex];
       currentImageIndices[cellIndex] = newImageIndex;
       lastChangedCell = cellIndex;
       
-      // Changer l'image dans cette cellule
       changeImageInCell(cellIndex, newImage);
-      console.log(`Changed image in cell ${cellIndex + 1}/${currentImageIndices.length} to ${newImage.filename || newImage.src}`);
     }
     
-    // Fonction pour démarrer le cycle infini des images
     function startProgressiveCycle() {
       if (cycleInterval) {
         clearInterval(cycleInterval);
       }
       
-      // Changer une image toutes les 2.5 secondes, indéfiniment
       cycleInterval = setInterval(() => {
         cycleNextImage();
-      }, 2500); // Changer une image toutes les 2.5 secondes
+      }, 2500);
     }
     
-    // Fonction pour démarrer le cycle automatique (ancienne version, gardée pour compatibilité)
     function startAutoCycle() {
       startProgressiveCycle();
     }
     
-    // Fonction pour faire alterner la langue du bouton
-    let currentLanguage = 'fr'; // 'fr' ou 'en'
+    let currentLanguage = 'fr';
     let languageInterval = null;
     
     function cycleLanguage() {
@@ -576,29 +492,23 @@
       if (!buttonTextFr || !buttonTextEn) return;
       
       if (currentLanguage === 'fr') {
-        // Transition vers l'anglais : crossfade fluide style Apple
-        // Le nouveau texte commence à apparaître légèrement avant que l'ancien ne disparaisse
-        // Cela crée un chevauchement doux et naturel
         requestAnimationFrame(() => {
-          buttonTextEn.style.opacity = '1'; // Fade in anglais
-          // Démarrer le fade out du français avec un léger délai pour un crossfade parfait
+          buttonTextEn.style.opacity = '1';
           setTimeout(() => {
             requestAnimationFrame(() => {
-              buttonTextFr.style.opacity = '0'; // Fade out français
+              buttonTextFr.style.opacity = '0';
             });
-          }, 150); // Délai optimisé pour un crossfade fluide
+          }, 150);
         });
         currentLanguage = 'en';
       } else {
-        // Transition vers le français : crossfade fluide style Apple
         requestAnimationFrame(() => {
-          buttonTextFr.style.opacity = '1'; // Fade in français
-          // Démarrer le fade out de l'anglais avec un léger délai pour un crossfade parfait
+          buttonTextFr.style.opacity = '1';
           setTimeout(() => {
             requestAnimationFrame(() => {
-              buttonTextEn.style.opacity = '0'; // Fade out anglais
+              buttonTextEn.style.opacity = '0';
             });
-          }, 150); // Délai optimisé pour un crossfade fluide
+          }, 150);
         });
         currentLanguage = 'fr';
       }
@@ -609,33 +519,24 @@
         clearInterval(languageInterval);
       }
       
-      // Alterner la langue avec un délai variable pour éviter la synchronisation avec les images
-      // Utiliser un délai initial aléatoire entre 3 et 7 secondes
-      const initialDelay = 3000 + Math.random() * 4000; // Entre 3 et 7 secondes
+      const initialDelay = 3000 + Math.random() * 4000;
       
       setTimeout(() => {
         cycleLanguage();
-        // Ensuite, alterner toutes les 4.7 secondes (durée non multiple de 2.5s pour éviter la sync)
         languageInterval = setInterval(() => {
           cycleLanguage();
-        }, 4700); // 4.7 secondes (pas un multiple de 2.5s)
+        }, 4700);
       }, initialDelay);
     }
     
-    // Attendre que le DOM soit chargé et que le script de configuration soit disponible
     document.addEventListener('DOMContentLoaded', function() {
-      // Vérifier que le script de configuration est chargé
       if (typeof IMAGES_CONFIG === 'undefined') {
         console.error('IMAGES_CONFIG is not defined. Make sure dist/images-config.js is loaded.');
-        // Essayer de charger le script de configuration dynamiquement
         const script = document.createElement('script');
         script.src = 'dist/images-config.js';
         script.onload = function() {
-          console.log('Images config loaded');
           renderBackgroundCanvas().then(() => {
-            // Démarrer le cycle automatique après le premier rendu
             startAutoCycle();
-            // Démarrer le cycle de langue
             startLanguageCycle();
           });
         };
@@ -645,9 +546,7 @@
         document.head.appendChild(script);
       } else {
         renderBackgroundCanvas().then(() => {
-          // Démarrer le cycle automatique après le premier rendu
           startAutoCycle();
-          // Démarrer le cycle de langue
           startLanguageCycle();
         });
       }

@@ -11,6 +11,19 @@
         if (elementId === 'navbar-container') {
           adjustNavbarPaths();
           
+          // Handle window resize to update portfolio text (desktop vs mobile)
+          let resizeTimeout;
+          window.addEventListener('resize', function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(function() {
+              const currentPage = window.location.pathname.split('/').pop() || window.location.pathname.split('\\').pop() || 'index.html';
+              const isInPortfolio = window.location.pathname.includes('/portfolio/') || window.location.pathname.includes('\\portfolio\\') || currentPage === 'nature.html' || currentPage === 'portraits.html';
+              if (isInPortfolio) {
+                updateActivePage(currentPage, true);
+              }
+            }, 150);
+          });
+          
           // Initialize mobile menu state - ensure it's closed on load
           setTimeout(function() {
             const menu = document.getElementById('menu');
@@ -134,11 +147,17 @@
   function updateActivePage(currentPage, isInPortfolio) {
     // Reset all underlines
     const portfolioUnderline = document.getElementById('nav-portfolio-underline');
+    const portfolioText = document.getElementById('nav-portfolio-text');
     const aboutUnderline = document.getElementById('nav-about-underline');
     const contactUnderline = document.getElementById('nav-contact-underline');
     
+    // Reset portfolio text to default
+    if (portfolioText) {
+      portfolioText.textContent = 'PORTFOLIO';
+    }
+    
     if (portfolioUnderline) {
-      portfolioUnderline.className = 'hidden md:block h-0.5 bg-black dark:bg-white';
+      portfolioUnderline.className = 'hidden md:block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-black dark:bg-white';
     }
     if (aboutUnderline) {
       aboutUnderline.className = 'hidden md:block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-black dark:bg-white';
@@ -147,10 +166,31 @@
       contactUnderline.className = 'hidden md:block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-black dark:bg-white';
     }
     
-    // Set active page underline
+    // Set active page underline and update portfolio text
     if (isInPortfolio) {
-      if (portfolioUnderline) {
-        portfolioUnderline.className = 'hidden md:block h-0.5 bg-black dark:bg-white';
+      // Determine which portfolio page we're on
+      // Only change text on desktop (md and above), keep PORTFOLIO on mobile
+      const isDesktop = window.innerWidth >= 768;
+      
+      if (currentPage === 'nature.html' || currentPage.includes('nature')) {
+        if (portfolioText && isDesktop) {
+          portfolioText.textContent = 'NATURE';
+        }
+        if (portfolioUnderline) {
+          portfolioUnderline.className = 'hidden md:block h-0.5 bg-black dark:bg-white absolute bottom-0 left-0 right-0';
+        }
+      } else if (currentPage === 'portraits.html' || currentPage.includes('portraits')) {
+        if (portfolioText && isDesktop) {
+          portfolioText.textContent = 'PORTRAITS';
+        }
+        if (portfolioUnderline) {
+          portfolioUnderline.className = 'hidden md:block h-0.5 bg-black dark:bg-white absolute bottom-0 left-0 right-0';
+        }
+      } else {
+        // Default portfolio page
+        if (portfolioUnderline) {
+          portfolioUnderline.className = 'hidden md:block h-0.5 bg-black dark:bg-white absolute bottom-0 left-0 right-0';
+        }
       }
     } else if (currentPage === 'about_me.html' || currentPage.includes('about')) {
       if (aboutUnderline) {

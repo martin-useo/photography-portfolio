@@ -1,4 +1,9 @@
 <!-- Navbar -->
+<style>
+  .dropdown-link:hover .underline-span {
+    width: 100%;
+  }
+</style>
 <header class="flex w-full pt-10 pb-1" style="overflow: visible;">
   <nav id="nav" x-data="{ open: false }" role="navigation" class="w-full relative" style="overflow: visible; z-index: 50;">
     <div class="container mx-auto flex flex-wrap items-center md:flex-no-wrap">
@@ -29,7 +34,7 @@
           class="flex flex-col duration-300 ease-out md:space-x-5 sm:transition-none mt-5 md:flex-row md:items-center md:ml-auto md:mt-0 md:pt-0 md:border-0">
           <li class="group transition duration-300 relative" id="portfolio-dropdown-container" style="overflow: visible;">
             <button id="nav-portfolio-button" class="font-signika text-2xl tap-highlight-transparent flex items-center relative" onclick="togglePortfolioDropdown(event)">
-              PORTFOLIO
+              <span id="nav-portfolio-text">PORTFOLIO</span>
               <svg class="w-4 h-4 ml-1 transition-transform duration-300" id="portfolio-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="display: inline-block;">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
               </svg>
@@ -37,13 +42,29 @@
             </button>
             <!-- Dropdown Menu (Desktop) -->
             <div id="portfolio-dropdown" class="hidden md:block absolute top-full left-0 mt-2 w-48 bg-white dark:bg-black border border-gray-200 dark:border-gray-800 shadow-lg rounded-md py-2 opacity-0 invisible transition-all duration-200" style="z-index: 9999; position: absolute;">
-              <a href="dist/portfolio/nature.html" id="nav-portfolio-nature-link" class="block px-4 py-2 text-lg font-signika hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors">Nature</a>
-              <a href="dist/portfolio/portraits.html" id="nav-portfolio-portraits-link" class="block px-4 py-2 text-lg font-signika hover:bg-gray-100 dark:hover:bg-gray-900 transition-colors">Portraits</a>
+              <a href="dist/portfolio/nature.html" id="nav-portfolio-nature-link" class="dropdown-link block px-4 py-2 text-xl font-signika">
+                <span class="relative inline-block">
+                  Nature
+                  <span class="underline-span absolute bottom-0 left-0 h-0.5 bg-black dark:bg-white w-0 transition-all duration-500"></span>
+                </span>
+              </a>
+              <a href="dist/portfolio/portraits.html" id="nav-portfolio-portraits-link" class="dropdown-link block px-4 py-2 text-xl font-signika">
+                <span class="relative inline-block">
+                  Portraits
+                  <span class="underline-span absolute bottom-0 left-0 h-0.5 bg-black dark:bg-white w-0 transition-all duration-500"></span>
+                </span>
+              </a>
             </div>
             <!-- Mobile Dropdown Menu -->
             <div id="portfolio-dropdown-mobile" class="md:hidden hidden mt-2 pl-4">
-              <a href="dist/portfolio/nature.html" id="nav-portfolio-nature-link-mobile" onclick="closePortfolioDropdown()" class="block py-2 text-xl font-signika">Nature</a>
-              <a href="dist/portfolio/portraits.html" id="nav-portfolio-portraits-link-mobile" onclick="closePortfolioDropdown()" class="block py-2 text-xl font-signika">Portraits</a>
+              <a href="dist/portfolio/nature.html" id="nav-portfolio-nature-link-mobile" onclick="closePortfolioDropdown()" class="group block py-2 text-xl font-signika relative">
+                Nature
+                <span class="absolute bottom-0 left-0 right-0 h-0.5 bg-black dark:bg-white max-w-0 group-hover:max-w-full transition-all duration-500"></span>
+              </a>
+              <a href="dist/portfolio/portraits.html" id="nav-portfolio-portraits-link-mobile" onclick="closePortfolioDropdown()" class="group block py-2 text-xl font-signika relative">
+                Portraits
+                <span class="absolute bottom-0 left-0 right-0 h-0.5 bg-black dark:bg-white max-w-0 group-hover:max-w-full transition-all duration-500"></span>
+              </a>
             </div>
           </li>
           <li class="group transition duration-300">

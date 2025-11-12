@@ -9,4 +9,4 @@ Thumbs.db
 *.swo
 *.log
 npm-debug.log*
-
+secrets.txt

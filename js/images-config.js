@@ -58,6 +58,7 @@ const IMAGES_CONFIG = {
 
   // Fonction pour obtenir le chemin relatif selon la page
   getImagePath: function(filename, basePath = '') {
+    // Le basePath est maintenant relatif à la racine du projet
     return `${basePath}assets/images/${filename}`;
   },
 

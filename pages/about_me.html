@@ -9,8 +9,8 @@
   <meta name="description"
     content="Hello there, I'm Martin USEO – a freelance photographer based in Paris">
   <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="./assets/favicon.ico" />
-  <link rel="stylesheet" href="output.css" />
+  <link rel="icon" type="image/x-icon" href="../assets/favicon.ico" />
+  <link rel="stylesheet" href="../css/output.css" />
   <!-- Alpine.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <!-- Start - Fonts -->
@@ -22,7 +22,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      content: ["./dist/*.{html,js}"],
+      content: ["../**/*.{html,js}"],
       theme: {
         extend: {
           fontFamily: {
@@ -34,8 +34,8 @@
       plugins: [],
     }
   </script>
-  <script src="../components/loader.js"></script>
-  <script src="../components/dropdown.js"></script>
+  <script src="../js/components/loader.js"></script>
+  <script src="../js/components/dropdown.js"></script>
 </head>
 
 <body
@@ -49,7 +49,7 @@
       <div class="col-span-2 md:col-span-1">
         <div
           class="bg-white dark:bg-neutral-900 p-5 pb-28 m-6 md:m-12 shadow-lg border border-gray-100 dark:border-neutral-800 hover:rotate-0 transition duration-500 -rotate-6 relative">
-          <img src="./assets/Avatar.png" alt=""
+          <img src="../assets/Avatar.png" alt=""
             class="smooth-edges flex flex-col w-full aspect-square object-cover h-auto" />
           <div class="absolute bottom-0 left-0 right-0 text-center">
             <p class="text-gray-800 dark:text-slate-200 pb-7 h-full text-6xl font-nothingyoucoulddo">me</p>
@@ -81,8 +81,8 @@
   <!-- Footer -->
   <div id="footer-container" data-path="../components/footer.html"></div>
 
-  <script src="fade_in.js"></script>
-  <script src="menu.js"></script>
+  <script src="../js/fade_in.js"></script>
+  <script src="../js/menu.js"></script>
 </body>
 
 </html>

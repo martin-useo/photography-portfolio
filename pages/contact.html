@@ -9,12 +9,12 @@
   <meta name="description"
     content="Hello there, I'm Martin USEO – a freelance photographer based in Paris, France. Get in touch with me!" />
   <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="./assets/favicon.ico" />
-  <link rel="stylesheet" href="output.css" />
+  <link rel="icon" type="image/x-icon" href="../assets/favicon.ico" />
+  <link rel="stylesheet" href="../css/output.css" />
   <!-- Alpine.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-  <script src="config.js" onerror="console.warn('config.js not found')"></script>
+  <script src="../js/config.js" onerror="console.warn('config.js not found')"></script>
   <!-- Start - Fonts -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -23,7 +23,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      content: ["./dist/*.{html,js}"],
+      content: ["../**/*.{html,js}"],
       theme: {
         extend: {
           fontFamily: {
@@ -34,8 +34,8 @@
       plugins: [],
     }
   </script>
-  <script src="../components/loader.js"></script>
-  <script src="../components/dropdown.js"></script>
+  <script src="../js/components/loader.js"></script>
+  <script src="../js/components/dropdown.js"></script>
 </head>
 
 <body
@@ -186,8 +186,8 @@
       }
     }
   </script>
-  <script src="fade_in.js"></script>
-  <script src="menu.js"></script>
+  <script src="../js/fade_in.js"></script>
+  <script src="../js/menu.js"></script>
 </body>
 
 </html>

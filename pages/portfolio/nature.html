@@ -5,12 +5,12 @@
   <meta charset="UTF-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Martin USEO - Portrait Photography</title>
+  <title>Martin USEO - Nature Photography</title>
   <meta name="description"
-    content="Portrait photography portfolio by Martin USEO – a freelance photographer based in Paris, France." />
+    content="Nature photography portfolio by Martin USEO – a freelance photographer based in Paris, France." />
   <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="../assets/favicon.ico" />
-  <link rel="stylesheet" href="../output.css" />
+  <link rel="icon" type="image/x-icon" href="../../assets/favicon.ico" />
+  <link rel="stylesheet" href="../../css/output.css" />
   <!-- Alpine.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <!-- Start - Fonts -->
@@ -27,7 +27,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      content: ["../dist/*.{html,js}"],
+      content: ["../../**/*.{html,js}"],
       theme: {
         extend: {
           fontFamily: {
@@ -38,8 +38,8 @@
       plugins: [],
     }
   </script>
-  <script src="../../components/loader.js"></script>
-  <script src="../../components/dropdown.js"></script>
+  <script src="../../js/components/loader.js"></script>
+  <script src="../../js/components/dropdown.js"></script>
 </head>
 
 <body
@@ -48,7 +48,7 @@
   <div id="navbar-container" data-path="../../components/navbar.html"></div>
   <!-- Content -->
   <div class="container mx-auto">
-    <h1 class="text-4xl pt-10 pb-8 font-bold md:hidden">PORTRAITS</h1>
+    <h1 class="text-4xl pt-10 pb-8 font-bold md:hidden">NATURE</h1>
     <section class="text-neutral-700 pt-10 md:pt-10">
       <div class="container w-full">
         <div class="flex flex-wrap w-full" id="portfolio-grid">
@@ -56,13 +56,13 @@
       </div>
     </section>
   </div>
-  <script src="../images-config.js"></script>
+  <script src="../../js/images-config.js"></script>
   <script>
     // Function to generate the gallery
     function renderPortfolio() {
       const grid = document.getElementById('portfolio-grid');
-      // Charger les images de portraits depuis la configuration centralisée
-      const images = IMAGES_CONFIG.getPortraitImages('../');
+      // Charger les images de nature depuis la configuration centralisée
+      const images = IMAGES_CONFIG.getNatureImages('../../');
       
       images.forEach((img, index) => {
         const item = document.createElement('div');
@@ -94,9 +94,9 @@
   <script>
     Fancybox.bind("[data-fancybox]", {});
   </script>
-  <script src="../fade_in.js"></script>
-  <script src="../menu.js"></script>
-  <script src="../scroll-to-top.js"></script>
+  <script src="../../js/fade_in.js"></script>
+  <script src="../../js/menu.js"></script>
+  <script src="../../js/scroll-to-top.js"></script>
 </body>
 
 </html>

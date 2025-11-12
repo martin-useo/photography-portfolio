@@ -74,7 +74,7 @@
   function adjustNavbarPaths() {
     const currentPath = window.location.pathname;
     const currentPage = window.location.pathname.split('/').pop() || window.location.pathname.split('\\').pop() || 'index.html';
-    const isInDist = currentPath.includes('/dist/') || currentPath.includes('\\dist\\') || currentPage === 'about_me.html' || currentPage === 'contact.html';
+    const isInPages = currentPath.includes('/pages/') || currentPath.includes('\\pages\\') || currentPage === 'about_me.html' || currentPage === 'contact.html';
     const isInPortfolio = currentPath.includes('/portfolio/') || currentPath.includes('\\portfolio\\') || 
       currentPage === 'nature.html' || currentPage === 'portraits.html' || 
       currentPage === 'interieur.html' || currentPage === 'vehicules.html' || 
@@ -121,6 +121,7 @@
     };
     
     if (isInPortfolio) {
+      // Pages dans pages/portfolio/
       if (homeLink) homeLink.href = '../../index.html';
       if (aboutLink) aboutLink.href = '../about_me.html';
       if (contactLink) contactLink.href = '../contact.html';
@@ -132,7 +133,8 @@
       });
       
       updateActivePage(currentPage, true);
-    } else if (isInDist) {
+    } else if (isInPages) {
+      // Pages dans pages/ (about_me, contact)
       if (homeLink) homeLink.href = '../index.html';
       if (aboutLink) aboutLink.href = 'about_me.html';
       if (contactLink) contactLink.href = 'contact.html';
@@ -145,14 +147,15 @@
       
       updateActivePage(currentPage, false);
     } else {
+      // Page racine (index.html)
       if (homeLink) homeLink.href = 'index.html';
-      if (aboutLink) aboutLink.href = 'dist/about_me.html';
-      if (contactLink) contactLink.href = 'dist/contact.html';
+      if (aboutLink) aboutLink.href = 'pages/about_me.html';
+      if (contactLink) contactLink.href = 'pages/contact.html';
       
       Object.keys(portfolioLinks).forEach(category => {
         const link = portfolioLinks[category];
-        if (link.desktop) link.desktop.href = `dist/portfolio/${category}.html`;
-        if (link.mobile) link.mobile.href = `dist/portfolio/${category}.html`;
+        if (link.desktop) link.desktop.href = `pages/portfolio/${category}.html`;
+        if (link.mobile) link.mobile.href = `pages/portfolio/${category}.html`;
       });
       
       updateActivePage(currentPage === '' || currentPage === '/' || currentPage === 'index.html' ? 'index.html' : currentPage, false);

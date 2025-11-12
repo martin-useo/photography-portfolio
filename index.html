@@ -14,7 +14,7 @@
   <meta property="og:url" content="https://martin-useo.github.io/photography-portfolio/" />
   <meta property="og:title" content="Martin USEO - Portfolio" />
   <meta property="og:description" content="Hello there, I'm Martin USEO – a freelance photographer based in Paris, France. Welcome to my portfolio." />
-  <meta property="og:image" content="https://martin-useo.github.io/photography-portfolio/dist/assets/Avatar.png" />
+  <meta property="og:image" content="https://martin-useo.github.io/photography-portfolio/assets/Avatar.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
   
@@ -23,11 +23,11 @@
   <meta name="twitter:url" content="https://martin-useo.github.io/photography-portfolio/" />
   <meta name="twitter:title" content="Martin USEO - Portfolio" />
   <meta name="twitter:description" content="Hello there, I'm Martin USEO – a freelance photographer based in Paris, France. Welcome to my portfolio." />
-  <meta name="twitter:image" content="https://martin-useo.github.io/photography-portfolio/dist/assets/Avatar.png" />
+  <meta name="twitter:image" content="https://martin-useo.github.io/photography-portfolio/assets/Avatar.png" />
   
   <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="dist/assets/favicon.ico" />
-  <link rel="stylesheet" href="dist/output.css" />
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+  <link rel="stylesheet" href="css/output.css" />
   <style>
     /* Transition fluide style Apple pour le changement de langue */
     #button-text-fr,
@@ -46,7 +46,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      content: ["./dist/*.{html,js}"],
+      content: ["./pages/**/*.{html,js}", "./js/**/*.{html,js}"],
       theme: {
         extend:
                 {
@@ -76,7 +76,7 @@
     <h1 class="text-6xl md:text-8xl font-signika font-bold text-white mb-12 text-center drop-shadow-2xl">
       MARTIN USEO
     </h1>
-    <a href="dist/portfolio/nature.html" 
+    <a href="pages/portfolio/nature.html" 
        id="portfolio-button"
        class="px-8 md:px-12 py-4 md:py-6 bg-white/70 dark:bg-white/10 backdrop-blur-sm text-black dark:text-white text-xl md:text-2xl font-signika font-bold rounded-lg shadow-lg hover:bg-white/80 dark:hover:bg-white/20 transition-all duration-300 transform hover:scale-105 active:scale-100 md:hover:scale-105 border-2 border-black/20 dark:border-white/20 relative">
       <span id="button-text-fr">DÉCOUVRIR LE PORTFOLIO</span>
@@ -84,7 +84,7 @@
     </a>
   </div>
 
-  <script src="dist/images-config.js"></script>
+  <script src="js/images-config.js"></script>
   <script>
     // Layouts prédéfinis pour la disposition des images
     const LAYOUTS = [
@@ -392,7 +392,7 @@
         }
         
         if (!cachedImages) {
-          cachedImages = IMAGES_CONFIG.getAllImages('./dist/');
+          cachedImages = IMAGES_CONFIG.getAllImages('./');
           
           if (!cachedImages || cachedImages.length === 0) {
             console.error('No images found in configuration');
@@ -569,7 +569,7 @@
       }
     });
   </script>
-  <script src="dist/fade_in.js"></script>
+  <script src="js/fade_in.js"></script>
 </body>
 
 </html>

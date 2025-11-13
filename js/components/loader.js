@@ -17,7 +17,8 @@
                 currentPage === 'nature.html' || currentPage === 'portraits.html' ||
                 currentPage === 'interieur.html' || currentPage === 'vehicules.html' ||
                 currentPage === 'nourriture.html' || currentPage === 'travaux.html' ||
-                currentPage === 'urbain.html' || currentPage === 'animaux.html';
+                currentPage === 'urbain.html' || currentPage === 'animaux.html' ||
+                currentPage === 'evenements.html' || currentPage === 'sport.html';
               if (isInPortfolio) {
                 updateActivePage(currentPage, true);
               }
@@ -79,7 +80,8 @@
       currentPage === 'nature.html' || currentPage === 'portraits.html' || 
       currentPage === 'interieur.html' || currentPage === 'vehicules.html' || 
       currentPage === 'nourriture.html' || currentPage === 'travaux.html' || 
-      currentPage === 'urbain.html' || currentPage === 'animaux.html';
+      currentPage === 'urbain.html' || currentPage === 'animaux.html' ||
+      currentPage === 'evenements.html' || currentPage === 'sport.html';
     
     const homeLink = document.getElementById('nav-home-link');
     const aboutLink = document.getElementById('nav-about-link');
@@ -117,6 +119,14 @@
       animaux: {
         desktop: document.getElementById('nav-portfolio-animaux-link'),
         mobile: document.getElementById('nav-portfolio-animaux-link-mobile')
+      },
+      evenements: {
+        desktop: document.getElementById('nav-portfolio-evenements-link'),
+        mobile: document.getElementById('nav-portfolio-evenements-link-mobile')
+      },
+      sport: {
+        desktop: document.getElementById('nav-portfolio-sport-link'),
+        mobile: document.getElementById('nav-portfolio-sport-link-mobile')
       }
     };
     
@@ -165,7 +175,7 @@
   }
 
   function hideCurrentPageFromDropdown(currentPage) {
-    const categories = ['nature', 'portraits', 'interieur', 'vehicules', 'nourriture', 'travaux', 'urbain', 'animaux'];
+    const categories = ['nature', 'portraits', 'interieur', 'vehicules', 'nourriture', 'travaux', 'urbain', 'animaux', 'evenements', 'sport'];
     
     categories.forEach(category => {
       const desktopLink = document.getElementById(`nav-portfolio-${category}-link`);
@@ -212,7 +222,9 @@
         'nourriture': 'NOURRITURE',
         'travaux': 'TRAVAUX',
         'urbain': 'URBAIN',
-        'animaux': 'ANIMAUX'
+        'animaux': 'ANIMAUX',
+        'evenements': 'ÉVÉNEMENTS',
+        'sport': 'SPORT'
       };
       
       for (const [key, value] of Object.entries(pageNames)) {

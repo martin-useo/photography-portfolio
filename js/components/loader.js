@@ -15,10 +15,9 @@
               const currentPage = window.location.pathname.split('/').pop() || window.location.pathname.split('\\').pop() || 'index.html';
               const isInPortfolio = window.location.pathname.includes('/portfolio/') || window.location.pathname.includes('\\portfolio\\') ||
                 currentPage === 'nature.html' || currentPage === 'portraits.html' ||
-                currentPage === 'interieur.html' || currentPage === 'vehicules.html' ||
-                currentPage === 'nourriture.html' || currentPage === 'travaux.html' ||
-                currentPage === 'urbain.html' || currentPage === 'animaux.html' ||
-                currentPage === 'evenements.html' || currentPage === 'sport.html';
+                currentPage === 'animaux.html' ||
+                currentPage === 'evenements.html' || currentPage === 'sport.html' ||
+                currentPage === 'personnel.html' || currentPage === 'showcase.html';
               if (isInPortfolio) {
                 updateActivePage(currentPage, true);
               }
@@ -78,12 +77,12 @@
     const isInPages = currentPath.includes('/pages/') || currentPath.includes('\\pages\\') || currentPage === 'about_me.html' || currentPage === 'contact.html';
     const isInPortfolio = currentPath.includes('/portfolio/') || currentPath.includes('\\portfolio\\') || 
       currentPage === 'nature.html' || currentPage === 'portraits.html' || 
-      currentPage === 'interieur.html' || currentPage === 'vehicules.html' || 
-      currentPage === 'nourriture.html' || currentPage === 'travaux.html' || 
-      currentPage === 'urbain.html' || currentPage === 'animaux.html' ||
-      currentPage === 'evenements.html' || currentPage === 'sport.html';
+      currentPage === 'animaux.html' ||
+      currentPage === 'evenements.html' || currentPage === 'sport.html' ||
+      currentPage === 'personnel.html' || currentPage === 'showcase.html';
     
     const homeLink = document.getElementById('nav-home-link');
+    const showcaseLink = document.getElementById('nav-showcase-link');
     const aboutLink = document.getElementById('nav-about-link');
     const contactLink = document.getElementById('nav-contact-link');
     
@@ -96,43 +95,28 @@
         desktop: document.getElementById('nav-portfolio-portraits-link'),
         mobile: document.getElementById('nav-portfolio-portraits-link-mobile')
       },
-      interieur: {
-        desktop: document.getElementById('nav-portfolio-interieur-link'),
-        mobile: document.getElementById('nav-portfolio-interieur-link-mobile')
-      },
-      vehicules: {
-        desktop: document.getElementById('nav-portfolio-vehicules-link'),
-        mobile: document.getElementById('nav-portfolio-vehicules-link-mobile')
-      },
-      nourriture: {
-        desktop: document.getElementById('nav-portfolio-nourriture-link'),
-        mobile: document.getElementById('nav-portfolio-nourriture-link-mobile')
-      },
-      travaux: {
-        desktop: document.getElementById('nav-portfolio-travaux-link'),
-        mobile: document.getElementById('nav-portfolio-travaux-link-mobile')
-      },
-      urbain: {
-        desktop: document.getElementById('nav-portfolio-urbain-link'),
-        mobile: document.getElementById('nav-portfolio-urbain-link-mobile')
-      },
-      animaux: {
-        desktop: document.getElementById('nav-portfolio-animaux-link'),
-        mobile: document.getElementById('nav-portfolio-animaux-link-mobile')
+      sport: {
+        desktop: document.getElementById('nav-portfolio-sport-link'),
+        mobile: document.getElementById('nav-portfolio-sport-link-mobile')
       },
       evenements: {
         desktop: document.getElementById('nav-portfolio-evenements-link'),
         mobile: document.getElementById('nav-portfolio-evenements-link-mobile')
       },
-      sport: {
-        desktop: document.getElementById('nav-portfolio-sport-link'),
-        mobile: document.getElementById('nav-portfolio-sport-link-mobile')
+      animaux: {
+        desktop: document.getElementById('nav-portfolio-animaux-link'),
+        mobile: document.getElementById('nav-portfolio-animaux-link-mobile')
+      },
+      personnel: {
+        desktop: document.getElementById('nav-portfolio-personnel-link'),
+        mobile: document.getElementById('nav-portfolio-personnel-link-mobile')
       }
     };
     
     if (isInPortfolio) {
       // Pages dans pages/portfolio/
       if (homeLink) homeLink.href = '../../index.html';
+      if (showcaseLink) showcaseLink.href = 'showcase.html';
       if (aboutLink) aboutLink.href = '../about_me.html';
       if (contactLink) contactLink.href = '../contact.html';
       
@@ -146,6 +130,7 @@
     } else if (isInPages) {
       // Pages dans pages/ (about_me, contact)
       if (homeLink) homeLink.href = '../index.html';
+      if (showcaseLink) showcaseLink.href = 'portfolio/showcase.html';
       if (aboutLink) aboutLink.href = 'about_me.html';
       if (contactLink) contactLink.href = 'contact.html';
       
@@ -159,6 +144,7 @@
     } else {
       // Page racine (index.html)
       if (homeLink) homeLink.href = 'index.html';
+      if (showcaseLink) showcaseLink.href = 'pages/portfolio/showcase.html';
       if (aboutLink) aboutLink.href = 'pages/about_me.html';
       if (contactLink) contactLink.href = 'pages/contact.html';
       
@@ -175,7 +161,7 @@
   }
 
   function hideCurrentPageFromDropdown(currentPage) {
-    const categories = ['nature', 'portraits', 'interieur', 'vehicules', 'nourriture', 'travaux', 'urbain', 'animaux', 'evenements', 'sport'];
+    const categories = ['nature', 'portraits', 'sport', 'evenements', 'animaux', 'personnel'];
     
     categories.forEach(category => {
       const desktopLink = document.getElementById(`nav-portfolio-${category}-link`);
@@ -194,6 +180,7 @@
   function updateActivePage(currentPage, isInPortfolio) {
     const portfolioUnderline = document.getElementById('nav-portfolio-underline');
     const portfolioText = document.getElementById('nav-portfolio-text');
+    const showcaseUnderline = document.getElementById('nav-showcase-underline');
     const aboutUnderline = document.getElementById('nav-about-underline');
     const contactUnderline = document.getElementById('nav-contact-underline');
     
@@ -201,8 +188,12 @@
       portfolioText.textContent = 'PORTFOLIO';
     }
     
+    // Reset all underlines
     if (portfolioUnderline) {
       portfolioUnderline.className = 'hidden md:block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-black dark:bg-white';
+    }
+    if (showcaseUnderline) {
+      showcaseUnderline.className = 'hidden md:block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-black dark:bg-white';
     }
     if (aboutUnderline) {
       aboutUnderline.className = 'hidden md:block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-black dark:bg-white';
@@ -214,28 +205,31 @@
     if (isInPortfolio) {
       const isDesktop = window.innerWidth >= 768;
       
-      const pageNames = {
-        'nature': 'NATURE',
-        'portraits': 'PORTRAITS',
-        'interieur': 'INTÉRIEUR',
-        'vehicules': 'VÉHICULES',
-        'nourriture': 'NOURRITURE',
-        'travaux': 'TRAVAUX',
-        'urbain': 'URBAIN',
-        'animaux': 'ANIMAUX',
-        'evenements': 'ÉVÉNEMENTS',
-        'sport': 'SPORT'
-      };
-      
-      for (const [key, value] of Object.entries(pageNames)) {
-        if (currentPage === `${key}.html` || currentPage.includes(key)) {
-          if (portfolioText && isDesktop) {
-            portfolioText.textContent = value;
+      // Check if on showcase page
+      if (currentPage === 'showcase.html' || currentPage.includes('showcase')) {
+        if (showcaseUnderline) {
+          showcaseUnderline.className = 'hidden md:block h-0.5 bg-black dark:bg-white';
+        }
+      } else {
+        const pageNames = {
+          'nature': 'NATURE',
+          'portraits': 'PORTRAITS',
+          'sport': 'SPORT',
+          'evenements': 'ÉVÉNEMENTS',
+          'animaux': 'ANIMAUX',
+          'personnel': 'PERSONNEL'
+        };
+        
+        for (const [key, value] of Object.entries(pageNames)) {
+          if (currentPage === `${key}.html` || currentPage.includes(key)) {
+            if (portfolioText && isDesktop) {
+              portfolioText.textContent = value;
+            }
+            if (portfolioUnderline) {
+              portfolioUnderline.className = 'hidden md:block h-0.5 bg-black dark:bg-white absolute bottom-0 left-0 right-0';
+            }
+            break;
           }
-          if (portfolioUnderline) {
-            portfolioUnderline.className = 'hidden md:block h-0.5 bg-black dark:bg-white absolute bottom-0 left-0 right-0';
-          }
-          break;
         }
       }
     } else if (currentPage === 'about_me.html' || currentPage.includes('about')) {

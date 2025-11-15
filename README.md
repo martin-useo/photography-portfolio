@@ -42,15 +42,13 @@ photography-portfolio/
 ├── 📁 pages/                        # Pages du site
 │   ├── about_me.html                # À propos
 │   ├── contact.html                 # Formulaire de contact
-│   └── 📁 portfolio/                # Catégories de portfolio (8 catégories)
+│   └── 📁 portfolio/                # Catégories de portfolio (6 catégories)
 │       ├── nature.html
 │       ├── portraits.html
+│       ├── sport.html
+│       ├── evenements.html
 │       ├── animaux.html
-│       ├── interieur.html
-│       ├── nourriture.html
-│       ├── travaux.html
-│       ├── urbain.html
-│       └── vehicules.html
+│       └── personnel.html
 │
 ├── .gitignore                       # Fichiers ignorés par Git
 ├── LICENSE                          # Licence du projet

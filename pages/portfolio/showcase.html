@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Martin USEO - Portfolio Showcase</title>
+  <meta name="description"
+    content="Discover the photography portfolio of Martin USEO – a freelance photographer based in Paris, France." />
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="../../assets/favicon.ico" />
+  <link rel="stylesheet" href="../../css/output.css" />
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <!-- Start - Fonts -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Signika:wght@400;700&display=swap" rel="stylesheet">
+  <!-- End - Fonts -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      content: ["../../**/*.{html,js}"],
+      theme: {
+        extend: {
+          fontFamily: {
+            'signika': ['Signika', 'sans-serif'],
+          },
+        },
+      },
+      plugins: [],
+    }
+  </script>
+  <script src="../../js/components/loader.js"></script>
+  <script src="../../js/components/dropdown.js"></script>
+</head>
+
+<body
+  class="dark:bg-black bg-white h-screen text-black dark:text-white px-5 md:px-20 opacity-0 animate-fade-in transition duration-500">
+  <!-- Navbar -->
+  <div id="navbar-container" data-path="../../components/navbar.html"></div>
+  
+  <!-- Content -->
+  <div class="container mx-auto max-w-7xl">
+    <!-- Hero Image -->
+    <div class="pt-10 md:pt-20 pb-12 md:pb-16">
+      <div class="w-full aspect-[16/9] md:aspect-[21/9] rounded-lg overflow-hidden">
+        <img id="hero-image" src="" alt="Portfolio showcase" class="w-full h-full object-cover" />
+      </div>
+    </div>
+
+    <!-- Categories Grid -->
+    <div class="pb-20">
+      <h2 class="text-3xl md:text-4xl font-signika font-bold mb-8 md:mb-12 text-center">Explore Categories</h2>
+      <div id="categories-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+        <!-- Categories will be dynamically generated here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div id="footer-container" data-path="../../components/footer.html"></div>
+  <!-- Scroll to Top Button -->
+  <div id="scroll-to-top-container" data-path="../../components/scroll-to-top.html"></div>
+
+  <script src="../../js/images-config.js"></script>
+  <script>
+    const categories = [
+      { name: 'Nature', slug: 'nature', path: 'nature.html' },
+      { name: 'Portraits', slug: 'portraits', path: 'portraits.html' },
+      { name: 'Sport', slug: 'sport', path: 'sport.html' },
+      { name: 'Événements', slug: 'evenements', path: 'evenements.html' },
+      { name: 'Animaux', slug: 'animaux', path: 'animaux.html' },
+      { name: 'Personnel', slug: 'personnel', path: 'personnel.html' }
+    ];
+
+    function getCategoryImage(categorySlug) {
+      const basePath = '../../';
+      let images = [];
+      
+      switch(categorySlug) {
+        case 'nature':
+          images = IMAGES_CONFIG.getNatureImages(basePath);
+          break;
+        case 'portraits':
+          images = IMAGES_CONFIG.getPortraitImages(basePath);
+          break;
+        case 'sport':
+        case 'evenements':
+        case 'animaux':
+        case 'personnel':
+          // Pour les catégories sans images, utiliser une image par défaut
+          images = IMAGES_CONFIG.getAllImages(basePath);
+          break;
+        default:
+          images = IMAGES_CONFIG.getAllImages(basePath);
+      }
+      
+      // Retourner la première image disponible, ou une image aléatoire
+      if (images.length > 0) {
+        return images[Math.floor(Math.random() * images.length)];
+      }
+      return null;
+    }
+
+    function getHeroImage() {
+      const allImages = IMAGES_CONFIG.getAllImages('../../');
+      if (allImages.length > 0) {
+        // Choisir une image aléatoire parmi toutes les images
+        return allImages[Math.floor(Math.random() * allImages.length)];
+      }
+      return null;
+    }
+
+    function renderShowcase() {
+      // Set hero image
+      const heroImage = getHeroImage();
+      if (heroImage) {
+        const heroImgElement = document.getElementById('hero-image');
+        heroImgElement.src = heroImage.src;
+        heroImgElement.alt = heroImage.alt || 'Portfolio showcase';
+      }
+
+      // Render category cards
+      const grid = document.getElementById('categories-grid');
+      grid.innerHTML = '';
+
+      categories.forEach(category => {
+        const categoryImage = getCategoryImage(category.slug);
+        
+        const card = document.createElement('a');
+        card.href = category.path;
+        card.className = 'group relative block overflow-hidden rounded-lg aspect-[4/3] transition-transform duration-300 hover:scale-105';
+        
+        if (categoryImage) {
+          card.innerHTML = `
+            <div class="absolute inset-0">
+              <img src="${categoryImage.src}" alt="${categoryImage.alt || category.name}" 
+                class="w-full h-full object-cover" />
+              <div class="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors duration-300"></div>
+            </div>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <h3 class="text-3xl md:text-4xl font-signika font-bold text-white drop-shadow-lg">
+                ${category.name}
+              </h3>
+            </div>
+          `;
+        } else {
+          // Fallback si pas d'image
+          card.innerHTML = `
+            <div class="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 group-hover:from-gray-700 group-hover:to-gray-800 transition-colors duration-300"></div>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <h3 class="text-3xl md:text-4xl font-signika font-bold text-white">
+                ${category.name}
+              </h3>
+            </div>
+          `;
+        }
+        
+        grid.appendChild(card);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', renderShowcase);
+  </script>
+
+  <script src="../../js/fade_in.js"></script>
+  <script src="../../js/menu.js"></script>
+  <script src="../../js/scroll-to-top.js"></script>
+</body>
+
+</html>
+

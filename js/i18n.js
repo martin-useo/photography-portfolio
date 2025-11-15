@@ -20,7 +20,7 @@ const translations = {
     },
     contactPage: {
       title: 'CONTACT',
-      heading: 'Contactez-moi !',
+      heading: 'Contactez-moi',
       emailLabel: 'Votre email',
       emailPlaceholder: 'exemple@gmail.com',
       subjectLabel: 'Sujet',

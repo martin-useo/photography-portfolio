@@ -57,4 +57,3 @@ if (document.readyState === 'loading') {
 }
 
 setTimeout(initMobileMenu, 500);
-

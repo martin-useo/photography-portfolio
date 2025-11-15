@@ -34,6 +34,35 @@
       plugins: [],
     }
   </script>
+  <script>
+    document.write('<style id="i18n-preload">body{visibility:hidden}</style>');
+  </script>
+  <script src="../js/i18n.js"></script>
+  <script>
+    if (typeof applyTranslationsBeforeRender === 'function') {
+      applyTranslationsBeforeRender();
+    }
+    
+    function revealBody() {
+      const style = document.getElementById('i18n-preload');
+      if (style) style.remove();
+      if (document.body) document.body.style.visibility = '';
+    }
+    
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof LanguageManager !== 'undefined') {
+          LanguageManager.applyLanguage();
+        }
+        revealBody();
+      });
+    } else {
+      if (typeof LanguageManager !== 'undefined') {
+        LanguageManager.applyLanguage();
+      }
+      revealBody();
+    }
+  </script>
   <script src="../js/components/loader.js"></script>
   <script src="../js/components/dropdown.js"></script>
 </head>
@@ -44,7 +73,7 @@
   <div id="navbar-container" data-path="../components/navbar.html"></div>
   <!-- Content -->
   <div class="container mx-auto max-w-6xl">
-    <h1 class="text-4xl pt-10 pb-8 md:hidden font-signika font-bold">ABOUT ME</h1>
+    <h1 class="text-4xl pt-10 pb-8 md:hidden font-signika font-bold" data-i18n="about.title"></h1>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 pt-10 md:pt-20">
       <div class="col-span-1 order-2 md:order-1">
         <img src="../assets/Avatar.png" alt="Martin USEO"
@@ -52,7 +81,7 @@
       </div>
       <section class="font-normal text-center md:text-left col-span-1 order-1 md:order-2 flex flex-col justify-center">
         <h2 class="text-4xl md:text-5xl font-signika font-bold mb-6">
-          Hello there, I'm Martin <span class="animate-wave">👋</span>
+          <span data-i18n="about.greeting"></span> <span class="animate-wave">👋</span>
         </h2>
         <div class="space-y-4 text-base md:text-lg leading-relaxed text-gray-700 dark:text-gray-300">
           <p>

@@ -1,9 +1,4 @@
-// Configuration centralisée des images du portfolio
-// Ce fichier contient toutes les images disponibles avec leurs métadonnées
-
 const IMAGES_CONFIG = {
-  // Toutes les images disponibles
-  // format: 'portrait' (vertical) ou 'landscape' (horizontal)
   all: [
     { 
       filename: 'ThéoNoJitensha-1.jpg', 
@@ -42,13 +37,10 @@ const IMAGES_CONFIG = {
     }
   ],
 
-  // Fonction pour obtenir le chemin relatif selon la page
   getImagePath: function(filename, basePath = '') {
-    // Le basePath est maintenant relatif à la racine du projet
     return `${basePath}assets/images/${filename}`;
   },
 
-  // Fonction pour obtenir toutes les images
   getAllImages: function(basePath = '') {
     return this.all.map(img => ({
       ...img,
@@ -56,7 +48,6 @@ const IMAGES_CONFIG = {
     }));
   },
 
-  // Fonction pour obtenir les images par catégorie
   getImagesByCategory: function(category, basePath = '') {
     return this.all
       .filter(img => img.category === category)
@@ -66,27 +57,22 @@ const IMAGES_CONFIG = {
       }));
   },
 
-  // Fonction pour obtenir les images de nature
   getNatureImages: function(basePath = '') {
     return this.getImagesByCategory('nature', basePath);
   },
 
-  // Fonction pour obtenir les images de portraits
   getPortraitImages: function(basePath = '') {
     return this.getImagesByCategory('portraits', basePath);
   },
 
-  // Fonction pour ajouter une nouvelle image (utile pour l'extension future)
   addImage: function(imageData) {
     this.all.push(imageData);
   },
 
-  // Fonction pour obtenir le nombre total d'images
   getTotalCount: function() {
     return this.all.length;
   },
 
-  // Fonction pour détecter automatiquement le format et les dimensions d'une image
   detectImageDimensions: function(imageSrc) {
     return new Promise((resolve) => {
       const img = new Image();
@@ -101,7 +87,6 @@ const IMAGES_CONFIG = {
         });
       };
       img.onerror = function() {
-        // En cas d'erreur, fallback sur landscape avec ratio 16:9
         resolve({
           width: 1920,
           height: 1080,
@@ -113,7 +98,6 @@ const IMAGES_CONFIG = {
     });
   },
 
-  // Fonction pour enrichir les images avec leur format et dimensions réels
   enrichImagesWithFormat: async function(images) {
     const enrichedImages = await Promise.all(
       images.map(async (img) => {
@@ -131,4 +115,3 @@ const IMAGES_CONFIG = {
     return enrichedImages;
   }
 };
-

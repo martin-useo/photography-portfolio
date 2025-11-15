@@ -40,21 +40,12 @@ const PortfolioLayout = {
 
   create2LandscapesWithPortrait(landscape1, landscape2, portrait) {
     const totalWidth = this.BASE_WIDTH - 2 * this.GAP;
-    
-    // On garde les paysages à leur hauteur naturelle pour éviter le cropping vertical
-    // Et on ajuste la largeur du portrait pour que sa hauteur corresponde
     const landscapeWidth = totalWidth * 0.65;
     
     const landscape1NaturalHeight = landscapeWidth / landscape1.aspectRatio;
     const landscape2NaturalHeight = landscape2 ? landscapeWidth / landscape2.aspectRatio : landscape1NaturalHeight;
-    
-    // Le portrait doit avoir la même hauteur que les 2 paysages empilés + gap
     const portraitHeight = landscape1NaturalHeight + landscape2NaturalHeight + this.GAP;
-    
-    // Calculer la largeur du portrait pour cette hauteur
     const portraitWidth = portraitHeight * portrait.aspectRatio;
-    
-    // Vérifier si cette largeur rentre dans l'espace disponible
     const portraitWidthPercent = (portraitWidth / totalWidth) * 100;
     const landscapeWidthPercent = 100 - portraitWidthPercent;
     
@@ -406,4 +397,3 @@ const PortfolioLayout = {
     }
   }
 };
-

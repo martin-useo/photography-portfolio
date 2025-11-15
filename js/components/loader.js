@@ -1,4 +1,20 @@
 (function() {
+  const PORTFOLIO_PAGES = ['nature.html', 'portraits.html', 'animaux.html', 'evenements.html', 'sport.html', 'personnel.html', 'showcase.html'];
+  const CATEGORIES = ['nature', 'portraits', 'sport', 'evenements', 'animaux', 'personnel'];
+  
+  function isPortfolioPage(path, page) {
+    return path.includes('/portfolio/') || path.includes('\\portfolio\\') || PORTFOLIO_PAGES.includes(page);
+  }
+  
+  function isPagesPage(path, page) {
+    return path.includes('/pages/') || path.includes('\\pages\\') || page === 'about_me.html' || page === 'contact.html';
+  }
+  
+  function getCurrentPage() {
+    const path = window.location.pathname;
+    return path.split('/').pop() || path.split('\\').pop() || 'index.html';
+  }
+  
   function loadComponent(elementId, filePath) {
     fetch(filePath)
       .then(response => response.text())
@@ -8,17 +24,48 @@
         if (elementId === 'navbar-container') {
           adjustNavbarPaths();
           
+          setTimeout(() => {
+            const navbarLanguageToggle = document.querySelector('#navbar-container #language-toggle-container');
+            if (navbarLanguageToggle) {
+              const currentPath = window.location.pathname;
+              let languageTogglePath = 'components/language-toggle.html';
+              if (currentPath.includes('/portfolio/')) {
+                languageTogglePath = '../../components/language-toggle.html';
+              } else if (currentPath.includes('/pages/')) {
+                languageTogglePath = '../components/language-toggle.html';
+              }
+              fetch(languageTogglePath)
+                .then(response => response.text())
+                .then(html => {
+                  navbarLanguageToggle.innerHTML = html;
+                  setTimeout(() => {
+                    if (typeof LanguageManager !== 'undefined') {
+                      window.dispatchEvent(new CustomEvent('languageChanged', { 
+                        detail: { language: LanguageManager.currentLang } 
+                      }));
+                    }
+                  }, 100);
+                })
+                .catch(() => {});
+            }
+          }, 50);
+          
+          if (typeof LanguageManager !== 'undefined') {
+            setTimeout(() => {
+              LanguageManager.applyLanguage();
+              const currentPage = getCurrentPage();
+              if (isPortfolioPage(window.location.pathname, currentPage)) {
+                updateActivePage(currentPage, true);
+              }
+            }, 100);
+          }
+          
           let resizeTimeout;
           window.addEventListener('resize', function() {
             clearTimeout(resizeTimeout);
             resizeTimeout = setTimeout(function() {
-              const currentPage = window.location.pathname.split('/').pop() || window.location.pathname.split('\\').pop() || 'index.html';
-              const isInPortfolio = window.location.pathname.includes('/portfolio/') || window.location.pathname.includes('\\portfolio\\') ||
-                currentPage === 'nature.html' || currentPage === 'portraits.html' ||
-                currentPage === 'animaux.html' ||
-                currentPage === 'evenements.html' || currentPage === 'sport.html' ||
-                currentPage === 'personnel.html' || currentPage === 'showcase.html';
-              if (isInPortfolio) {
+              const currentPage = getCurrentPage();
+              if (isPortfolioPage(window.location.pathname, currentPage)) {
                 updateActivePage(currentPage, true);
               }
             }, 150);
@@ -46,8 +93,8 @@
           }, 50);
           
           setTimeout(function() {
-            const button = document.getElementById('nav-portfolio-button');
             const chevron = document.getElementById('portfolio-chevron');
+            const button = document.getElementById('nav-portfolio-button');
             
             if (chevron) {
               chevron.style.display = 'inline-block';
@@ -66,61 +113,35 @@
           }, 200);
         }
       })
-      .catch(error => {
-        console.error('Error loading component:', error);
-      });
+      .catch(() => {});
   }
 
   function adjustNavbarPaths() {
     const currentPath = window.location.pathname;
-    const currentPage = window.location.pathname.split('/').pop() || window.location.pathname.split('\\').pop() || 'index.html';
-    const isInPages = currentPath.includes('/pages/') || currentPath.includes('\\pages\\') || currentPage === 'about_me.html' || currentPage === 'contact.html';
-    const isInPortfolio = currentPath.includes('/portfolio/') || currentPath.includes('\\portfolio\\') || 
-      currentPage === 'nature.html' || currentPage === 'portraits.html' || 
-      currentPage === 'animaux.html' ||
-      currentPage === 'evenements.html' || currentPage === 'sport.html' ||
-      currentPage === 'personnel.html' || currentPage === 'showcase.html';
+    const currentPage = getCurrentPage();
+    const isInPages = isPagesPage(currentPath, currentPage);
+    const isInPortfolio = isPortfolioPage(currentPath, currentPage);
     
     const homeLink = document.getElementById('nav-home-link');
     const showcaseLink = document.getElementById('nav-showcase-link');
     const aboutLink = document.getElementById('nav-about-link');
     const contactLink = document.getElementById('nav-contact-link');
     
-    const portfolioLinks = {
-      nature: {
-        desktop: document.getElementById('nav-portfolio-nature-link'),
-        mobile: document.getElementById('nav-portfolio-nature-link-mobile')
-      },
-      portraits: {
-        desktop: document.getElementById('nav-portfolio-portraits-link'),
-        mobile: document.getElementById('nav-portfolio-portraits-link-mobile')
-      },
-      sport: {
-        desktop: document.getElementById('nav-portfolio-sport-link'),
-        mobile: document.getElementById('nav-portfolio-sport-link-mobile')
-      },
-      evenements: {
-        desktop: document.getElementById('nav-portfolio-evenements-link'),
-        mobile: document.getElementById('nav-portfolio-evenements-link-mobile')
-      },
-      animaux: {
-        desktop: document.getElementById('nav-portfolio-animaux-link'),
-        mobile: document.getElementById('nav-portfolio-animaux-link-mobile')
-      },
-      personnel: {
-        desktop: document.getElementById('nav-portfolio-personnel-link'),
-        mobile: document.getElementById('nav-portfolio-personnel-link-mobile')
-      }
-    };
+    const portfolioLinks = {};
+    CATEGORIES.forEach(category => {
+      portfolioLinks[category] = {
+        desktop: document.getElementById(`nav-portfolio-${category}-link`),
+        mobile: document.getElementById(`nav-portfolio-${category}-link-mobile`)
+      };
+    });
     
     if (isInPortfolio) {
-      // Pages dans pages/portfolio/
       if (homeLink) homeLink.href = '../../index.html';
       if (showcaseLink) showcaseLink.href = 'showcase.html';
       if (aboutLink) aboutLink.href = '../about_me.html';
       if (contactLink) contactLink.href = '../contact.html';
       
-      Object.keys(portfolioLinks).forEach(category => {
+      CATEGORIES.forEach(category => {
         const link = portfolioLinks[category];
         if (link.desktop) link.desktop.href = `${category}.html`;
         if (link.mobile) link.mobile.href = `${category}.html`;
@@ -128,13 +149,12 @@
       
       updateActivePage(currentPage, true);
     } else if (isInPages) {
-      // Pages dans pages/ (about_me, contact)
       if (homeLink) homeLink.href = '../index.html';
       if (showcaseLink) showcaseLink.href = 'portfolio/showcase.html';
       if (aboutLink) aboutLink.href = 'about_me.html';
       if (contactLink) contactLink.href = 'contact.html';
       
-      Object.keys(portfolioLinks).forEach(category => {
+      CATEGORIES.forEach(category => {
         const link = portfolioLinks[category];
         if (link.desktop) link.desktop.href = `portfolio/${category}.html`;
         if (link.mobile) link.mobile.href = `portfolio/${category}.html`;
@@ -142,13 +162,12 @@
       
       updateActivePage(currentPage, false);
     } else {
-      // Page racine (index.html)
       if (homeLink) homeLink.href = 'index.html';
       if (showcaseLink) showcaseLink.href = 'pages/portfolio/showcase.html';
       if (aboutLink) aboutLink.href = 'pages/about_me.html';
       if (contactLink) contactLink.href = 'pages/contact.html';
       
-      Object.keys(portfolioLinks).forEach(category => {
+      CATEGORIES.forEach(category => {
         const link = portfolioLinks[category];
         if (link.desktop) link.desktop.href = `pages/portfolio/${category}.html`;
         if (link.mobile) link.mobile.href = `pages/portfolio/${category}.html`;
@@ -161,9 +180,7 @@
   }
 
   function hideCurrentPageFromDropdown(currentPage) {
-    const categories = ['nature', 'portraits', 'sport', 'evenements', 'animaux', 'personnel'];
-    
-    categories.forEach(category => {
+    CATEGORIES.forEach(category => {
       const desktopLink = document.getElementById(`nav-portfolio-${category}-link`);
       const mobileLink = document.getElementById(`nav-portfolio-${category}-link-mobile`);
       
@@ -185,83 +202,73 @@
     const contactUnderline = document.getElementById('nav-contact-underline');
     
     if (portfolioText) {
-      portfolioText.textContent = 'PORTFOLIO';
+      if (typeof LanguageManager !== 'undefined') {
+        portfolioText.textContent = LanguageManager.get('portfolio');
+      } else {
+        portfolioText.textContent = 'PORTFOLIO';
+      }
     }
     
-    // Reset all underlines
-    if (portfolioUnderline) {
-      portfolioUnderline.className = 'hidden md:block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-black dark:bg-white';
-    }
-    if (showcaseUnderline) {
-      showcaseUnderline.className = 'hidden md:block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-black dark:bg-white';
-    }
-    if (aboutUnderline) {
-      aboutUnderline.className = 'hidden md:block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-black dark:bg-white';
-    }
-    if (contactUnderline) {
-      contactUnderline.className = 'hidden md:block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-black dark:bg-white';
-    }
+    const resetClass = 'hidden md:block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-black dark:bg-white';
+    const activeClass = 'hidden md:block h-0.5 bg-black dark:bg-white';
+    
+    if (portfolioUnderline) portfolioUnderline.className = resetClass;
+    if (showcaseUnderline) showcaseUnderline.className = resetClass;
+    if (aboutUnderline) aboutUnderline.className = resetClass;
+    if (contactUnderline) contactUnderline.className = resetClass;
     
     if (isInPortfolio) {
       const isDesktop = window.innerWidth >= 768;
       
-      // Check if on showcase page
       if (currentPage === 'showcase.html' || currentPage.includes('showcase')) {
-        if (showcaseUnderline) {
-          showcaseUnderline.className = 'hidden md:block h-0.5 bg-black dark:bg-white';
-        }
+        if (showcaseUnderline) showcaseUnderline.className = activeClass;
       } else {
-        const pageNames = {
-          'nature': 'NATURE',
-          'portraits': 'PORTRAITS',
-          'sport': 'SPORT',
-          'evenements': 'ÉVÉNEMENTS',
-          'animaux': 'ANIMAUX',
-          'personnel': 'PERSONNEL'
-        };
-        
-        for (const [key, value] of Object.entries(pageNames)) {
+        for (const key of CATEGORIES) {
           if (currentPage === `${key}.html` || currentPage.includes(key)) {
             if (portfolioText && isDesktop) {
-              portfolioText.textContent = value;
+              if (typeof LanguageManager !== 'undefined') {
+                portfolioText.textContent = LanguageManager.get(key).toUpperCase();
+              } else {
+                const pageNames = {
+                  'nature': 'NATURE',
+                  'portraits': 'PORTRAITS',
+                  'sport': 'SPORT',
+                  'evenements': 'ÉVÉNEMENTS',
+                  'animaux': 'ANIMAUX',
+                  'personnel': 'PERSONNEL'
+                };
+                portfolioText.textContent = pageNames[key] || 'PORTFOLIO';
+              }
             }
             if (portfolioUnderline) {
-              portfolioUnderline.className = 'hidden md:block h-0.5 bg-black dark:bg-white absolute bottom-0 left-0 right-0';
+              portfolioUnderline.className = activeClass + ' absolute bottom-0 left-0 right-0';
             }
             break;
           }
         }
       }
     } else if (currentPage === 'about_me.html' || currentPage.includes('about')) {
-      if (aboutUnderline) {
-        aboutUnderline.className = 'hidden md:block h-0.5 bg-black dark:bg-white';
-      }
+      if (aboutUnderline) aboutUnderline.className = activeClass;
     } else if (currentPage === 'contact.html' || currentPage.includes('contact')) {
-      if (contactUnderline) {
-        contactUnderline.className = 'hidden md:block h-0.5 bg-black dark:bg-white';
-      }
+      if (contactUnderline) contactUnderline.className = activeClass;
     }
   }
 
   function loadComponents() {
-    const navbarContainer = document.getElementById('navbar-container');
-    const footerContainer = document.getElementById('footer-container');
-    const scrollToTopContainer = document.getElementById('scroll-to-top-container');
+    const components = [
+      { id: 'navbar-container', defaultPath: 'components/navbar.html' },
+      { id: 'footer-container', defaultPath: 'components/footer.html' },
+      { id: 'scroll-to-top-container', defaultPath: 'components/scroll-to-top.html' },
+      { id: 'language-toggle-container', defaultPath: 'components/language-toggle.html' }
+    ];
     
-    if (navbarContainer) {
-      const navbarPath = navbarContainer.getAttribute('data-path') || 'components/navbar.html';
-      loadComponent('navbar-container', navbarPath);
-    }
-    
-    if (footerContainer) {
-      const footerPath = footerContainer.getAttribute('data-path') || 'components/footer.html';
-      loadComponent('footer-container', footerPath);
-    }
-    
-    if (scrollToTopContainer) {
-      const scrollToTopPath = scrollToTopContainer.getAttribute('data-path') || 'components/scroll-to-top.html';
-      loadComponent('scroll-to-top-container', scrollToTopPath);
-    }
+    components.forEach(component => {
+      const element = document.getElementById(component.id);
+      if (element) {
+        const path = element.getAttribute('data-path') || component.defaultPath;
+        loadComponent(component.id, path);
+      }
+    });
   }
 
   if (document.readyState === 'loading') {
@@ -270,4 +277,3 @@
     loadComponents();
   }
 })();
-

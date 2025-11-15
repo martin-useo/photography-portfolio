@@ -117,7 +117,6 @@
       }
     });
     
-    // Also handle hover on dropdown itself
     if (dropdown) {
       dropdown.addEventListener('mouseenter', function() {
         if (window.innerWidth >= 768) {
@@ -147,4 +146,3 @@
   
   setTimeout(initDropdown, 500);
 })();
-

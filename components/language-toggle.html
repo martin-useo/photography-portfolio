@@ -1,0 +1,40 @@
+<button 
+  id="language-toggle"
+  onclick="if(typeof LanguageManager !== 'undefined') { LanguageManager.toggleLanguage(); }"
+  class="px-3 py-1.5 text-sm font-signika font-medium bg-white border border-black text-black rounded transition-all duration-300 hover:scale-105 hover:shadow-md min-w-[2.5rem]"
+  aria-label="Toggle language">
+  <span id="language-toggle-text" class="inline-block transition-opacity duration-300 w-6 text-center">FR</span>
+</button>
+
+<script>
+  (function() {
+    function initLanguageToggle() {
+      const toggleText = document.getElementById('language-toggle-text');
+      if (toggleText && typeof LanguageManager !== 'undefined' && LanguageManager.currentLang) {
+        toggleText.textContent = LanguageManager.currentLang.toUpperCase();
+      }
+    }
+    
+    if (typeof LanguageManager !== 'undefined' && LanguageManager.currentLang) {
+      initLanguageToggle();
+    } else {
+      let attempts = 0;
+      const maxAttempts = 40;
+      
+      const checkLanguageManager = setInterval(() => {
+        attempts++;
+        if (typeof LanguageManager !== 'undefined' && LanguageManager.currentLang) {
+          clearInterval(checkLanguageManager);
+          initLanguageToggle();
+        } else if (attempts >= maxAttempts) {
+          clearInterval(checkLanguageManager);
+          setTimeout(() => {
+            if (typeof LanguageManager !== 'undefined' && LanguageManager.currentLang) {
+              initLanguageToggle();
+            }
+          }, 500);
+        }
+      }, 50);
+    }
+  })();
+</script>

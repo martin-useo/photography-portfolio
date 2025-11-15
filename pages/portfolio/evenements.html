@@ -28,6 +28,35 @@
       plugins: [],
     }
   </script>
+  <script>
+    document.write('<style id="i18n-preload">body{visibility:hidden}</style>');
+  </script>
+  <script src="../../js/i18n.js"></script>
+  <script>
+    if (typeof applyTranslationsBeforeRender === 'function') {
+      applyTranslationsBeforeRender();
+    }
+    
+    function revealBody() {
+      const style = document.getElementById('i18n-preload');
+      if (style) style.remove();
+      if (document.body) document.body.style.visibility = '';
+    }
+    
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof LanguageManager !== 'undefined') {
+          LanguageManager.applyLanguage();
+        }
+        revealBody();
+      });
+    } else {
+      if (typeof LanguageManager !== 'undefined') {
+        LanguageManager.applyLanguage();
+      }
+      revealBody();
+    }
+  </script>
   <script src="../../js/components/loader.js"></script>
   <script src="../../js/components/dropdown.js"></script>
 </head>

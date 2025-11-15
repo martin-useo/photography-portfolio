@@ -32,6 +32,35 @@
       plugins: [],
     }
   </script>
+  <script>
+    document.write('<style id="i18n-preload">body{visibility:hidden}</style>');
+  </script>
+  <script src="../../js/i18n.js"></script>
+  <script>
+    if (typeof applyTranslationsBeforeRender === 'function') {
+      applyTranslationsBeforeRender();
+    }
+    
+    function revealBody() {
+      const style = document.getElementById('i18n-preload');
+      if (style) style.remove();
+      if (document.body) document.body.style.visibility = '';
+    }
+    
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof LanguageManager !== 'undefined') {
+          LanguageManager.applyLanguage();
+        }
+        revealBody();
+      });
+    } else {
+      if (typeof LanguageManager !== 'undefined') {
+        LanguageManager.applyLanguage();
+      }
+      revealBody();
+    }
+  </script>
   <script src="../../js/components/loader.js"></script>
   <script src="../../js/components/dropdown.js"></script>
 </head>
@@ -46,13 +75,13 @@
     <!-- Hero Image -->
     <div class="pt-10 md:pt-20 pb-12 md:pb-16">
       <div class="w-full aspect-[16/9] md:aspect-[21/9] rounded-lg overflow-hidden">
-        <img id="hero-image" src="" alt="Portfolio showcase" class="w-full h-full object-cover" />
+        <img id="hero-image" src="" data-i18n-alt="showcase.heroAlt" alt="Vitrine du portfolio" class="w-full h-full object-cover" />
       </div>
     </div>
 
     <!-- Categories Grid -->
     <div class="pb-20">
-      <h2 class="text-3xl md:text-4xl font-signika font-bold mb-8 md:mb-12 text-center">Explore Categories</h2>
+      <h2 class="text-3xl md:text-4xl font-signika font-bold mb-8 md:mb-12 text-center" data-i18n="showcase.title">Découvrir les catégories</h2>
       <div id="categories-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
         <!-- Categories will be dynamically generated here -->
       </div>
@@ -67,12 +96,12 @@
   <script src="../../js/images-config.js"></script>
   <script>
     const categories = [
-      { name: 'Nature', slug: 'nature', path: 'nature.html' },
-      { name: 'Portraits', slug: 'portraits', path: 'portraits.html' },
-      { name: 'Sport', slug: 'sport', path: 'sport.html' },
-      { name: 'Événements', slug: 'evenements', path: 'evenements.html' },
-      { name: 'Animaux', slug: 'animaux', path: 'animaux.html' },
-      { name: 'Personnel', slug: 'personnel', path: 'personnel.html' }
+      { nameKey: 'nature', slug: 'nature', path: 'nature.html' },
+      { nameKey: 'portraits', slug: 'portraits', path: 'portraits.html' },
+      { nameKey: 'sport', slug: 'sport', path: 'sport.html' },
+      { nameKey: 'evenements', slug: 'evenements', path: 'evenements.html' },
+      { nameKey: 'animaux', slug: 'animaux', path: 'animaux.html' },
+      { nameKey: 'personnel', slug: 'personnel', path: 'personnel.html' }
     ];
 
     function getCategoryImage(categorySlug) {
@@ -119,8 +148,18 @@
       if (heroImage) {
         const heroImgElement = document.getElementById('hero-image');
         heroImgElement.src = heroImage.src;
-        heroImgElement.alt = heroImage.alt || 'Portfolio showcase';
+        heroImgElement.alt = heroImage.alt || LanguageManager.get('showcase.heroAlt');
       }
+      
+      // Écouter les changements de langue
+      window.addEventListener('languageChanged', () => {
+        LanguageManager.applyLanguage();
+        // Mettre à jour l'alt de l'image hero
+        const heroImgElement = document.getElementById('hero-image');
+        if (heroImgElement && !heroImage) {
+          heroImgElement.alt = LanguageManager.get('showcase.heroAlt');
+        }
+      });
 
       // Render category cards
       const grid = document.getElementById('categories-grid');
@@ -128,21 +167,23 @@
 
       categories.forEach(category => {
         const categoryImage = getCategoryImage(category.slug);
+        const categoryName = LanguageManager.get(category.nameKey);
         
         const card = document.createElement('a');
         card.href = category.path;
         card.className = 'group relative block overflow-hidden rounded-lg aspect-[4/3] transition-transform duration-300 hover:scale-105';
+        card.setAttribute('data-category', category.slug);
         
         if (categoryImage) {
           card.innerHTML = `
             <div class="absolute inset-0">
-              <img src="${categoryImage.src}" alt="${categoryImage.alt || category.name}" 
+              <img src="${categoryImage.src}" alt="${categoryImage.alt || categoryName}" 
                 class="w-full h-full object-cover" />
               <div class="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors duration-300"></div>
             </div>
             <div class="absolute inset-0 flex items-center justify-center">
-              <h3 class="text-3xl md:text-4xl font-signika font-bold text-white drop-shadow-lg">
-                ${category.name}
+              <h3 class="text-3xl md:text-4xl font-signika font-bold text-white drop-shadow-lg" data-i18n="${category.nameKey}">
+                ${categoryName}
               </h3>
             </div>
           `;
@@ -151,14 +192,27 @@
           card.innerHTML = `
             <div class="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 group-hover:from-gray-700 group-hover:to-gray-800 transition-colors duration-300"></div>
             <div class="absolute inset-0 flex items-center justify-center">
-              <h3 class="text-3xl md:text-4xl font-signika font-bold text-white">
-                ${category.name}
+              <h3 class="text-3xl md:text-4xl font-signika font-bold text-white" data-i18n="${category.nameKey}">
+                ${categoryName}
               </h3>
             </div>
           `;
         }
         
         grid.appendChild(card);
+      });
+      
+      // Écouter les changements de langue pour mettre à jour les noms de catégories
+      window.addEventListener('languageChanged', () => {
+        categories.forEach(category => {
+          const card = grid.querySelector(`[data-category="${category.slug}"]`);
+          if (card) {
+            const h3 = card.querySelector('h3');
+            if (h3) {
+              h3.textContent = LanguageManager.get(category.nameKey);
+            }
+          }
+        });
       });
     }
 

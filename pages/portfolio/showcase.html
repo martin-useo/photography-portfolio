@@ -142,26 +142,16 @@
       return null;
     }
 
+    let heroImage = null;
+
     function renderShowcase() {
-      // Set hero image
-      const heroImage = getHeroImage();
+      heroImage = getHeroImage();
       if (heroImage) {
         const heroImgElement = document.getElementById('hero-image');
         heroImgElement.src = heroImage.src;
         heroImgElement.alt = heroImage.alt || LanguageManager.get('showcase.heroAlt');
       }
-      
-      // Écouter les changements de langue
-      window.addEventListener('languageChanged', () => {
-        LanguageManager.applyLanguage();
-        // Mettre à jour l'alt de l'image hero
-        const heroImgElement = document.getElementById('hero-image');
-        if (heroImgElement && !heroImage) {
-          heroImgElement.alt = LanguageManager.get('showcase.heroAlt');
-        }
-      });
 
-      // Render category cards
       const grid = document.getElementById('categories-grid');
       grid.innerHTML = '';
 
@@ -188,7 +178,6 @@
             </div>
           `;
         } else {
-          // Fallback si pas d'image
           card.innerHTML = `
             <div class="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 group-hover:from-gray-700 group-hover:to-gray-800 transition-colors duration-300"></div>
             <div class="absolute inset-0 flex items-center justify-center">
@@ -201,20 +190,16 @@
         
         grid.appendChild(card);
       });
-      
-      // Écouter les changements de langue pour mettre à jour les noms de catégories
-      window.addEventListener('languageChanged', () => {
-        categories.forEach(category => {
-          const card = grid.querySelector(`[data-category="${category.slug}"]`);
-          if (card) {
-            const h3 = card.querySelector('h3');
-            if (h3) {
-              h3.textContent = LanguageManager.get(category.nameKey);
-            }
-          }
-        });
-      });
     }
+
+    window.addEventListener('languageChanged', () => {
+      if (heroImage) {
+        const heroImgElement = document.getElementById('hero-image');
+        if (heroImgElement) {
+          heroImgElement.alt = heroImage.alt || LanguageManager.get('showcase.heroAlt');
+        }
+      }
+    });
 
     document.addEventListener('DOMContentLoaded', renderShowcase);
   </script>

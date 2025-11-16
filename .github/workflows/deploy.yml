@@ -2,49 +2,99 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  # Permet de lancer manuellement le workflow
+  workflow_dispatch:
 
+# Permissions nécessaires pour GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
+# N'autorise qu'un seul déploiement à la fois
 concurrency:
   group: "pages"
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
+  # Job de build et configuration
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+    
+    - name: 🔧 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+    
+    - name: 📦 Install dependencies
+      run: |
+        npm ci || npm install
+    
+    - name: ⚙️ Create EmailJS config
+      env:
+        EMAILJS_PUBLIC_KEY: ${{ secrets.EMAILJS_PUBLIC_KEY }}
+        EMAILJS_SERVICE_ID: ${{ secrets.EMAILJS_SERVICE_ID }}
+        EMAILJS_TEMPLATE_ID: ${{ secrets.EMAILJS_TEMPLATE_ID }}
+      run: |
+        # Crée le fichier de configuration EmailJS
+        cat > config/emailjs.config.js << EOF
+        const CONFIG = {
+          emailjs: {
+            publicKey: "${EMAILJS_PUBLIC_KEY}",
+            serviceId: "${EMAILJS_SERVICE_ID}",
+            templateId: "${EMAILJS_TEMPLATE_ID}"
+          }
+        };
+        EOF
+        
+        echo "📝 EmailJS config created"
+    
+    - name: 🎨 Build CSS (if Tailwind config exists)
+      run: |
+        if [ -f "tailwind.config.js" ]; then
+          npm run build:css || echo "⚠️  No Tailwind build script found"
+        else
+          echo "ℹ️  No Tailwind config found, skipping CSS build"
+        fi
+    
+    - name: 📊 Display build info
+      run: |
+        echo "🌐 Site will be deployed to GitHub Pages"
+        echo "📦 Total files: $(find . -type f | wc -l)"
+        echo "🖼️  Images: $(find assets/images -type f 2>/dev/null | wc -l || echo 0)"
+        echo "✅ EmailJS config created"
+    
+    - name: 📤 Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: '.'
+
+  # Job de déploiement
   deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    
+    # Déploie uniquement sur main/master
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
+    
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Create config.js with secrets
-        run: |
-          cat > js/config.js << 'EOF'
-          const CONFIG = {
-            emailjs: {
-              publicKey: "${{ secrets.EMAILJS_PUBLIC_KEY }}",
-              serviceId: "${{ secrets.EMAILJS_SERVICE_ID }}",
-              templateId: "${{ secrets.EMAILJS_TEMPLATE_ID }}"
-            }
-          };
-          EOF
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: '.'
-
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-
+    - name: 🚀 Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
+    
+    - name: ✅ Deployment complete
+      run: |
+        echo "🎉 Site deployed successfully!"
+        echo "🌐 URL: ${{ steps.deployment.outputs.page_url }}"

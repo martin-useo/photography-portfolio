@@ -1,5 +1,4 @@
-js/config.js
-dist/config.js
+config/emailjs.config.js
 
 node_modules/
 .DS_Store

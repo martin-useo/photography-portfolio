@@ -82,7 +82,7 @@
     <!-- Categories Grid -->
     <div class="pb-20">
       <h2 class="text-3xl md:text-4xl font-signika font-bold mb-8 md:mb-12 text-center" data-i18n="showcase.title">Découvrir les catégories</h2>
-      <div id="categories-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+      <div id="categories-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-4 md:gap-8">
         <!-- Categories will be dynamically generated here -->
       </div>
     </div>
@@ -161,7 +161,7 @@
         
         const card = document.createElement('a');
         card.href = category.path;
-        card.className = 'group relative block overflow-hidden rounded-lg aspect-[4/3] transition-transform duration-300 hover:scale-105';
+        card.className = 'group relative block overflow-hidden rounded-lg aspect-[3/2] sm:aspect-[4/3] transition-transform duration-300 hover:scale-105';
         card.setAttribute('data-category', category.slug);
         
         if (categoryImage) {
@@ -172,7 +172,7 @@
               <div class="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors duration-300"></div>
             </div>
             <div class="absolute inset-0 flex items-center justify-center">
-              <h3 class="text-3xl md:text-4xl font-signika font-bold text-white drop-shadow-lg" data-i18n="${category.nameKey}">
+              <h3 class="text-base sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-signika font-bold text-white drop-shadow-lg" data-i18n="${category.nameKey}">
                 ${categoryName}
               </h3>
             </div>
@@ -181,7 +181,7 @@
           card.innerHTML = `
             <div class="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 group-hover:from-gray-700 group-hover:to-gray-800 transition-colors duration-300"></div>
             <div class="absolute inset-0 flex items-center justify-center">
-              <h3 class="text-3xl md:text-4xl font-signika font-bold text-white" data-i18n="${category.nameKey}">
+              <h3 class="text-base sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-signika font-bold text-white" data-i18n="${category.nameKey}">
                 ${categoryName}
               </h3>
             </div>

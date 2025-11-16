@@ -43,7 +43,7 @@ jobs:
         EMAILJS_SERVICE_ID: ${{ secrets.EMAILJS_SERVICE_ID }}
         EMAILJS_TEMPLATE_ID: ${{ secrets.EMAILJS_TEMPLATE_ID }}
       run: |
-        # Crée le fichier de configuration EmailJS
+        # Crée le fichier de configuration EmailJS dans config/ comme attendu par contact.html
         cat > config/emailjs.config.js << EOF
         const CONFIG = {
           emailjs: {
@@ -54,7 +54,7 @@ jobs:
         };
         EOF
         
-        echo "📝 EmailJS config created"
+        echo "📝 EmailJS config created in config/emailjs.config.js"
     
     - name: 🎨 Build CSS (if Tailwind config exists)
       run: |

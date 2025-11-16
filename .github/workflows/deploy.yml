@@ -25,53 +25,39 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: 📥 Checkout code
+    - name: Checkout code
       uses: actions/checkout@v4
     
-    - name: 🔧 Setup Node.js
+    - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
     
-    - name: 📦 Install dependencies
+    - name: Install dependencies
       run: |
         npm ci || npm install
     
-    - name: ⚙️ Create EmailJS config
-      env:
-        EMAILJS_PUBLIC_KEY: ${{ secrets.EMAILJS_PUBLIC_KEY }}
-        EMAILJS_SERVICE_ID: ${{ secrets.EMAILJS_SERVICE_ID }}
-        EMAILJS_TEMPLATE_ID: ${{ secrets.EMAILJS_TEMPLATE_ID }}
+    - name: Create config.js with secrets
       run: |
-        # Crée le fichier de configuration EmailJS dans config/ comme attendu par contact.html
-        cat > config/emailjs.config.js << EOF
+        cat > config/emailjs.config.js << 'EOF'
         const CONFIG = {
           emailjs: {
-            publicKey: "${EMAILJS_PUBLIC_KEY}",
-            serviceId: "${EMAILJS_SERVICE_ID}",
-            templateId: "${EMAILJS_TEMPLATE_ID}"
+            publicKey: "${{ secrets.EMAILJS_PUBLIC_KEY }}",
+            serviceId: "${{ secrets.EMAILJS_SERVICE_ID }}",
+            templateId: "${{ secrets.EMAILJS_TEMPLATE_ID }}"
           }
         };
         EOF
-        
-        echo "📝 EmailJS config created in config/emailjs.config.js"
     
-    - name: 🎨 Build CSS (if Tailwind config exists)
+    - name: Build CSS
       run: |
         if [ -f "tailwind.config.js" ]; then
-          npm run build:css || echo "⚠️  No Tailwind build script found"
+          npm run build:css || echo "No Tailwind build script found"
         else
-          echo "ℹ️  No Tailwind config found, skipping CSS build"
+          echo "No Tailwind config found, skipping CSS build"
         fi
     
-    - name: 📊 Display build info
-      run: |
-        echo "🌐 Site will be deployed to GitHub Pages"
-        echo "📦 Total files: $(find . -type f | wc -l)"
-        echo "🖼️  Images: $(find assets/images -type f 2>/dev/null | wc -l || echo 0)"
-        echo "✅ EmailJS config created"
-    
-    - name: 📤 Upload artifact
+    - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
         path: '.'
@@ -89,11 +75,6 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     
     steps:
-    - name: 🚀 Deploy to GitHub Pages
+    - name: Deploy to GitHub Pages
       id: deployment
       uses: actions/deploy-pages@v4
-    
-    - name: ✅ Deployment complete
-      run: |
-        echo "🎉 Site deployed successfully!"
-        echo "🌐 URL: ${{ steps.deployment.outputs.page_url }}"

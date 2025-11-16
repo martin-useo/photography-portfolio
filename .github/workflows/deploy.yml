@@ -24,6 +24,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate optimized thumbnails
+        run: npm run generate:thumbs
+
       - name: Create config.js with secrets
         run: |
           cat > config/emailjs.config.js << 'EOF'

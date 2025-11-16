@@ -2,25 +2,23 @@ const ImageOptimizer = (function() {
   'use strict';
   
   const config = {
-    rootMargin: '50px',
+    rootMargin: '100px',
     threshold: 0.01,
-    loadDelay: 0,
-    fadeInDuration: 500,
-    enableLQIP: true,
-    preloadAdjacent: 2
+    fadeInDuration: 600,
+    blurTransition: 800
   };
   
   const stats = {
     total: 0,
-    loaded: 0,
-    failed: 0,
-    cached: 0
+    lqipLoaded: 0,
+    thumbLoaded: 0,
+    failed: 0
   };
   
   let observer = null;
   const loadingImages = new Map();
   
-  function getLocalImageUrl(filename) {
+  function getImagePath(filename, version = 'original') {
     const depth = (window.location.pathname.match(/\//g) || []).length;
     let basePath = '';
     
@@ -28,7 +26,19 @@ const ImageOptimizer = (function() {
       basePath = '../'.repeat(depth - 1);
     }
     
-    return `${basePath}assets/images/${filename}`;
+    const ext = filename.match(/\.[^.]+$/)?.[0] || '.jpg';
+    const baseName = filename.replace(ext, '');
+    
+    switch(version) {
+      case 'lqip':
+        return `${basePath}assets/images-optimized/${baseName}-lqip${ext}`;
+      case 'thumb':
+        return `${basePath}assets/images-optimized/${baseName}-thumb${ext}`;
+      case 'fullres':
+        return `${basePath}assets/images-optimized/${filename}`;
+      default:
+        return `${basePath}assets/images/${filename}`;
+    }
   }
   
   function initObserver() {
@@ -55,177 +65,105 @@ const ImageOptimizer = (function() {
     return observer;
   }
   
-  function loadImage(img) {
-    if (loadingImages.has(img)) return;
-    loadingImages.set(img, true);
-    
-    const filename = img.dataset.filename || img.dataset.src;
-    if (!filename) {
-      console.warn('No filename or data-src found for image', img);
-      return;
-    }
-    
-    const isLQIP = img.dataset.lqip === 'true';
-    const targetUrl = img.dataset.src || getLocalImageUrl(filename);
-    
-    if (img.src === targetUrl) {
-      markAsLoaded(img);
-      return;
-    }
-    
-    img.classList.add('loading');
+  function loadLQIP(img, filename) {
+    const lqipUrl = getImagePath(filename, 'lqip');
     
     const loader = new Image();
     loader.onload = () => {
-      setTimeout(() => {
-        if (isLQIP) {
-          img.style.transition = `opacity ${config.fadeInDuration}ms ease-in-out`;
-          img.style.opacity = '0';
-          
-          setTimeout(() => {
-            img.src = targetUrl;
-            img.srcset = img.dataset.srcset || '';
-            img.style.opacity = '1';
-            markAsLoaded(img);
-          }, 50);
-        } else {
-          img.src = targetUrl;
-          img.srcset = img.dataset.srcset || '';
-          img.style.opacity = '1';
-          markAsLoaded(img);
-        }
-        
-        img.classList.remove('loading');
-        img.classList.add('loaded');
-        
-        if (img.dataset.preloadAdjacent === 'true') {
-          preloadAdjacentImages(img);
-        }
-        
-        stats.loaded++;
-      }, config.loadDelay);
+      img.src = lqipUrl;
+      img.style.filter = 'blur(12px)';
+      img.style.transform = 'scale(1.05)';
+      img.style.opacity = '1';
+      img.classList.add('lqip-loaded');
+      stats.lqipLoaded++;
+      
+      loadThumb(img, filename);
     };
     
     loader.onerror = () => {
-      console.error('Failed to load image:', targetUrl);
-      img.classList.remove('loading');
-      img.classList.add('error');
+      console.warn('LQIP failed, loading thumb directly:', filename);
+      loadThumb(img, filename);
+    };
+    
+    loader.src = lqipUrl;
+  }
+  
+  function loadThumb(img, filename) {
+    const thumbUrl = getImagePath(filename, 'thumb');
+    
+    const loader = new Image();
+    loader.onload = () => {
+      img.style.transition = `filter ${config.blurTransition}ms ease-out, transform ${config.blurTransition}ms ease-out`;
+      
+      setTimeout(() => {
+        img.src = thumbUrl;
+        img.style.filter = 'blur(0)';
+        img.style.transform = 'scale(1)';
+        img.classList.remove('lqip-loaded');
+        img.classList.add('thumb-loaded');
+        stats.thumbLoaded++;
+        
+        img.dataset.loaded = 'true';
+        loadingImages.delete(img);
+        
+        img.dispatchEvent(new CustomEvent('imageLoaded', {
+          bubbles: true,
+          detail: { src: thumbUrl, filename }
+        }));
+      }, 50);
+    };
+    
+    loader.onerror = () => {
+      console.error('Thumb failed, trying fallback:', filename);
+      const fallbackUrl = getImagePath(filename, 'original');
+      img.src = fallbackUrl;
+      img.style.filter = 'blur(0)';
+      img.style.transform = 'scale(1)';
       stats.failed++;
       loadingImages.delete(img);
     };
     
-    loader.src = targetUrl;
+    loader.src = thumbUrl;
   }
   
-  function markAsLoaded(img) {
-    img.dataset.loaded = 'true';
-    img.removeAttribute('data-filename');
-    loadingImages.delete(img);
+  function loadImage(img) {
+    if (loadingImages.has(img)) return;
+    if (img.dataset.loaded === 'true') return;
     
-    img.dispatchEvent(new CustomEvent('imageLoaded', {
-      bubbles: true,
-      detail: { src: img.src }
-    }));
-  }
-  
-  function preloadAdjacentImages(currentImg) {
-    const container = currentImg.closest('[data-gallery]') || document;
-    const allImages = Array.from(container.querySelectorAll('img[data-filename]'));
-    const currentIndex = allImages.indexOf(currentImg);
-    
-    if (currentIndex === -1) return;
-    
-    const toPreload = [];
-    
-    for (let i = 1; i <= config.preloadAdjacent; i++) {
-      const prevIndex = currentIndex - i;
-      if (prevIndex >= 0) {
-        toPreload.push(allImages[prevIndex]);
-      }
+    const filename = img.dataset.filename;
+    if (!filename) {
+      console.warn('No filename found for image', img);
+      return;
     }
     
-    for (let i = 1; i <= config.preloadAdjacent; i++) {
-      const nextIndex = currentIndex + i;
-      if (nextIndex < allImages.length) {
-        toPreload.push(allImages[nextIndex]);
-      }
-    }
-    
-    toPreload.forEach(img => {
-      if (!img.dataset.loaded && !loadingImages.has(img)) {
-        loadImage(img);
-      }
-    });
-  }
-  
-  function setupImage(img, options = {}) {
-    const {
-      filename,
-      size = 'medium',
-      alt = '',
-      enableLQIP = config.enableLQIP,
-      preloadAdjacent = false,
-      immediate = false
-    } = options;
-    
+    loadingImages.set(img, true);
+    img.classList.add('loading');
     stats.total++;
     
-    img.dataset.filename = filename;
-    img.dataset.size = size;
-    img.alt = alt;
-    
-    if (preloadAdjacent) {
-      img.dataset.preloadAdjacent = 'true';
-    }
-    
-    img.style.opacity = '0';
-    img.style.transition = `opacity ${config.fadeInDuration}ms ease-in-out`;
-    
-    if (immediate || !observer) {
-      loadImage(img);
-    } else {
-      observer.observe(img);
-    }
-    
-    return img;
+    loadLQIP(img, filename);
+  }
+  
+  function getFullResUrl(filename) {
+    return getImagePath(filename, 'fullres');
   }
   
   function initLazyImages(container = document) {
     initObserver();
     
-    const lazyImages = container.querySelectorAll('img[data-lazy]');
+    const lazyImages = container.querySelectorAll('img.lazy-load[data-filename]:not([data-loaded])');
     
     lazyImages.forEach(img => {
-      const filename = img.dataset.lazy;
-      const size = img.dataset.size || 'medium';
-      const alt = img.alt || '';
-      const preloadAdjacent = img.dataset.preloadAdjacent === 'true';
+      img.style.opacity = '0';
+      img.style.transition = `opacity ${config.fadeInDuration}ms ease-in-out`;
       
-      setupImage(img, { filename, size, alt, preloadAdjacent });
-      img.removeAttribute('data-lazy');
+      if (observer) {
+        observer.observe(img);
+      } else {
+        loadImage(img);
+      }
     });
     
     return lazyImages.length;
-  }
-  
-  function createOptimizedImage(options = {}) {
-    const img = document.createElement('img');
-    const {
-      filename,
-      size = 'medium',
-      alt = '',
-      className = '',
-      preloadAdjacent = false,
-      immediate = false
-    } = options;
-    
-    if (className) {
-      img.className = className;
-    }
-    
-    setupImage(img, { filename, size, alt, preloadAdjacent, immediate });
-    
-    return img;
   }
   
   function loadAllPending() {
@@ -249,16 +187,16 @@ const ImageOptimizer = (function() {
   function getStats() {
     return {
       ...stats,
-      pending: stats.total - stats.loaded - stats.failed,
-      successRate: stats.total > 0 ? (stats.loaded / stats.total * 100).toFixed(2) + '%' : '0%'
+      pending: stats.total - stats.thumbLoaded - stats.failed,
+      successRate: stats.total > 0 ? (stats.thumbLoaded / stats.total * 100).toFixed(2) + '%' : '0%'
     };
   }
   
   function resetStats() {
     stats.total = 0;
-    stats.loaded = 0;
+    stats.lqipLoaded = 0;
+    stats.thumbLoaded = 0;
     stats.failed = 0;
-    stats.cached = 0;
   }
   
   function setConfig(newConfig) {
@@ -274,12 +212,11 @@ const ImageOptimizer = (function() {
   }
   
   return {
-    setupImage,
     initLazyImages,
-    createOptimizedImage,
     loadImage,
     loadAllPending,
-    preloadAdjacentImages,
+    getFullResUrl,
+    getImagePath,
     destroy,
     getStats,
     resetStats,

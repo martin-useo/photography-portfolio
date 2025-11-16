@@ -56,7 +56,7 @@ const LightboxOptimizer = (function() {
     });
   }
   
-  function getLocalImageUrl(filename) {
+  function getFullResUrl(filename) {
     const depth = (window.location.pathname.match(/\//g) || []).length;
     let basePath = '';
     
@@ -64,20 +64,20 @@ const LightboxOptimizer = (function() {
       basePath = '../'.repeat(depth - 1);
     }
     
-    return `${basePath}assets/images/${filename}`;
+    return `${basePath}assets/images-optimized/${filename}`;
   }
   
   function prepareGalleryItems(images, galleryId = 'gallery') {
     const items = images.map((img, index) => {
       const filename = img.filename || img.src?.split('/').pop();
-      const imageUrl = getLocalImageUrl(filename);
+      const fullResUrl = getFullResUrl(filename);
       
       return {
-        src: imageUrl,
-        thumb: imageUrl,
+        src: fullResUrl,
+        thumb: fullResUrl,
         caption: img.alt || img.caption || '',
         filename: filename,
-        highResUrl: imageUrl,
+        highResUrl: fullResUrl,
         index: index
       };
     });
@@ -218,19 +218,18 @@ const LightboxOptimizer = (function() {
       imgClassName = ''
     } = imageData;
     
-    const imageUrl = getLocalImageUrl(filename);
+    const fullResUrl = getFullResUrl(filename);
     
     const link = document.createElement('a');
-    link.href = imageUrl;
+    link.href = fullResUrl;
     link.setAttribute('data-fancybox', galleryName);
     link.setAttribute('data-caption', alt);
     if (className) link.className = className;
     
     const img = document.createElement('img');
-    img.src = imageUrl;
-    img.alt = alt;
     img.dataset.filename = filename;
-    if (imgClassName) img.className = imgClassName;
+    img.alt = alt;
+    img.className = (imgClassName || '') + ' lazy-load';
     
     link.appendChild(img);
     

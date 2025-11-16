@@ -7,7 +7,8 @@
     "start": "http-server -p 8000 -c-1",
     "build:css": "tailwindcss -i ./css/input.css -o ./css/output.css",
     "watch:css": "tailwindcss -i ./css/input.css -o ./css/output.css --watch",
-    "serve": "python3 -m http.server 8000"
+    "serve": "python3 -m http.server 8000",
+    "generate:thumbs": "node scripts/generate-thumbnails.js"
   },
   "keywords": [
     "photography",
@@ -25,6 +26,7 @@
   },
   "devDependencies": {
     "http-server": "^14.1.1",
+    "sharp": "^0.33.0",
     "tailwindcss": "^3.4.0"
   },
   "optionalDependencies": {},

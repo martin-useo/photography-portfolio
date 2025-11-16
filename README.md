@@ -58,10 +58,13 @@ photography-portfolio/
 ## Fonctionnalités
 
 ### 🚀 Optimisations de performance
+- **LQIP (Low Quality Image Placeholder)** : chargement instantané d'une version 50px (~5-10 Ko)
+- **Thumbnails** : 70% de la résolution originale (~800 Ko - 2 Mo selon l'image) pour les galeries
+- **Full-res** : réservée exclusivement pour la lightbox
 - **Lazy loading** avec Intersection Observer API
 - **Service Worker** pour cache agressif (30 jours)
-- **Préchargement intelligent** des images adjacentes dans la lightbox
-- **Transitions smooth** pour un chargement progressif
+- **Préchargement intelligent** des 2 images adjacentes dans la lightbox
+- **Transitions smooth** (flou → net) pour un chargement progressif
 - **Mode offline** avec fallback cache
 
 ### Page d'accueil
@@ -109,15 +112,39 @@ Le site est déployé automatiquement sur GitHub Pages via GitHub Actions.
 Les images sont gérées de manière centralisée dans `js/images-config.js`.
 
 1. Ajouter l'image dans `assets/images/`
-2. Ajouter sa configuration dans `js/images-config.js`
-3. Spécifier sa catégorie et son format (portrait/landscape)
+2. Générer les thumbnails : `npm run generate:thumbs`
+3. Ajouter sa configuration dans `js/images-config.js`
+4. Spécifier sa catégorie et son format (portrait/landscape)
+
+### Génération des thumbnails
+
+```bash
+npm install        # Si ce n'est pas déjà fait
+npm run generate:thumbs
+```
+
+Cela génère automatiquement 3 versions de chaque image :
+- **LQIP** (50px, ~5-10 Ko) : chargement instantané avec flou
+- **Thumbnail** (70% de la résolution originale, ~800 Ko - 2 Mo) : affichage dans les galeries
+- **Full-res** (originale) : exclusivement pour la lightbox
+
+Les images optimisées sont générées dans `assets/images-optimized/` (dans `.gitignore`).
 
 ### Système d'optimisation
 
-- **Lazy loading** : Les images se chargent uniquement quand visibles
-- **Préchargement** : Images adjacentes préchargées pour navigation fluide
-- **Cache** : 30 jours via Service Worker
-- **Transitions** : Effet fade-in smooth sur le chargement
+**Galeries :**
+1. LQIP s'affiche instantanément (floue)
+2. Thumbnail se charge avec lazy loading (Intersection Observer)
+3. Transition smooth du flou vers net
+
+**Lightbox :**
+1. Full-res exclusivement
+2. Préchargement des 2 images adjacentes
+3. Navigation instantanée
+
+**Cache :**
+- Service Worker : 30 jours
+- Mode offline complet
 
 ## Développement
 
@@ -129,26 +156,34 @@ npx tailwindcss -i ./css/input.css -o ./css/output.css --watch
 ### Commandes utiles
 
 ```bash
+# Installation
+npm install
+
+# Générer les thumbnails optimisés
+npm run generate:thumbs
+
 # Compiler Tailwind CSS
-npx tailwindcss -i ./css/input.css -o ./css/output.css --watch
+npm run build:css
+npm run watch:css
 
-# Serveur local (Python 3)
-python -m http.server 8000
-
-# Serveur local (Node.js)
-npx http-server -p 8000
+# Serveur local
+npm start                    # http-server (port 8000)
+npm run serve               # Python alternatif
 
 # Vider le cache du Service Worker (dans la console du navigateur)
 await window.swCache.clear()
 
 # Vérifier la taille du cache
 await window.swCache.getSize()
+
+# Statistiques d'optimisation (dans la console)
+ImageOptimizer.getStats()   # Stats lazy loading
+LightboxOptimizer.getCacheStats()  # Stats lightbox
 ```
 
 ## 📚 Documentation
 
-- **[QUICKSTART.md](./docs/QUICKSTART.md)** - Démarrage rapide
-- **[NEXT_STEPS.md](./docs/NEXT_STEPS.md)** - Prochaines étapes
+- **[scripts/README.md](./scripts/README.md)** - Scripts d'optimisation (génération de thumbnails)
 - **[LICENSE](./LICENSE)** - Licence du projet
 
 ## 🎯 Optimisations

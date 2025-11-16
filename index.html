@@ -85,10 +85,41 @@
     </a>
   </div>
 
-  <script src="js/image-protection.js"></script>
-  <script src="js/images-config.js"></script>
-  <script src="js/optimization/image-optimizer.js"></script>
-  <script>
+    <script src="js/image-protection.js"></script>
+    <script src="js/images-config.js"></script>
+    <script src="js/optimization/image-optimizer.js"></script>
+    <script>
+    // Fonction de chargement direct des thumbnails pour la page d'accueil
+    function loadThumbnailForCanvas(img) {
+      if (!img.dataset.filename) return;
+      
+      const filename = img.dataset.filename;
+      const depth = (window.location.pathname.match(/\//g) || []).length;
+      let basePath = '';
+      if (depth > 1) {
+        basePath = '../'.repeat(depth - 1);
+      }
+      
+      const ext = filename.match(/\.[^.]+$/)?.[0] || '.jpg';
+      const baseName = filename.replace(ext, '');
+      
+      // Charger directement le thumbnail
+      const thumbUrl = `${basePath}assets/images-optimized/${baseName}-thumb${ext}`;
+      
+      img.onload = () => {
+        img.style.opacity = '1';
+      };
+      
+      img.onerror = () => {
+        // Fallback vers image originale
+        const fallbackUrl = `${basePath}assets/images/${filename}`;
+        img.src = fallbackUrl;
+      };
+      
+      img.src = thumbUrl;
+    }
+    </script>
+    <script>
     // Layouts prédéfinis pour la disposition des images
     const LAYOUTS = [
       {
@@ -279,17 +310,12 @@
           imgElement.dataset.src = img.src;
           imgElement.dataset.filename = img.filename || img.src.split('/').pop();
           imgElement.alt = img.alt || 'Portfolio image';
-          imgElement.className = 'block h-full w-full object-cover object-center opacity-0 transition-opacity duration-1000 lazy-load';
+          imgElement.className = 'block h-full w-full object-cover object-center opacity-0 transition-opacity duration-700 ease-in-out';
           imgElement.dataset.imageIndex = index;
           imageStack.appendChild(imgElement);
           
-          // Charger l'image via ImageOptimizer
-          if (typeof ImageOptimizer !== 'undefined') {
-            ImageOptimizer.loadImage(imgElement);
-          } else {
-            imgElement.src = img.src;
-            imgElement.style.opacity = '1';
-          }
+          // Charger thumbnail directement
+          loadThumbnailForCanvas(imgElement);
           
           cellContainer.appendChild(imageStack);
           
@@ -342,17 +368,12 @@
           imgElement.dataset.src = img.src;
           imgElement.dataset.filename = img.filename || img.src.split('/').pop();
           imgElement.alt = img.alt || 'Portfolio image';
-          imgElement.className = 'block h-full w-full object-cover object-center opacity-0 transition-opacity duration-1000 lazy-load';
+          imgElement.className = 'block h-full w-full object-cover object-center opacity-0 transition-opacity duration-700 ease-in-out';
           imgElement.dataset.imageIndex = index;
           imageStack.appendChild(imgElement);
           
-          // Charger l'image via ImageOptimizer
-          if (typeof ImageOptimizer !== 'undefined') {
-            ImageOptimizer.loadImage(imgElement);
-          } else {
-            imgElement.src = img.src;
-            imgElement.style.opacity = '1';
-          }
+          // Charger thumbnail directement
+          loadThumbnailForCanvas(imgElement);
           
           cellContainer.appendChild(imageStack);
           grid.appendChild(cellContainer);
@@ -370,31 +391,28 @@
       const imageStack = cellContainer.querySelector('div');
       if (!imageStack) return;
       
+      const oldImg = imageStack.querySelector('img:not(:last-child)');
+      
       const newImgElement = document.createElement('img');
       newImgElement.dataset.src = newImage.src;
       newImgElement.dataset.filename = newImage.filename || newImage.src.split('/').pop();
       newImgElement.alt = newImage.alt || 'Portfolio image';
-      newImgElement.className = 'block h-full w-full object-cover object-center opacity-0 transition-opacity duration-1000 absolute inset-0 lazy-load';
+      newImgElement.className = 'block h-full w-full object-cover object-center opacity-0 transition-opacity duration-700 ease-in-out absolute inset-0';
       newImgElement.dataset.imageIndex = cellIndex;
       
       imageStack.appendChild(newImgElement);
       
-      // Charger l'image via ImageOptimizer
-      if (typeof ImageOptimizer !== 'undefined') {
-        ImageOptimizer.loadImage(newImgElement);
-      } else {
-        newImgElement.src = newImage.src;
-        setTimeout(() => {
-          newImgElement.style.opacity = '1';
-        }, 50);
-      }
+      // Charger thumbnail directement
+      loadThumbnailForCanvas(newImgElement);
       
-      const oldImg = imageStack.querySelector('img:not(:last-child)');
+      // Crossfade avec l'ancienne image
       if (oldImg) {
+        oldImg.style.transition = 'opacity 700ms ease-in-out';
         oldImg.style.opacity = '0';
+        
         setTimeout(() => {
           oldImg.remove();
-        }, 1000);
+        }, 700);
       }
     }
     

@@ -54,6 +54,9 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v4
 
+      - name: Remove .gitignore for artifact upload
+        run: rm .gitignore
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

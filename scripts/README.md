@@ -14,7 +14,6 @@ npm run generate:thumbs
 
 Génère dans `assets/images-optimized/` :
 - `image-thumb.jpg` : 70% résolution originale, qualité 70%
-- `image.jpg` : copie full-res pour lightbox
 
 ### Notes
 

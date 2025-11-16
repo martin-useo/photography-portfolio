@@ -35,7 +35,7 @@ const ImageOptimizer = (function() {
       case 'thumb':
         return `${basePath}assets/images-optimized/${baseName}-thumb${ext}`;
       case 'fullres':
-        return `${basePath}assets/images-optimized/${filename}`;
+        return `${basePath}assets/images/${filename}`;
       default:
         return `${basePath}assets/images/${filename}`;
     }

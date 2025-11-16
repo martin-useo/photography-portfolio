@@ -76,14 +76,6 @@ async function processImage(filename) {
     const thumbSize = (fs.statSync(thumbPath).size / 1024).toFixed(2);
     console.log(`   ${colors.green}✓${colors.reset} Thumb: ${thumbWidth}x${thumbHeight}px (${thumbSize} Ko)`);
     
-    // Copier la full-res dans le dossier optimized
-    const fullresPath = path.join(OUTPUT_DIR, filename);
-    if (!fs.existsSync(fullresPath)) {
-      fs.copyFileSync(inputPath, fullresPath);
-      const fullresSize = (fs.statSync(fullresPath).size / 1024 / 1024).toFixed(2);
-      console.log(`   ${colors.green}✓${colors.reset} Full-res: ${metadata.width}x${metadata.height} (${fullresSize} Mo)`);
-    }
-    
     console.log('');
     return { success: true, filename };
     
@@ -141,9 +133,8 @@ async function main() {
     console.log(`\n${colors.bright}💡 Prochaines étapes :${colors.reset}`);
     console.log(`   1. Vérifier les images générées dans ${OUTPUT_DIR}`);
     console.log(`   2. Le site utilisera automatiquement :`);
-    console.log(`      - LQIP pour le chargement immédiat (flou)`);
-    console.log(`      - Thumb pour les galeries (1200px)`);
-    console.log(`      - Full-res pour la lightbox uniquement`);
+    console.log(`      - Thumb pour les galeries (70% résolution)`);
+    console.log(`      - Full-res originales pour la lightbox`);
     
   } catch (error) {
     console.error(`${colors.red}Erreur fatale: ${error.message}${colors.reset}`);

@@ -64,7 +64,7 @@ const LightboxOptimizer = (function() {
       basePath = '../'.repeat(depth - 1);
     }
     
-    return `${basePath}assets/images-optimized/${filename}`;
+    return `${basePath}assets/images/${filename}`;
   }
   
   function prepareGalleryItems(images, galleryId = 'gallery') {

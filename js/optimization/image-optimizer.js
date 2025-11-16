@@ -101,12 +101,28 @@ const ImageOptimizer = (function() {
     
     const lqipUrl = getImagePath(filename, 'lqip');
     const thumbUrl = getImagePath(filename, 'thumb');
+    const fullResUrl = getImagePath(filename, 'fullres');
+    
+    // Log de diagnostic au début du chargement
+    console.log('[ImageOptimizer] Loading image:', {
+      filename,
+      pathname: window.location.pathname,
+      paths: {
+        lqip: lqipUrl,
+        thumb: thumbUrl,
+        fullres: fullResUrl
+      }
+    });
     
     const state = { thumbAttempted: false };
     
     // Charger LQIP immédiatement
     const lqipImg = new Image();
     lqipImg.onload = () => {
+      console.log('[ImageOptimizer] ✓ LQIP loaded successfully:', {
+        filename,
+        url: lqipUrl
+      });
       img.src = lqipUrl;
       img.style.opacity = '1';
       img.style.filter = 'blur(10px)';
@@ -120,7 +136,13 @@ const ImageOptimizer = (function() {
     
     lqipImg.onerror = () => {
       // Si LQIP échoue, essayer directement le thumbnail
-      console.warn('LQIP failed, trying thumbnail directly:', filename);
+      console.warn('[ImageOptimizer] ✗ LQIP failed:', {
+        filename,
+        url: lqipUrl,
+        pathname: window.location.pathname,
+        reason: 'File may not exist or path incorrect',
+        nextAction: 'Trying thumbnail directly'
+      });
       if (!state.thumbAttempted) {
         loadThumbnail(img, thumbUrl, filename, state);
       }
@@ -135,6 +157,10 @@ const ImageOptimizer = (function() {
       
       const thumbImg = new Image();
       thumbImg.onload = () => {
+        console.log('[ImageOptimizer] ✓ Thumbnail loaded successfully:', {
+          filename: imgFilename,
+          url: thumbUrl
+        });
         imgElement.src = thumbUrl;
         imgElement.style.filter = 'blur(0)';
         imgElement.style.transition = `filter ${config.blurTransition}ms ease-in-out`;
@@ -153,10 +179,22 @@ const ImageOptimizer = (function() {
       
       thumbImg.onerror = () => {
         // Si thumbnail échoue, essayer l'image originale
-        console.warn('Thumb failed, trying fallback:', imgFilename);
         const fallbackUrl = getImagePath(imgFilename, 'fullres');
+        console.warn('[ImageOptimizer] ✗ Thumbnail failed:', {
+          filename: imgFilename,
+          url: thumbUrl,
+          pathname: window.location.pathname,
+          reason: 'File may not exist or path incorrect',
+          nextAction: 'Trying full-res fallback',
+          fallbackUrl: fallbackUrl
+        });
+        
         const fallbackImg = new Image();
         fallbackImg.onload = () => {
+          console.log('[ImageOptimizer] ✓ Fallback (full-res) loaded:', {
+            filename: imgFilename,
+            url: fallbackUrl
+          });
           imgElement.src = fallbackUrl;
           imgElement.style.filter = 'blur(0)';
           imgElement.classList.remove('loading');
@@ -167,7 +205,15 @@ const ImageOptimizer = (function() {
         };
         fallbackImg.onerror = () => {
           // Dernier recours : garder LQIP ou afficher une erreur
-          console.error('All image versions failed for:', imgFilename);
+          console.error('[ImageOptimizer] ✗ All image versions failed:', {
+            filename: imgFilename,
+            attemptedUrls: {
+              lqip: getImagePath(imgFilename, 'lqip'),
+              thumb: thumbUrl,
+              fullres: fallbackUrl
+            },
+            pathname: window.location.pathname
+          });
           imgElement.style.filter = 'blur(0)';
           imgElement.classList.remove('loading');
           imgElement.dataset.loaded = 'true';

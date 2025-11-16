@@ -103,9 +103,24 @@
       
       // Charger directement le thumbnail
       const thumbUrl = `${basePath}assets/images-optimized/${baseName}-thumb${ext}`;
+      const fallbackUrl = `${basePath}assets/images/${filename}`;
+      
+      // Log de diagnostic
+      console.log('[IndexCanvas] Loading thumbnail:', {
+        filename,
+        pathname: window.location.pathname,
+        paths: {
+          thumb: thumbUrl,
+          fallback: fallbackUrl
+        }
+      });
       
       const thumbImg = new Image();
       thumbImg.onload = () => {
+        console.log('[IndexCanvas] ✓ Thumbnail loaded successfully:', {
+          filename,
+          url: thumbUrl
+        });
         img.src = thumbUrl;
         img.style.opacity = '1';
         img.dataset.loaded = 'true';
@@ -113,16 +128,33 @@
       
       thumbImg.onerror = () => {
         // Fallback vers image originale
-        console.warn('Thumbnail failed, using original:', filename);
-        const fallbackUrl = `${basePath}assets/images/${filename}`;
+        console.warn('[IndexCanvas] ✗ Thumbnail failed:', {
+          filename,
+          url: thumbUrl,
+          pathname: window.location.pathname,
+          reason: 'File may not exist or path incorrect',
+          nextAction: 'Trying full-res fallback',
+          fallbackUrl: fallbackUrl
+        });
         const fallbackImg = new Image();
         fallbackImg.onload = () => {
+          console.log('[IndexCanvas] ✓ Fallback (full-res) loaded:', {
+            filename,
+            url: fallbackUrl
+          });
           img.src = fallbackUrl;
           img.style.opacity = '1';
           img.dataset.loaded = 'true';
         };
         fallbackImg.onerror = () => {
-          console.error('Failed to load image:', filename);
+          console.error('[IndexCanvas] ✗ All image versions failed:', {
+            filename,
+            attemptedUrls: {
+              thumb: thumbUrl,
+              fullres: fallbackUrl
+            },
+            pathname: window.location.pathname
+          });
           img.style.opacity = '0';
         };
         fallbackImg.src = fallbackUrl;

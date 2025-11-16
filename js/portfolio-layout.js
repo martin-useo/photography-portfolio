@@ -2,6 +2,15 @@ const PortfolioLayout = {
   BASE_WIDTH: 1200,
   GAP: 8,
   
+  // Helper pour créer une image optimisée avec lazy loading
+  createOptimizedImage(imageSrc, imageAlt, imageFilename) {
+    const filename = imageFilename || imageSrc.split('/').pop();
+    return `<img data-src="${imageSrc}" 
+                 data-filename="${filename}"
+                 alt="${imageAlt}" 
+                 class="w-full h-full object-cover transition duration-500 transform hover:scale-105 lazy-load opacity-0" />`;
+  },
+  
   createPortraitWith2Landscapes(portrait, landscape1, landscape2) {
     const portraitWidth = (this.BASE_WIDTH - 2 * this.GAP) / 3;
     const landscapeWidth = (this.BASE_WIDTH - 2 * this.GAP) * 2 / 3;
@@ -108,7 +117,7 @@ const PortfolioLayout = {
     portraitDiv.innerHTML = `
       <div class="overflow-hidden w-full rounded-sm" style="aspect-ratio: ${dims.portraitAdjustedRatio};">
         <a href="${portrait.src}" data-fancybox="gallery" class="block h-full w-full">
-          <img alt="${portrait.alt}" class="w-full h-full object-cover transition duration-500 transform hover:scale-105" src="${portrait.src}" onload="this.style.opacity='1'" style="opacity: 0" />
+          ${this.createOptimizedImage(portrait.src, portrait.alt, portrait.filename)}
         </a>
       </div>
     `;
@@ -122,7 +131,7 @@ const PortfolioLayout = {
     landscape1Div.innerHTML = `
       <div class="overflow-hidden w-full rounded-sm" style="aspect-ratio: ${dims.landscape1AdjustedRatio};">
         <a href="${landscape1.src}" data-fancybox="gallery" class="block h-full w-full">
-          <img alt="${landscape1.alt}" class="w-full h-full object-cover transition duration-500 transform hover:scale-105" src="${landscape1.src}" onload="this.style.opacity='1'" style="opacity: 0" />
+          ${this.createOptimizedImage(landscape1.src, landscape1.alt, landscape1.filename)}
         </a>
       </div>
     `;
@@ -134,7 +143,7 @@ const PortfolioLayout = {
       landscape2Div.innerHTML = `
         <div class="overflow-hidden w-full rounded-sm" style="aspect-ratio: ${dims.landscape2AdjustedRatio};">
           <a href="${landscape2.src}" data-fancybox="gallery" class="block h-full w-full">
-            <img alt="${landscape2.alt}" class="w-full h-full object-cover transition duration-500 transform hover:scale-105" src="${landscape2.src}" onload="this.style.opacity='1'" style="opacity: 0" />
+            ${this.createOptimizedImage(landscape2.src, landscape2.alt, landscape2.filename)}
           </a>
         </div>
       `;
@@ -156,7 +165,7 @@ const PortfolioLayout = {
     landscapeDiv.innerHTML = `
       <div class="overflow-hidden w-full rounded-sm" style="aspect-ratio: ${dims.landscapeAdjustedRatio};">
         <a href="${landscape.src}" data-fancybox="gallery" class="block h-full w-full">
-          <img alt="${landscape.alt}" class="w-full h-full object-cover transition duration-500 transform hover:scale-105" src="${landscape.src}" onload="this.style.opacity='1'" style="opacity: 0" />
+          ${this.createOptimizedImage(landscape.src, landscape.alt, landscape.filename)}
         </a>
       </div>
     `;
@@ -167,7 +176,7 @@ const PortfolioLayout = {
     portraitDiv.innerHTML = `
       <div class="overflow-hidden w-full rounded-sm" style="aspect-ratio: ${dims.portraitAdjustedRatio};">
         <a href="${portrait.src}" data-fancybox="gallery" class="block h-full w-full">
-          <img alt="${portrait.alt}" class="w-full h-full object-cover transition duration-500 transform hover:scale-105" src="${portrait.src}" onload="this.style.opacity='1'" style="opacity: 0" />
+          ${this.createOptimizedImage(portrait.src, portrait.alt, portrait.filename)}
         </a>
       </div>
     `;
@@ -193,7 +202,7 @@ const PortfolioLayout = {
     landscape1Div.innerHTML = `
       <div class="overflow-hidden w-full h-full rounded-sm">
         <a href="${landscape1.src}" data-fancybox="gallery" class="block h-full w-full">
-          <img alt="${landscape1.alt}" class="w-full h-full object-contain transition duration-500 transform hover:scale-105" src="${landscape1.src}" onload="this.style.opacity='1'" style="opacity: 0" />
+          ${this.createOptimizedImage(landscape1.src, landscape1.alt, landscape1.filename)}
         </a>
       </div>
     `;
@@ -206,7 +215,7 @@ const PortfolioLayout = {
       landscape2Div.innerHTML = `
         <div class="overflow-hidden w-full h-full rounded-sm">
           <a href="${landscape2.src}" data-fancybox="gallery" class="block h-full w-full">
-            <img alt="${landscape2.alt}" class="w-full h-full object-contain transition duration-500 transform hover:scale-105" src="${landscape2.src}" onload="this.style.opacity='1'" style="opacity: 0" />
+            ${this.createOptimizedImage(landscape2.src, landscape2.alt, landscape2.filename)}
           </a>
         </div>
       `;
@@ -222,7 +231,7 @@ const PortfolioLayout = {
     portraitDiv.innerHTML = `
       <div class="overflow-hidden w-full h-full rounded-sm">
         <a href="${portrait.src}" data-fancybox="gallery" class="block h-full w-full">
-          <img alt="${portrait.alt}" class="w-full h-full object-contain transition duration-500 transform hover:scale-105" src="${portrait.src}" onload="this.style.opacity='1'" style="opacity: 0" />
+          ${this.createOptimizedImage(portrait.src, portrait.alt, portrait.filename)}
         </a>
       </div>
     `;
@@ -276,7 +285,7 @@ const PortfolioLayout = {
       item.innerHTML = `
         <div class="overflow-hidden w-full rounded-sm" style="aspect-ratio: ${dims.adjustedRatios[index]};">
           <a href="${portrait.src}" data-fancybox="gallery" class="block h-full w-full">
-            <img alt="${portrait.alt}" class="w-full h-full object-cover transition duration-500 transform hover:scale-105" src="${portrait.src}" onload="this.style.opacity='1'" style="opacity: 0" />
+            ${this.createOptimizedImage(portrait.src, portrait.alt, portrait.filename)}
           </a>
         </div>
       `;
@@ -292,7 +301,7 @@ const PortfolioLayout = {
     item.innerHTML = `
       <div class="overflow-hidden w-full rounded-sm" style="aspect-ratio: ${img.aspectRatio};">
         <a href="${img.src}" data-fancybox="gallery" class="block h-full w-full">
-          <img alt="${img.alt}" class="w-full h-full object-cover transition duration-500 transform hover:scale-105" src="${img.src}" onload="this.style.opacity='1'" style="opacity: 0" />
+          ${this.createOptimizedImage(img.src, img.alt, img.filename)}
         </a>
       </div>
     `;
@@ -392,7 +401,24 @@ const PortfolioLayout = {
       if (!patternApplied) break;
     }
     
+    // Charger toutes les images avec lazy loading
+    if (typeof ImageOptimizer !== 'undefined') {
+      const lazyImages = gridElement.querySelectorAll('.lazy-load');
+      lazyImages.forEach(img => {
+        ImageOptimizer.loadImage(img);
+      });
+    }
+    
+    // Initialiser Fancybox avec optimisations
     if (typeof Fancybox !== 'undefined') {
+      if (typeof LightboxOptimizer !== 'undefined') {
+        // Utiliser LightboxOptimizer pour précharger les images adjacentes
+        const galleryImages = Array.from(gridElement.querySelectorAll('[data-fancybox="gallery"] img')).map(img => ({
+          filename: img.dataset.filename || img.dataset.src?.split('/').pop() || img.src.split('/').pop(),
+          alt: img.alt
+        }));
+        LightboxOptimizer.prepareGalleryItems(galleryImages, 'gallery');
+      }
       Fancybox.bind("[data-fancybox]", {});
     }
   }

@@ -95,6 +95,7 @@
 
   <script src="../../js/image-protection.js"></script>
   <script src="../../js/images-config.js"></script>
+  <script src="../../js/optimization/image-optimizer.js"></script>
   <script>
     const categories = [
       { nameKey: 'nature', slug: 'nature', path: 'nature.html' },
@@ -168,8 +169,10 @@
         if (categoryImage) {
           card.innerHTML = `
             <div class="absolute inset-0">
-              <img src="${categoryImage.src}" alt="${categoryImage.alt || categoryName}" 
-                class="w-full h-full object-cover" />
+              <img data-src="${categoryImage.src}" 
+                   data-filename="${categoryImage.filename || categoryImage.src.split('/').pop()}"
+                   alt="${categoryImage.alt || categoryName}" 
+                   class="w-full h-full object-cover lazy-load opacity-0 transition-opacity duration-500" />
               <div class="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors duration-300"></div>
             </div>
             <div class="absolute inset-0 flex items-center justify-center">
@@ -178,6 +181,15 @@
               </h3>
             </div>
           `;
+          
+          // Charger l'image avec lazy loading
+          const img = card.querySelector('img');
+          if (img && typeof ImageOptimizer !== 'undefined') {
+            ImageOptimizer.loadImage(img);
+          } else if (img) {
+            img.src = img.dataset.src;
+            img.style.opacity = '1';
+          }
         } else {
           card.innerHTML = `
             <div class="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 group-hover:from-gray-700 group-hover:to-gray-800 transition-colors duration-300"></div>

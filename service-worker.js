@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v1.0.2';
+const CACHE_VERSION = 'v1.0.3';
 const CACHE_NAME = `photography-portfolio-${CACHE_VERSION}`;
 const IMAGE_CACHE_NAME = `photography-images-${CACHE_VERSION}`;
 

@@ -36,15 +36,8 @@ jobs:
       - name: Generate optimized thumbnails
         run: npm run generate:thumbs
 
-      - name: Verify thumbnails generated
-        run: |
-          echo "Checking if thumbnails were generated..."
-          ls -la assets/images-optimized/ || echo "Directory not found!"
-      
       - name: Prepare for deployment
-        run: |
-          touch .nojekyll
-          echo "Created .nojekyll to disable Jekyll"
+        run: touch .nojekyll
           
       - name: Create config.js with secrets
         run: |

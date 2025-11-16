@@ -1,0 +1,4 @@
+# Override .gitignore for artifact upload
+# Only ignore node_modules for deployment
+node_modules/
+

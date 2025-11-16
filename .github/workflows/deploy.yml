@@ -43,7 +43,9 @@ jobs:
       
       - name: Remove images-optimized from gitignore for deployment
         run: |
-          sed -i '/assets\/images-optimized\//d' .gitignore
+          grep -v "assets/images-optimized" .gitignore > .gitignore.tmp
+          mv .gitignore.tmp .gitignore
+          echo "Updated .gitignore:"
           cat .gitignore
           
       - name: Create config.js with secrets

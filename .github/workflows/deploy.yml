@@ -40,6 +40,11 @@ jobs:
         run: |
           echo "Checking if thumbnails were generated..."
           ls -la assets/images-optimized/ || echo "Directory not found!"
+      
+      - name: Remove images-optimized from gitignore for deployment
+        run: |
+          sed -i '/assets\/images-optimized\//d' .gitignore
+          cat .gitignore
           
       - name: Create config.js with secrets
         run: |

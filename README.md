@@ -57,15 +57,13 @@ photography-portfolio/
 
 ## Fonctionnalités
 
-### 🚀 Optimisations de performance
-- **LQIP (Low Quality Image Placeholder)** : chargement instantané d'une version 50px (~5-10 Ko)
-- **Thumbnails** : 70% de la résolution originale (~800 Ko - 2 Mo selon l'image) pour les galeries
-- **Full-res** : réservée exclusivement pour la lightbox
-- **Lazy loading** avec Intersection Observer API
-- **Service Worker** pour cache agressif (30 jours)
-- **Préchargement intelligent** des 2 images adjacentes dans la lightbox
-- **Transitions smooth** (flou → net) pour un chargement progressif
-- **Mode offline** avec fallback cache
+### Optimisations de performance
+- Thumbnails : 70% résolution originale (~1-2 Mo)
+- Full-res : lightbox uniquement
+- Lazy loading avec Intersection Observer
+- Service Worker avec cache 30 jours
+- Préchargement 2 images adjacentes dans lightbox
+- Mode offline
 
 ### Page d'accueil
 - Canvas d'images en arrière-plan avec layouts aléatoires
@@ -123,24 +121,27 @@ npm install        # Si ce n'est pas déjà fait
 npm run generate:thumbs
 ```
 
-Cela génère automatiquement 3 versions de chaque image :
-- **LQIP** (50px, ~5-10 Ko) : chargement instantané avec flou
-- **Thumbnail** (70% de la résolution originale, ~800 Ko - 2 Mo) : affichage dans les galeries
+Cela génère automatiquement 2 versions de chaque image :
+- **Thumbnail** (70% de la résolution originale, ~1-2 Mo) : affichage partout
 - **Full-res** (originale) : exclusivement pour la lightbox
 
 Les images optimisées sont générées dans `assets/images-optimized/` (dans `.gitignore`).
 
 ### Système d'optimisation
 
+**Page d'accueil :**
+- Thumbnails chargées directement
+- Transitions simples de 700ms
+- Canvas animé fluide
+
 **Galeries :**
-1. LQIP s'affiche instantanément (floue)
-2. Thumbnail se charge avec lazy loading (Intersection Observer)
-3. Transition smooth du flou vers net
+- Thumbnails avec lazy loading au scroll
+- Intersection Observer pour économie de bande passante
 
 **Lightbox :**
-1. Full-res exclusivement
-2. Préchargement des 2 images adjacentes
-3. Navigation instantanée
+- Full-res exclusivement
+- Préchargement des 2 images adjacentes
+- Navigation instantanée
 
 **Cache :**
 - Service Worker : 30 jours
@@ -181,12 +182,12 @@ ImageOptimizer.getStats()   # Stats lazy loading
 LightboxOptimizer.getCacheStats()  # Stats lightbox
 ```
 
-## 📚 Documentation
+## Documentation
 
-- **[scripts/README.md](./scripts/README.md)** - Scripts d'optimisation (génération de thumbnails)
-- **[LICENSE](./LICENSE)** - Licence du projet
+- [scripts/README.md](./scripts/README.md) - Scripts d'optimisation
+- [LICENSE](./LICENSE) - Licence
 
-## 🎯 Optimisations
+## Optimisations
 
 - **Lazy loading** : Les images se chargent uniquement quand visibles
 - **Cache 30 jours** : Via Service Worker pour chargement instantané

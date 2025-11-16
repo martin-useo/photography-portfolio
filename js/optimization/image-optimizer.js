@@ -65,67 +65,6 @@ const ImageOptimizer = (function() {
     return observer;
   }
   
-  function loadLQIP(img, filename) {
-    const lqipUrl = getImagePath(filename, 'lqip');
-    
-    const loader = new Image();
-    loader.onload = () => {
-      img.src = lqipUrl;
-      img.style.filter = 'blur(12px)';
-      img.style.transform = 'scale(1.05)';
-      img.style.opacity = '1';
-      img.classList.add('lqip-loaded');
-      stats.lqipLoaded++;
-      
-      loadThumb(img, filename);
-    };
-    
-    loader.onerror = () => {
-      console.warn('LQIP failed, loading thumb directly:', filename);
-      loadThumb(img, filename);
-    };
-    
-    loader.src = lqipUrl;
-  }
-  
-  function loadThumb(img, filename) {
-    const thumbUrl = getImagePath(filename, 'thumb');
-    
-    const loader = new Image();
-    loader.onload = () => {
-      img.style.transition = `filter ${config.blurTransition}ms ease-out, transform ${config.blurTransition}ms ease-out`;
-      
-      setTimeout(() => {
-        img.src = thumbUrl;
-        img.style.filter = 'blur(0)';
-        img.style.transform = 'scale(1)';
-        img.classList.remove('lqip-loaded');
-        img.classList.add('thumb-loaded');
-        stats.thumbLoaded++;
-        
-        img.dataset.loaded = 'true';
-        loadingImages.delete(img);
-        
-        img.dispatchEvent(new CustomEvent('imageLoaded', {
-          bubbles: true,
-          detail: { src: thumbUrl, filename }
-        }));
-      }, 50);
-    };
-    
-    loader.onerror = () => {
-      console.error('Thumb failed, trying fallback:', filename);
-      const fallbackUrl = getImagePath(filename, 'original');
-      img.src = fallbackUrl;
-      img.style.filter = 'blur(0)';
-      img.style.transform = 'scale(1)';
-      stats.failed++;
-      loadingImages.delete(img);
-    };
-    
-    loader.src = thumbUrl;
-  }
-  
   function loadImage(img) {
     if (loadingImages.has(img)) return;
     if (img.dataset.loaded === 'true') return;
@@ -140,7 +79,34 @@ const ImageOptimizer = (function() {
     img.classList.add('loading');
     stats.total++;
     
-    loadLQIP(img, filename);
+    // Charger directement le thumbnail (plus de LQIP)
+    const thumbUrl = getImagePath(filename, 'thumb');
+    
+    img.onload = () => {
+      img.style.opacity = '1';
+      img.classList.remove('loading');
+      img.classList.add('thumb-loaded');
+      img.dataset.loaded = 'true';
+      stats.thumbLoaded++;
+      loadingImages.delete(img);
+      
+      img.dispatchEvent(new CustomEvent('imageLoaded', {
+        bubbles: true,
+        detail: { src: thumbUrl, filename }
+      }));
+    };
+    
+    img.onerror = () => {
+      console.warn('Thumb failed, trying fallback:', filename);
+      const fallbackUrl = getImagePath(filename, 'original');
+      img.src = fallbackUrl;
+      img.style.opacity = '1';
+      img.classList.remove('loading');
+      stats.failed++;
+      loadingImages.delete(img);
+    };
+    
+    img.src = thumbUrl;
   }
   
   function getFullResUrl(filename) {

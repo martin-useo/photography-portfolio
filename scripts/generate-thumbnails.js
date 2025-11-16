@@ -2,9 +2,8 @@
 
 /**
  * Script de génération de thumbnails
- * Génère 3 versions de chaque image :
- * - LQIP (50px, basse qualité, ~5-10 Ko)
- * - Thumb (70% de la taille originale)
+ * Génère 2 versions de chaque image :
+ * - Thumb (70% de la taille originale, ~1-2 Mo)
  * - Full-res (conservée telle quelle, pour lightbox)
  * 
  * Usage: node scripts/generate-thumbnails.js
@@ -19,11 +18,6 @@ const OUTPUT_DIR = path.join(__dirname, '../assets/images-optimized');
 
 // Configuration des tailles
 const SIZES = {
-  lqip: {
-    width: 50,
-    quality: 30,
-    suffix: '-lqip'
-  },
   thumb: {
     scale: 0.70,  // 70% de la résolution originale
     quality: 70,
@@ -66,19 +60,6 @@ async function processImage(filename) {
     const metadata = await image.metadata();
     
     console.log(`   Taille originale: ${metadata.width}x${metadata.height} (${(fs.statSync(inputPath).size / 1024 / 1024).toFixed(2)} Mo)`);
-    
-    // Générer LQIP (20px, très basse qualité)
-    const lqipPath = path.join(OUTPUT_DIR, `${baseName}${SIZES.lqip.suffix}${ext}`);
-    await sharp(inputPath)
-      .resize(SIZES.lqip.width, null, { 
-        fit: 'inside',
-        withoutEnlargement: true 
-      })
-      .jpeg({ quality: SIZES.lqip.quality, progressive: true })
-      .toFile(lqipPath);
-    
-    const lqipSize = (fs.statSync(lqipPath).size / 1024).toFixed(2);
-    console.log(`   ${colors.green}✓${colors.reset} LQIP: ${SIZES.lqip.width}px (${lqipSize} Ko)`);
     
     // Générer thumbnail (70% de la résolution originale)
     const thumbWidth = Math.round(metadata.width * SIZES.thumb.scale);

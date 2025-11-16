@@ -205,8 +205,8 @@
       if (typeof LanguageManager !== 'undefined') {
         portfolioText.textContent = LanguageManager.get('portfolio');
       } else {
-        portfolioText.textContent = 'PORTFOLIO';
-      }
+      portfolioText.textContent = 'PORTFOLIO';
+    }
     }
     
     const resetClass = 'hidden md:block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-black dark:bg-white';
@@ -229,9 +229,9 @@
               if (typeof LanguageManager !== 'undefined') {
                 portfolioText.textContent = LanguageManager.get(key).toUpperCase();
               } else {
-                const pageNames = {
-                  'nature': 'NATURE',
-                  'portraits': 'PORTRAITS',
+      const pageNames = {
+        'nature': 'NATURE',
+        'portraits': 'PORTRAITS',
                   'sport': 'SPORT',
                   'evenements': 'ÉVÉNEMENTS',
                   'animaux': 'ANIMAUX',
@@ -239,8 +239,8 @@
                 };
                 portfolioText.textContent = pageNames[key] || 'PORTFOLIO';
               }
-            }
-            if (portfolioUnderline) {
+          }
+          if (portfolioUnderline) {
               portfolioUnderline.className = activeClass + ' absolute bottom-0 left-0 right-0';
             }
             break;
@@ -267,7 +267,7 @@
       if (element) {
         const path = element.getAttribute('data-path') || component.defaultPath;
         loadComponent(component.id, path);
-      }
+    }
     });
   }
 

@@ -92,13 +92,11 @@
     // Fonction de chargement direct des thumbnails pour la page d'accueil
     function loadThumbnailForCanvas(img) {
       if (!img.dataset.filename) return;
+      if (img.dataset.loaded === 'true') return;
       
       const filename = img.dataset.filename;
-      const depth = (window.location.pathname.match(/\//g) || []).length;
-      let basePath = '';
-      if (depth > 1) {
-        basePath = '../'.repeat(depth - 1);
-      }
+      // Sur index.html, on est à la racine, donc pas de basePath
+      const basePath = '';
       
       const ext = filename.match(/\.[^.]+$/)?.[0] || '.jpg';
       const baseName = filename.replace(ext, '');
@@ -106,17 +104,31 @@
       // Charger directement le thumbnail
       const thumbUrl = `${basePath}assets/images-optimized/${baseName}-thumb${ext}`;
       
-      img.onload = () => {
+      const thumbImg = new Image();
+      thumbImg.onload = () => {
+        img.src = thumbUrl;
         img.style.opacity = '1';
+        img.dataset.loaded = 'true';
       };
       
-      img.onerror = () => {
+      thumbImg.onerror = () => {
         // Fallback vers image originale
+        console.warn('Thumbnail failed, using original:', filename);
         const fallbackUrl = `${basePath}assets/images/${filename}`;
-        img.src = fallbackUrl;
+        const fallbackImg = new Image();
+        fallbackImg.onload = () => {
+          img.src = fallbackUrl;
+          img.style.opacity = '1';
+          img.dataset.loaded = 'true';
+        };
+        fallbackImg.onerror = () => {
+          console.error('Failed to load image:', filename);
+          img.style.opacity = '0';
+        };
+        fallbackImg.src = fallbackUrl;
       };
       
-      img.src = thumbUrl;
+      thumbImg.src = thumbUrl;
     }
     </script>
     <script>

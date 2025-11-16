@@ -100,6 +100,7 @@ self.addEventListener('fetch', (event) => {
 function isImageRequest(request) {
   const url = new URL(request.url);
   return url.pathname.includes('/assets/images/') ||
+         url.pathname.includes('/assets/images-optimized/') ||
          url.pathname.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i);
 }
 

@@ -57,11 +57,29 @@ const LightboxOptimizer = (function() {
   }
   
   function getFullResUrl(filename) {
-    const depth = (window.location.pathname.match(/\//g) || []).length;
+    // Calculer le basePath de manière fiable basé sur le chemin actuel
+    const pathname = window.location.pathname;
+    const pathParts = pathname.split('/').filter(p => p && p !== 'index.html');
     let basePath = '';
     
-    if (depth > 1) {
-      basePath = '../'.repeat(depth - 1);
+    // Déterminer le nombre de niveaux à remonter
+    // index.html ou / -> 0 niveaux (basePath = '')
+    // pages/*.html -> 1 niveau (basePath = '../')
+    // pages/portfolio/*.html -> 2 niveaux (basePath = '../../')
+    
+    if (pathParts.length > 0) {
+      const lastPart = pathParts[pathParts.length - 1];
+      const secondLastPart = pathParts.length >= 2 ? pathParts[pathParts.length - 2] : null;
+      
+      // Si on est dans pages/portfolio/
+      if (secondLastPart === 'portfolio' || (lastPart === 'portfolio' && pathParts.length >= 2)) {
+        basePath = '../../';
+      } 
+      // Si on est dans pages/ mais pas dans portfolio/
+      else if (secondLastPart === 'pages' || lastPart === 'pages') {
+        basePath = '../';
+      }
+      // Sinon on est à la racine, basePath reste vide
     }
     
     return `${basePath}assets/images/${filename}`;

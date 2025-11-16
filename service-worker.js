@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v1.0.0';
+const CACHE_VERSION = 'v1.0.1';
 const CACHE_NAME = `photography-portfolio-${CACHE_VERSION}`;
 const IMAGE_CACHE_NAME = `photography-images-${CACHE_VERSION}`;
 
@@ -16,6 +16,7 @@ const STATIC_ASSETS = [
   '/js/optimization/lightbox-optimizer.js',
   '/js/optimization/sw-register.js',
   '/js/images-config.js',
+  '/js/image-protection.js',
   '/js/i18n.js',
   '/js/fade_in.js',
   '/js/menu.js',

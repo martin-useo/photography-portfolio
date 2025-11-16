@@ -10,3 +10,6 @@ Thumbs.db
 *.log
 npm-debug.log*
 secrets.txt
+
+# Images optimisées générées automatiquement au déploiement
+assets/images-optimized/

@@ -1,8 +1,6 @@
 config/emailjs.config.js
 
 node_modules/
-assets/images-optimized/*
-!assets/images-optimized/.gitkeep
 .DS_Store
 Thumbs.db
 .vscode/

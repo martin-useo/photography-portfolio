@@ -18,6 +18,11 @@ const OUTPUT_DIR = path.join(__dirname, '../assets/images-optimized');
 
 // Configuration des tailles
 const SIZES = {
+  lqip: {
+    scale: 0.40,  // 40% de la résolution originale
+    quality: 30,
+    suffix: '-lqip'
+  },
   thumb: {
     scale: 0.70,  // 70% de la résolution originale
     quality: 70,
@@ -60,6 +65,21 @@ async function processImage(filename) {
     const metadata = await image.metadata();
     
     console.log(`   Taille originale: ${metadata.width}x${metadata.height} (${(fs.statSync(inputPath).size / 1024 / 1024).toFixed(2)} Mo)`);
+    
+    // Générer LQIP (40% de la résolution originale)
+    const lqipWidth = Math.round(metadata.width * SIZES.lqip.scale);
+    const lqipHeight = Math.round(metadata.height * SIZES.lqip.scale);
+    const lqipPath = path.join(OUTPUT_DIR, `${baseName}${SIZES.lqip.suffix}${ext}`);
+    await sharp(inputPath)
+      .resize(lqipWidth, lqipHeight, { 
+        fit: 'inside',
+        withoutEnlargement: true 
+      })
+      .jpeg({ quality: SIZES.lqip.quality, progressive: true })
+      .toFile(lqipPath);
+    
+    const lqipSize = (fs.statSync(lqipPath).size / 1024).toFixed(2);
+    console.log(`   ${colors.green}✓${colors.reset} LQIP: ${lqipWidth}x${lqipHeight}px (${lqipSize} Ko)`);
     
     // Générer thumbnail (70% de la résolution originale)
     const thumbWidth = Math.round(metadata.width * SIZES.thumb.scale);
@@ -133,6 +153,7 @@ async function main() {
     console.log(`\n${colors.bright}💡 Prochaines étapes :${colors.reset}`);
     console.log(`   1. Vérifier les images générées dans ${OUTPUT_DIR}`);
     console.log(`   2. Le site utilisera automatiquement :`);
+    console.log(`      - LQIP pour le chargement immédiat (40% résolution)`);
     console.log(`      - Thumb pour les galeries (70% résolution)`);
     console.log(`      - Full-res originales pour la lightbox`);
     

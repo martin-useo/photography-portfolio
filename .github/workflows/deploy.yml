@@ -2,7 +2,8 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main, master ]
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -11,58 +12,38 @@ permissions:
 
 concurrency:
   group: "pages"
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-    
-    - name: Install dependencies
-      run: |
-        npm ci || npm install
-    
-    - name: Create EmailJS config
-      run: |
-        cat > config/emailjs.config.js << EOF
-        const CONFIG = {
-          emailjs: {
-            publicKey: "${{ secrets.EMAILJS_PUBLIC_KEY }}",
-            serviceId: "${{ secrets.EMAILJS_SERVICE_ID }}",
-            templateId: "${{ secrets.EMAILJS_TEMPLATE_ID }}"
-          }
-        };
-        EOF
-    
-    - name: Build CSS
-      run: |
-        if [ -f "tailwind.config.js" ]; then
-          npm run build:css || true
-        fi
-    
-    - name: Upload artifact
-      uses: actions/upload-pages-artifact@v3
-      with:
-        path: '.'
-
   deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
-    
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    
+    runs-on: ubuntu-latest
     steps:
-    - name: Deploy to GitHub Pages
-      id: deployment
-      uses: actions/deploy-pages@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create config.js with secrets
+        run: |
+          cat > config/emailjs.config.js << 'EOF'
+          const CONFIG = {
+            emailjs: {
+              publicKey: "${{ secrets.EMAILJS_PUBLIC_KEY }}",
+              serviceId: "${{ secrets.EMAILJS_SERVICE_ID }}",
+              templateId: "${{ secrets.EMAILJS_TEMPLATE_ID }}"
+            }
+          };
+          EOF
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

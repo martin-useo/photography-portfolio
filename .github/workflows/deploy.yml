@@ -23,6 +23,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      
+      - name: Create .nojekyll
+        run: touch .nojekyll
           
       - name: Create config.js with secrets
         run: |

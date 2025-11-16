@@ -3,24 +3,17 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-  # Permet de lancer manuellement le workflow
-  workflow_dispatch:
 
-# Permissions nécessaires pour GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# N'autorise qu'un seul déploiement à la fois
 concurrency:
   group: "pages"
   cancel-in-progress: true
 
 jobs:
-  # Job de build et configuration
   build:
     runs-on: ubuntu-latest
     
@@ -37,9 +30,9 @@ jobs:
       run: |
         npm ci || npm install
     
-    - name: Create config.js with secrets
+    - name: Create EmailJS config
       run: |
-        cat > config/emailjs.config.js << 'EOF'
+        cat > config/emailjs.config.js << EOF
         const CONFIG = {
           emailjs: {
             publicKey: "${{ secrets.EMAILJS_PUBLIC_KEY }}",
@@ -52,9 +45,7 @@ jobs:
     - name: Build CSS
       run: |
         if [ -f "tailwind.config.js" ]; then
-          npm run build:css || echo "No Tailwind build script found"
-        else
-          echo "No Tailwind config found, skipping CSS build"
+          npm run build:css || true
         fi
     
     - name: Upload artifact
@@ -62,12 +53,9 @@ jobs:
       with:
         path: '.'
 
-  # Job de déploiement
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    
-    # Déploie uniquement sur main/master
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
     
     environment:

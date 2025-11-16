@@ -153,15 +153,7 @@
         submitText.classList.remove('hidden');
         submitLoading.classList.add('hidden');
       }
-      
-      // Mettre à jour les traductions après changement d'état
-      LanguageManager.applyLanguage();
     }
-    
-    // Écouter les changements de langue pour mettre à jour les textes
-    window.addEventListener('languageChanged', () => {
-      LanguageManager.applyLanguage();
-    });
 
     function getErrorMessage(error) {
       if (error.status === 400 && error.text && error.text.includes('Public Key')) {

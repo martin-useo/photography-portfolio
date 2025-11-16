@@ -87,6 +87,7 @@
 
   <script src="js/image-protection.js"></script>
   <script src="js/images-config.js"></script>
+  <script src="js/optimization/image-optimizer.js"></script>
   <script>
     // Layouts prédéfinis pour la disposition des images
     const LAYOUTS = [
@@ -139,7 +140,7 @@
       }
     ];
 
-    // Fonction pour précharger une image
+    // Fonction pour précharger uniquement les premières images visibles
     function preloadImage(src) {
       return new Promise((resolve, reject) => {
         const img = new Image();
@@ -147,13 +148,6 @@
         img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
         img.src = src;
       });
-    }
-
-    async function preloadAllImages(images) {
-      const preloadPromises = images.map(img => 
-        preloadImage(img.src).catch(() => null)
-      );
-      return Promise.all(preloadPromises);
     }
 
     function getRandomLayout() {
@@ -282,11 +276,20 @@
           imageStack.className = 'absolute inset-0';
           
           const imgElement = document.createElement('img');
-          imgElement.src = img.src;
+          imgElement.dataset.src = img.src;
+          imgElement.dataset.filename = img.filename || img.src.split('/').pop();
           imgElement.alt = img.alt || 'Portfolio image';
-          imgElement.className = 'block h-full w-full object-cover object-center opacity-100 transition-opacity duration-1000';
+          imgElement.className = 'block h-full w-full object-cover object-center opacity-0 transition-opacity duration-1000 lazy-load';
           imgElement.dataset.imageIndex = index;
           imageStack.appendChild(imgElement);
+          
+          // Charger l'image via ImageOptimizer
+          if (typeof ImageOptimizer !== 'undefined') {
+            ImageOptimizer.loadImage(imgElement);
+          } else {
+            imgElement.src = img.src;
+            imgElement.style.opacity = '1';
+          }
           
           cellContainer.appendChild(imageStack);
           
@@ -336,11 +339,20 @@
           imageStack.className = 'absolute inset-0';
           
           const imgElement = document.createElement('img');
-          imgElement.src = img.src;
+          imgElement.dataset.src = img.src;
+          imgElement.dataset.filename = img.filename || img.src.split('/').pop();
           imgElement.alt = img.alt || 'Portfolio image';
-          imgElement.className = 'block h-full w-full object-cover object-center opacity-100 transition-opacity duration-1000';
+          imgElement.className = 'block h-full w-full object-cover object-center opacity-0 transition-opacity duration-1000 lazy-load';
           imgElement.dataset.imageIndex = index;
           imageStack.appendChild(imgElement);
+          
+          // Charger l'image via ImageOptimizer
+          if (typeof ImageOptimizer !== 'undefined') {
+            ImageOptimizer.loadImage(imgElement);
+          } else {
+            imgElement.src = img.src;
+            imgElement.style.opacity = '1';
+          }
           
           cellContainer.appendChild(imageStack);
           grid.appendChild(cellContainer);
@@ -359,12 +371,23 @@
       if (!imageStack) return;
       
       const newImgElement = document.createElement('img');
-      newImgElement.src = newImage.src;
+      newImgElement.dataset.src = newImage.src;
+      newImgElement.dataset.filename = newImage.filename || newImage.src.split('/').pop();
       newImgElement.alt = newImage.alt || 'Portfolio image';
-      newImgElement.className = 'block h-full w-full object-cover object-center opacity-0 transition-opacity duration-1000 absolute inset-0';
+      newImgElement.className = 'block h-full w-full object-cover object-center opacity-0 transition-opacity duration-1000 absolute inset-0 lazy-load';
       newImgElement.dataset.imageIndex = cellIndex;
       
       imageStack.appendChild(newImgElement);
+      
+      // Charger l'image via ImageOptimizer
+      if (typeof ImageOptimizer !== 'undefined') {
+        ImageOptimizer.loadImage(newImgElement);
+      } else {
+        newImgElement.src = newImage.src;
+        setTimeout(() => {
+          newImgElement.style.opacity = '1';
+        }, 50);
+      }
       
       const oldImg = imageStack.querySelector('img:not(:last-child)');
       if (oldImg) {
@@ -373,10 +396,6 @@
           oldImg.remove();
         }, 1000);
       }
-      
-      setTimeout(() => {
-        newImgElement.style.opacity = '1';
-      }, 50);
     }
     
     async function renderBackgroundCanvas(useTransition = false) {
@@ -399,15 +418,6 @@
           if (!cachedImages || cachedImages.length === 0) {
             console.error('No images found in configuration');
             return;
-          }
-          
-          try {
-            await Promise.race([
-              preloadAllImages(cachedImages),
-              new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 5000))
-            ]);
-          } catch (err) {
-            // Continue even if some images fail to preload
           }
         }
         

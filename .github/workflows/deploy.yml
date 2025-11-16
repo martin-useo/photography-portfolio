@@ -36,6 +36,11 @@ jobs:
       - name: Generate optimized thumbnails
         run: npm run generate:thumbs
 
+      - name: Verify thumbnails generated
+        run: |
+          echo "Checking if thumbnails were generated..."
+          ls -la assets/images-optimized/ || echo "Directory not found!"
+          
       - name: Create config.js with secrets
         run: |
           cat > config/emailjs.config.js << 'EOF'

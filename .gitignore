@@ -11,5 +11,8 @@ Thumbs.db
 npm-debug.log*
 secrets.txt
 
-# Images optimisées générées automatiquement au déploiement
-assets/images-optimized/
+# Images originales (full res) - privées, jamais commitées
+assets/images/
+
+# Images optimisées générées localement - seront commitées
+# assets/images-optimized/

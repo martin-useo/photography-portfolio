@@ -464,7 +464,12 @@ const IMAGES_CONFIG = {
   },
 
   getImagePath: function(filename, basePath = '') {
-    return `${basePath}assets/images/${filename}`;
+    // Utiliser display par défaut, toujours en WebP
+    const ext = filename.match(/\.[^.]+$/)?.[0] || '.jpg';
+    const baseName = filename.replace(ext, '');
+    
+    // Toujours utiliser WebP (le script de génération ne produit que du WebP)
+    return `${basePath}assets/images-optimized/${baseName}-display.webp`;
   },
 
   getAllImages: function(basePath = '') {

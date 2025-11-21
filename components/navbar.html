@@ -34,7 +34,7 @@
         <ul id="ulMenu"
           class="flex flex-col duration-300 ease-out md:space-x-5 sm:transition-none mt-5 md:flex-row md:items-center md:ml-auto md:mt-0 md:pt-0 md:border-0">
           <li class="group transition duration-300">
-            <a href="pages/portfolio/showcase.html" id="nav-showcase-link" class="font-signika text-2xl tap-highlight-transparent" data-i18n="home">ACCUEIL
+            <a href="pages/portfolio/home.html" id="nav-showcase-link" class="font-signika text-2xl tap-highlight-transparent" data-i18n="home">ACCUEIL
               <span id="nav-showcase-underline"
                 class="hidden md:block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-black dark:bg-white"></span>
             </a>
@@ -48,18 +48,6 @@
               <span id="nav-portfolio-underline" class="hidden md:block h-0.5 bg-black dark:bg-white absolute bottom-0 left-0 right-0"></span>
             </button>
             <div id="portfolio-dropdown" class="hidden md:block absolute top-full left-0 mt-2 w-48 bg-white dark:bg-black border border-gray-200 dark:border-gray-800 shadow-lg rounded-md py-2 opacity-0 invisible transition-all duration-200" style="z-index: 9999; position: absolute;">
-              <a href="pages/portfolio/nature.html" id="nav-portfolio-nature-link" class="dropdown-link block px-4 py-2 text-xl font-signika">
-                <span class="relative inline-block">
-                  <span data-i18n="nature">Nature</span>
-                  <span class="underline-span absolute bottom-0 left-0 h-0.5 bg-black dark:bg-white w-0 transition-all duration-500"></span>
-                </span>
-              </a>
-              <a href="pages/portfolio/portraits.html" id="nav-portfolio-portraits-link" class="dropdown-link block px-4 py-2 text-xl font-signika">
-                <span class="relative inline-block">
-                  <span data-i18n="portraits">Portraits</span>
-                  <span class="underline-span absolute bottom-0 left-0 h-0.5 bg-black dark:bg-white w-0 transition-all duration-500"></span>
-                </span>
-              </a>
               <a href="pages/portfolio/sport.html" id="nav-portfolio-sport-link" class="dropdown-link block px-4 py-2 text-xl font-signika">
                 <span class="relative inline-block">
                   <span data-i18n="sport">Sport</span>
@@ -78,20 +66,38 @@
                   <span class="underline-span absolute bottom-0 left-0 h-0.5 bg-black dark:bg-white w-0 transition-all duration-500"></span>
                 </span>
               </a>
-              <a href="pages/portfolio/personnel.html" id="nav-portfolio-personnel-link" class="dropdown-link block px-4 py-2 text-xl font-signika">
+              <a href="pages/portfolio/portraits.html" id="nav-portfolio-portraits-link" class="dropdown-link block px-4 py-2 text-xl font-signika">
                 <span class="relative inline-block">
-                  <span data-i18n="personnel">Personnel</span>
+                  <span data-i18n="portraits">Portraits</span>
+                  <span class="underline-span absolute bottom-0 left-0 h-0.5 bg-black dark:bg-white w-0 transition-all duration-500"></span>
+                </span>
+              </a>
+              <a href="pages/portfolio/urban.html" id="nav-portfolio-urban-link" class="dropdown-link block px-4 py-2 text-xl font-signika">
+                <span class="relative inline-block">
+                  <span data-i18n="urban">Urbain</span>
+                  <span class="underline-span absolute bottom-0 left-0 h-0.5 bg-black dark:bg-white w-0 transition-all duration-500"></span>
+                </span>
+              </a>
+              <a href="pages/portfolio/nature.html" id="nav-portfolio-nature-link" class="dropdown-link block px-4 py-2 text-xl font-signika">
+                <span class="relative inline-block">
+                  <span data-i18n="nature">Nature</span>
+                  <span class="underline-span absolute bottom-0 left-0 h-0.5 bg-black dark:bg-white w-0 transition-all duration-500"></span>
+                </span>
+              </a>
+              <a href="pages/portfolio/vehicules.html" id="nav-portfolio-vehicules-link" class="dropdown-link block px-4 py-2 text-xl font-signika">
+                <span class="relative inline-block">
+                  <span data-i18n="vehicules">Véhicules</span>
+                  <span class="underline-span absolute bottom-0 left-0 h-0.5 bg-black dark:bg-white w-0 transition-all duration-500"></span>
+                </span>
+              </a>
+              <a href="pages/portfolio/divers.html" id="nav-portfolio-divers-link" class="dropdown-link block px-4 py-2 text-xl font-signika">
+                <span class="relative inline-block">
+                  <span data-i18n="divers">Divers</span>
                   <span class="underline-span absolute bottom-0 left-0 h-0.5 bg-black dark:bg-white w-0 transition-all duration-500"></span>
                 </span>
               </a>
             </div>
             <div id="portfolio-dropdown-mobile" class="md:hidden hidden mt-2 pl-4">
-              <a href="pages/portfolio/nature.html" id="nav-portfolio-nature-link-mobile" onclick="closePortfolioDropdown()" class="block py-2 text-xl font-signika">
-                <span data-i18n="nature">Nature</span>
-              </a>
-              <a href="pages/portfolio/portraits.html" id="nav-portfolio-portraits-link-mobile" onclick="closePortfolioDropdown()" class="block py-2 text-xl font-signika">
-                <span data-i18n="portraits">Portraits</span>
-              </a>
               <a href="pages/portfolio/sport.html" id="nav-portfolio-sport-link-mobile" onclick="closePortfolioDropdown()" class="block py-2 text-xl font-signika">
                 <span data-i18n="sport">Sport</span>
               </a>
@@ -101,8 +107,20 @@
               <a href="pages/portfolio/animaux.html" id="nav-portfolio-animaux-link-mobile" onclick="closePortfolioDropdown()" class="block py-2 text-xl font-signika">
                 <span data-i18n="animaux">Animaux</span>
               </a>
-              <a href="pages/portfolio/personnel.html" id="nav-portfolio-personnel-link-mobile" onclick="closePortfolioDropdown()" class="block py-2 text-xl font-signika">
-                <span data-i18n="personnel">Personnel</span>
+              <a href="pages/portfolio/portraits.html" id="nav-portfolio-portraits-link-mobile" onclick="closePortfolioDropdown()" class="block py-2 text-xl font-signika">
+                <span data-i18n="portraits">Portraits</span>
+              </a>
+              <a href="pages/portfolio/urban.html" id="nav-portfolio-urban-link-mobile" onclick="closePortfolioDropdown()" class="block py-2 text-xl font-signika">
+                <span data-i18n="urban">Urbain</span>
+              </a>
+              <a href="pages/portfolio/nature.html" id="nav-portfolio-nature-link-mobile" onclick="closePortfolioDropdown()" class="block py-2 text-xl font-signika">
+                <span data-i18n="nature">Nature</span>
+              </a>
+              <a href="pages/portfolio/vehicules.html" id="nav-portfolio-vehicules-link-mobile" onclick="closePortfolioDropdown()" class="block py-2 text-xl font-signika">
+                <span data-i18n="vehicules">Véhicules</span>
+              </a>
+              <a href="pages/portfolio/divers.html" id="nav-portfolio-divers-link-mobile" onclick="closePortfolioDropdown()" class="block py-2 text-xl font-signika">
+                <span data-i18n="divers">Divers</span>
               </a>
             </div>
           </li>

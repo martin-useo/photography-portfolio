@@ -8,17 +8,13 @@
   <title>Martin USEO - About Me</title>
   <meta name="description"
     content="Hello there, I'm Martin USEO – a freelance photographer based in Paris">
-  <!-- Favicon -->
   <link rel="icon" type="image/x-icon" href="../assets/favicon.ico" />
   <link rel="stylesheet" href="../css/output.css" />
-  <!-- Alpine.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <!-- Start - Fonts -->
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Nothing+You+Could+Do&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Signika:wght@400;700&display=swap" rel="stylesheet">
-  <!-- End - Fonts -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -72,29 +68,26 @@
   <!-- Navbar -->
   <div id="navbar-container" data-path="../components/navbar.html"></div>
   <!-- Content -->
-  <div class="container mx-auto max-w-6xl">
-    <h1 class="text-4xl pt-10 pb-8 md:hidden font-signika font-bold" data-i18n="about.title"></h1>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 pt-10 md:pt-20">
-      <div class="col-span-1 order-2 md:order-1">
-        <img src="../assets/Avatar.png" alt="Martin USEO"
-          class="w-full aspect-square object-cover rounded-lg" />
-      </div>
-      <section class="font-normal text-center md:text-left col-span-1 order-1 md:order-2 flex flex-col justify-center">
-        <h2 class="text-4xl md:text-5xl font-signika font-bold mb-6">
-          <span data-i18n="about.greeting"></span> <span class="animate-wave">👋</span>
-        </h2>
-        <div class="space-y-4 text-base md:text-lg leading-relaxed text-gray-700 dark:text-gray-300">
-          <p>
-          bap
-        </p>
-          <p>
-          bap
-        </p>
-        <p>
-          bap
-        </p>
+  <div class="container mx-auto max-w-7xl px-5 md:px-0">
+    <h1 class="text-4xl pt-10 pb-8 md:hidden font-signika font-bold text-center" data-i18n="about.title"></h1>
+    <div class="flex items-center justify-center min-h-[calc(100vh-300px)] py-6 md:py-12">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 w-full max-w-6xl">
+        <div class="col-span-1 order-2 md:order-1 flex items-center justify-center">
+          <img src="../assets/Avatar.png" alt="Martin USEO"
+            class="w-full max-w-[544px] aspect-square object-cover rounded-lg md:w-[544px] md:h-[544px]" />
         </div>
-      </section>
+        <section class="font-normal text-center md:text-left col-span-1 order-1 md:order-2 flex flex-col justify-center">
+          <h2 class="text-4xl md:text-5xl font-signika font-bold mb-6">
+            <span data-i18n="about.greeting"></span> <span class="animate-wave">👋</span>
+          </h2>
+          <div class="space-y-4 text-base md:text-lg leading-relaxed text-gray-700 dark:text-gray-300">
+            <p data-i18n="about.intro"></p>
+            <p data-i18n="about.description"></p>
+            <p data-i18n="about.open"></p>
+            <p data-i18n="about.inspiration"></p>
+          </div>
+        </section>
+      </div>
     </div>
   </div>
   

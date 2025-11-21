@@ -143,6 +143,4 @@
   } else {
     initDropdown();
   }
-  
-  setTimeout(initDropdown, 500);
 })();

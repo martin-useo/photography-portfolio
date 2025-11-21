@@ -56,46 +56,40 @@ const LightboxOptimizer = (function() {
     });
   }
   
-  function getFullResUrl(filename) {
-    // Calculer le basePath de manière fiable basé sur le chemin actuel
+  function getLightboxUrl(filename) {
     const pathname = window.location.pathname;
     const pathParts = pathname.split('/').filter(p => p && p !== 'index.html');
     let basePath = '';
-    
-    // Déterminer le nombre de niveaux à remonter
-    // index.html ou / -> 0 niveaux (basePath = '')
-    // pages/*.html -> 1 niveau (basePath = '../')
-    // pages/portfolio/*.html -> 2 niveaux (basePath = '../../')
     
     if (pathParts.length > 0) {
       const lastPart = pathParts[pathParts.length - 1];
       const secondLastPart = pathParts.length >= 2 ? pathParts[pathParts.length - 2] : null;
       
-      // Si on est dans pages/portfolio/
       if (secondLastPart === 'portfolio' || (lastPart === 'portfolio' && pathParts.length >= 2)) {
         basePath = '../../';
-      } 
-      // Si on est dans pages/ mais pas dans portfolio/
-      else if (secondLastPart === 'pages' || lastPart === 'pages') {
+      } else if (secondLastPart === 'pages' || lastPart === 'pages') {
         basePath = '../';
       }
-      // Sinon on est à la racine, basePath reste vide
     }
     
-    return `${basePath}assets/images/${filename}`;
+    const ext = filename.match(/\.[^.]+$/)?.[0] || '.jpg';
+    const baseName = filename.replace(ext, '');
+    
+    // WebP uniquement (support 97%+ navigateurs)
+    return `${basePath}assets/images-optimized/${baseName}-lightbox.webp`;
   }
   
   function prepareGalleryItems(images, galleryId = 'gallery') {
     const items = images.map((img, index) => {
       const filename = img.filename || img.src?.split('/').pop();
-      const fullResUrl = getFullResUrl(filename);
+      const lightboxUrl = getLightboxUrl(filename);
       
       return {
-        src: fullResUrl,
-        thumb: fullResUrl,
+        src: lightboxUrl,
+        thumb: lightboxUrl, // Utiliser lightbox aussi pour le thumb
         caption: img.alt || img.caption || '',
         filename: filename,
-        highResUrl: fullResUrl,
+        highResUrl: lightboxUrl, // Renommé mais même valeur
         index: index
       };
     });
@@ -146,10 +140,6 @@ const LightboxOptimizer = (function() {
         protected: true,
       },
       on: {
-        init: (fancybox) => {
-          console.log('Lightbox opened');
-        },
-        
         reveal: (fancybox, slide) => {
           const currentIndex = slide.index;
           
@@ -164,10 +154,6 @@ const LightboxOptimizer = (function() {
           if (config.enablePreload && to !== undefined) {
             preloadAdjacentImages(to, items);
           }
-        },
-        
-        destroy: (fancybox) => {
-          console.log('Lightbox closed');
         }
       }
     };
@@ -236,10 +222,10 @@ const LightboxOptimizer = (function() {
       imgClassName = ''
     } = imageData;
     
-    const fullResUrl = getFullResUrl(filename);
+    const lightboxUrl = getLightboxUrl(filename);
     
     const link = document.createElement('a');
-    link.href = fullResUrl;
+    link.href = lightboxUrl;
     link.setAttribute('data-fancybox', galleryName);
     link.setAttribute('data-caption', alt);
     if (className) link.className = className;

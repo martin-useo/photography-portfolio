@@ -9,14 +9,20 @@ const translations = {
     sport: 'Sport',
     evenements: 'Événements',
     animaux: 'Animaux',
-    personnel: 'Personnel',
+    divers: 'Divers',
+    urban: 'Urbain',
+    vehicules: 'Véhicules',
     showcase: {
       title: 'Découvrir les catégories',
       heroAlt: 'Vitrine du portfolio'
     },
     about: {
       title: 'À PROPOS',
-      greeting: 'Bonjour, je suis Martin'
+      greeting: 'Bonjour, je suis Martin',
+      intro: 'Photographe freelance basé en Île de France,',
+      description: 'J\'aime apprendre de nouvelles techniques photographiques et expérimenter, saisir des évènements, prendre des photos qui plaisent.',
+      open: 'Je suis ouvert à tous les genres, tous les styles, n\'hésitez pas à me contacter pour me parler de vos projets :)',
+      inspiration: 'J\'admire et m\'inspire des photographes sportifs contemporains les plus talentueux comme How Lao, Ashley et Jered Gruber ou encore Pauline Ballet.'
     },
     contactPage: {
       title: 'CONTACT',
@@ -36,7 +42,11 @@ const translations = {
       invalidService: 'Service ID invalide. Vérifiez votre configuration EmailJS.',
       invalidTemplate: 'Template ID invalide. Vérifiez votre configuration EmailJS.'
     },
-    scrollToTop: 'Retour en haut de la page'
+    scrollToTop: 'Retour en haut de la page',
+    footer: {
+      thanks: 'Merci à toutes les personnes qui m\'ont autorisé à publier les photos sur lesquelles elles figurent.',
+      copyright: '© 2025 Développé et conçu par Martin USEO, basé sur le travail original de'
+    }
   },
   en: {
     home: 'HOME',
@@ -48,14 +58,20 @@ const translations = {
     sport: 'Sport',
     evenements: 'Events',
     animaux: 'Animals',
-    personnel: 'Personal',
+    divers: 'Miscellaneous',
+    urban: 'Urban',
+    vehicules: 'Vehicles',
     showcase: {
       title: 'Explore Categories',
       heroAlt: 'Portfolio showcase'
     },
     about: {
       title: 'ABOUT ME',
-      greeting: 'Hello there, I\'m Martin'
+      greeting: 'Hello there, I\'m Martin',
+      intro: 'Freelance photographer based in Île de France,',
+      description: 'I love learning new photographic techniques and experimenting, capturing events, taking photos that please.',
+      open: 'I am open to all genres, all styles, feel free to contact me to talk about your projects :)',
+      inspiration: 'I admire and draw inspiration from the most talented contemporary sports photographers like How Lao, Ashley and Jered Gruber or Pauline Ballet.'
     },
     contactPage: {
       title: 'CONTACT',
@@ -75,7 +91,11 @@ const translations = {
       invalidService: 'Invalid Service ID. Check your EmailJS configuration.',
       invalidTemplate: 'Invalid Template ID. Check your EmailJS configuration.'
     },
-    scrollToTop: 'Back to top'
+    scrollToTop: 'Back to top',
+    footer: {
+      thanks: 'Thank you to all the people who authorized me to publish the photos in which they appear.',
+      copyright: '© 2025 Developed and Designed by Martin USEO, based on the original work of'
+    }
   }
 };
 

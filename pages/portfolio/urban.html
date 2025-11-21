@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Martin USEO - Urban Photography</title>
+  <meta name="description"
+    content="Urban photography portfolio by Martin USEO – a freelance photographer based in Paris, France." />
+  <link rel="icon" type="image/x-icon" href="../../assets/favicon.ico" />
+  <link rel="stylesheet" href="../../css/output.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Signika:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      content: ["../../**/*.{html,js}"],
+      theme: {
+        extend: {
+          fontFamily: {
+            'signika': ['Signika', 'sans-serif'],
+          },
+        },
+      },
+      plugins: [],
+    }
+  </script>
+  <script>
+    document.write('<style id="i18n-preload">body{visibility:hidden}</style>');
+  </script>
+  <script src="../../js/i18n.js"></script>
+  <script>
+    if (typeof applyTranslationsBeforeRender === 'function') {
+      applyTranslationsBeforeRender();
+    }
+    
+    function revealBody() {
+      const style = document.getElementById('i18n-preload');
+      if (style) style.remove();
+      if (document.body) document.body.style.visibility = '';
+    }
+    
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof LanguageManager !== 'undefined') {
+          LanguageManager.applyLanguage();
+        }
+        revealBody();
+      });
+    } else {
+      if (typeof LanguageManager !== 'undefined') {
+        LanguageManager.applyLanguage();
+      }
+      revealBody();
+    }
+  </script>
+  <script src="../../js/components/loader.js"></script>
+  <script src="../../js/components/dropdown.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.umd.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" />
+  <script src="https://code.jquery.com/jquery-3.6.3.min.js"
+    integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+</head>
+
+<body
+  class="dark:bg-black bg-white h-screen text-black dark:text-white px-5 md:px-20 opacity-0 animate-fade-in transition duration-500">
+  <div id="navbar-container" data-path="../../components/navbar.html"></div>
+  <div class="container mx-auto">
+    <h1 class="text-4xl pt-10 pb-8 font-bold md:hidden" data-i18n="urban">URBAIN</h1>
+    <section class="text-neutral-700 pt-10 md:pt-10">
+      <div class="container w-full">
+        <div class="flex flex-col w-full" id="portfolio-grid">
+        </div>
+      </div>
+    </section>
+  </div>
+  <script src="../../js/image-protection.js"></script>
+  <script src="../../js/utils/webp-support.js"></script>
+  <script src="../../js/images-config.js"></script>
+  <script src="../../js/optimization/image-optimizer.js"></script>
+  <script src="../../js/optimization/lightbox-optimizer.js"></script>
+  <script src="../../js/portfolio-layout.js"></script>
+  <script>
+    async function renderPortfolio() {
+      const grid = document.getElementById('portfolio-grid');
+      const images = IMAGES_CONFIG.getUrbanImages('../../');
+      await PortfolioLayout.generatePortfolio(images, grid);
+    }
+    
+    document.addEventListener('DOMContentLoaded', renderPortfolio);
+  </script>
+  <div id="footer-container" data-path="../../components/footer.html"></div>
+  <div id="scroll-to-top-container" data-path="../../components/scroll-to-top.html"></div>
+  <script src="../../js/fade_in.js"></script>
+  <script src="../../js/menu.js"></script>
+  <script src="../../js/scroll-to-top.js"></script>
+</body>
+
+</html>
+

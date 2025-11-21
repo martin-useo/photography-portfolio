@@ -23,7 +23,6 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/fancybox/fancybox.css" />
   <script src="https://code.jquery.com/jquery-3.6.3.min.js"
     integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
-  <!-- End - Fancybox Scripts -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -85,33 +84,23 @@
       </div>
     </section>
   </div>
+  <script src="../../js/utils/webp-support.js"></script>
   <script src="../../js/image-protection.js"></script>
   <script src="../../js/images-config.js"></script>
   <script src="../../js/optimization/image-optimizer.js"></script>
   <script src="../../js/optimization/lightbox-optimizer.js"></script>
   <script src="../../js/portfolio-layout.js"></script>
   <script>
-    // Function to generate the gallery with intelligent layout
     async function renderPortfolio() {
       const grid = document.getElementById('portfolio-grid');
-      // Charger les images de nature depuis la configuration centralisée
       const images = IMAGES_CONFIG.getNatureImages('../../');
-      
-      // Utiliser le module PortfolioLayout pour générer le portfolio
       await PortfolioLayout.generatePortfolio(images, grid);
     }
     
-    // Call the function on load
     document.addEventListener('DOMContentLoaded', renderPortfolio);
   </script>
-  <!-- Footer -->
   <div id="footer-container" data-path="../../components/footer.html"></div>
-  <!-- Scroll to Top Button -->
   <div id="scroll-to-top-container" data-path="../../components/scroll-to-top.html"></div>
-  <!-- Script for the LightBox -->
-  <script>
-    Fancybox.bind("[data-fancybox]", {});
-  </script>
   <script src="../../js/fade_in.js"></script>
   <script src="../../js/menu.js"></script>
   <script src="../../js/scroll-to-top.js"></script>

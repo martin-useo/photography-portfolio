@@ -27,13 +27,15 @@ const STATIC_ASSETS = [
 const PAGES = [
   '/pages/about_me.html',
   '/pages/contact.html',
-  '/pages/portfolio/showcase.html',
+  '/pages/portfolio/home.html',
+  '/pages/portfolio/divers.html',
+  '/pages/portfolio/urban.html',
+  '/pages/portfolio/vehicules.html',
   '/pages/portfolio/nature.html',
   '/pages/portfolio/portraits.html',
   '/pages/portfolio/sport.html',
   '/pages/portfolio/evenements.html',
   '/pages/portfolio/animaux.html',
-  '/pages/portfolio/personnel.html'
 ];
 
 const COMPONENTS = [
@@ -99,8 +101,8 @@ self.addEventListener('fetch', (event) => {
 
 function isImageRequest(request) {
   const url = new URL(request.url);
-  return url.pathname.includes('/assets/images/') ||
-         url.pathname.includes('/assets/images-optimized/') ||
+  // Plus de full res - seulement les images optimisées
+  return url.pathname.includes('/assets/images-optimized/') ||
          url.pathname.match(/\.(jpg|jpeg|png|gif|webp|svg)$/i);
 }
 

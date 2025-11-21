@@ -1,4 +1,3 @@
-<!-- Footer -->
 <footer>
   <div class="max-w-screen-xl py-16 mx-auto">
     <div class="grid grid-cols-1 gap-8 text-center mx-auto">
@@ -29,12 +28,97 @@
             </a>
           </div>
         </div>
+        <p class="mt-8 text-sm text-gray-600 dark:text-gray-300 text-center" data-i18n="footer.thanks"></p>
       </div>
     </div>
-    <!-- <p class="mt-8 text-xs text-gray-600 dark:text-gray-300 text-center">
-      © 2023 Developed and Designed by
-      <a href="https://www.linkedin.com/in/joão-franco-452161195/" class="underline">João Franco</a>
-    </p> -->
+    <p class="mt-8 text-xs text-gray-600 dark:text-gray-300 text-center">
+      <span data-i18n="footer.copyright"></span> 
+      <a href="https://www.linkedin.com/in/joão-franco-452161195/" target="_blank" rel="noreferrer" class="underline">João Franco</a>
+    </p>
   </div>
 </footer>
+
+<script>
+  (function() {
+    function applyFooterTranslations() {
+      if (typeof LanguageManager === 'undefined' || !LanguageManager.currentLang) {
+        return false;
+      }
+      
+      const footer = document.querySelector('footer');
+      if (!footer) {
+        return false;
+      }
+      
+      if (typeof LanguageManager.applyLanguage === 'function') {
+        LanguageManager.applyLanguage();
+        return true;
+      }
+      
+      const thanksElement = footer.querySelector('[data-i18n="footer.thanks"]');
+      const copyrightElement = footer.querySelector('[data-i18n="footer.copyright"]');
+      
+      let applied = false;
+      
+      if (thanksElement) {
+        const thanksTranslation = LanguageManager.get('footer.thanks');
+        if (thanksTranslation && thanksTranslation !== 'footer.thanks') {
+          thanksElement.textContent = thanksTranslation;
+          applied = true;
+        }
+      }
+      
+      if (copyrightElement) {
+        const copyrightTranslation = LanguageManager.get('footer.copyright');
+        if (copyrightTranslation && copyrightTranslation !== 'footer.copyright') {
+          copyrightElement.textContent = copyrightTranslation;
+          applied = true;
+        }
+      }
+      
+      return applied;
+    }
+    
+    function initFooterTranslations() {
+      let attempts = 0;
+      const maxAttempts = 50;
+      
+      const tryApply = setInterval(() => {
+        attempts++;
+        if (applyFooterTranslations()) {
+          clearInterval(tryApply);
+        } else if (attempts >= maxAttempts) {
+          clearInterval(tryApply);
+          setTimeout(() => {
+            applyFooterTranslations();
+          }, 500);
+        }
+      }, 50);
+      
+      setTimeout(() => {
+        applyFooterTranslations();
+      }, 100);
+      
+      setTimeout(() => {
+        applyFooterTranslations();
+      }, 300);
+      
+      setTimeout(() => {
+        applyFooterTranslations();
+      }, 600);
+    }
+    
+    window.addEventListener('languageChanged', function() {
+      setTimeout(() => {
+        applyFooterTranslations();
+      }, 50);
+    });
+    
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initFooterTranslations);
+    } else {
+      initFooterTranslations();
+    }
+  })();
+</script>
 

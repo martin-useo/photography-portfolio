@@ -8,16 +8,35 @@
 
 <script>
   (function() {
-    function initLanguageToggle() {
+    function updateToggleText() {
       const toggleText = document.getElementById('language-toggle-text');
       if (toggleText && typeof LanguageManager !== 'undefined' && LanguageManager.currentLang) {
-        toggleText.textContent = LanguageManager.currentLang.toUpperCase();
+        const expectedText = LanguageManager.currentLang.toUpperCase();
+        // Ne mettre à jour que si le texte est différent pour éviter les boucles
+        if (toggleText.textContent !== expectedText) {
+          toggleText.textContent = expectedText;
+        }
       }
     }
     
+    // Écouter les changements de langue (important pour les mises à jour dynamiques)
+    window.addEventListener('languageChanged', function() {
+      updateToggleText();
+    });
+    
+    // Fonction pour initialiser le texte du bouton
+    function initLanguageToggle() {
+      updateToggleText();
+      // Forcer une mise à jour après un court délai pour être sûr
+      setTimeout(updateToggleText, 50);
+      setTimeout(updateToggleText, 150);
+      }
+    
+    // Initialiser immédiatement si LanguageManager est déjà disponible
     if (typeof LanguageManager !== 'undefined' && LanguageManager.currentLang) {
       initLanguageToggle();
     } else {
+      // Sinon, attendre que LanguageManager soit disponible
       let attempts = 0;
       const maxAttempts = 40;
       

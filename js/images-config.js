@@ -1,41 +1,467 @@
 const IMAGES_CONFIG = {
-  all: [
-    { 
-      filename: 'ThéoNoJitensha-1.jpg', 
-      alt: 'a person standing in front of a rock formation', 
-      category: 'portraits'
-    },
-    { 
-      filename: 'ThéoNoJitensha-2.jpg', 
-      alt: 'a cat laying on top of a sidewalk next to the ocean', 
-      category: 'portraits'
-    },
-    { 
-      filename: 'ThéoNoJitensha-3.jpg', 
-      alt: 'a man standing on a beach next to the ocean', 
-      category: 'nature'
-    },
-    { 
-      filename: 'ThéoNoJitensha-4.jpg', 
-      alt: 'a snow covered mountain with trees on the side', 
-      category: 'nature'
-    },
-    { 
-      filename: 'ThéoNoJitensha-5.jpg', 
-      alt: 'a branch of a plant floating in a body of water', 
-      category: 'nature'
-    },
-    { 
-      filename: 'ThéoNoJitensha-6.jpg', 
-      alt: 'a blue sky with a lot of red and orange clouds', 
-      category: 'nature'
-    },
-    { 
-      filename: 'ThéoNoJitensha-7.jpg', 
-      alt: 'a view of the ocean from the top of a hill', 
-      category: 'nature'
-    }
+  categoryMap: {
+    'Animals': 'animaux',
+    'Events': 'evenements',
+    'Nature': 'nature',
+    'Miscellaneous': 'divers',
+    'Portraits': 'portraits',
+    'Sports': 'sport',
+    'Urban': 'urban',
+    'Vehicles': 'vehicules'
+  },
+
+  imageFiles: [
+    'Animals-1.jpg',
+    'Animals-2.jpg',
+    'Animals-3.jpg',
+    'Animals-4.jpg',
+    'Animals-5.jpg',
+    'Animals-6.jpg',
+    'Animals-7.jpg',
+    'Animals-8.jpg',
+    'Animals-9.jpg',
+    'Animals-10.jpg',
+    'Animals-11.jpg',
+    'Animals-12.jpg',
+    'Animals-13.jpg',
+    'Animals-14.jpg',
+    'Animals-15.jpg',
+    'Animals-16.jpg',
+    'Animals-17.jpg',
+    'Animals-18.jpg',
+    'Animals-19.jpg',
+    'Events-1.jpg',
+    'Events-2.jpg',
+    'Events-3.jpg',
+    'Events-4.jpg',
+    'Events-5.jpg',
+    'Events-6.jpg',
+    'Events-7.jpg',
+    'Events-8.jpg',
+    'Events-9.jpg',
+    'Events-10.jpg',
+    'Events-11.jpg',
+    'Events-12.jpg',
+    'Events-13.jpg',
+    'Events-14.jpg',
+    'Events-15.jpg',
+    'Events-16.jpg',
+    'Events-17.jpg',
+    'Events-18.jpg',
+    'Events-19.jpg',
+    'Events-20.jpg',
+    'Events-21.jpg',
+    'Events-22.jpg',
+    'Events-23.jpg',
+    'Events-24.jpg',
+    'Events-25.jpg',
+    'Events-26.jpg',
+    'Events-27.jpg',
+    'Events-28.jpg',
+    'Events-29.jpg',
+    'Events-30.jpg',
+    'Events-31.jpg',
+    'Events-32.jpg',
+    'Events-33.jpg',
+    'Events-34.jpg',
+    'Events-35.jpg',
+    'Miscellaneous-1.jpg',
+    'Miscellaneous-2.jpg',
+    'Miscellaneous-3.jpg',
+    'Miscellaneous-4.jpg',
+    'Miscellaneous-5.jpg',
+    'Miscellaneous-6.jpg',
+    'Miscellaneous-7.jpg',
+    'Miscellaneous-8.jpg',
+    'Miscellaneous-9.jpg',
+    'Miscellaneous-10.jpg',
+    'Miscellaneous-11.jpg',
+    'Miscellaneous-12.jpg',
+    'Miscellaneous-13.jpg',
+    'Miscellaneous-14.jpg',
+    'Miscellaneous-15.jpg',
+    'Miscellaneous-16.jpg',
+    'Miscellaneous-17.jpg',
+    'Miscellaneous-18.jpg',
+    'Miscellaneous-19.jpg',
+    'Miscellaneous-20.jpg',
+    'Miscellaneous-21.jpg',
+    'Miscellaneous-22.jpg',
+    'Miscellaneous-23.jpg',
+    'Miscellaneous-24.jpg',
+    'Miscellaneous-25.jpg',
+    'Miscellaneous-26.jpg',
+    'Miscellaneous-27.jpg',
+    'Miscellaneous-28.jpg',
+    'Miscellaneous-29.jpg',
+    'Miscellaneous-30.jpg',
+    'Miscellaneous-31.jpg',
+    'Miscellaneous-32.jpg',
+    'Miscellaneous-33.jpg',
+    'Miscellaneous-34.jpg',
+    'Nature-1.jpg',
+    'Nature-2.jpg',
+    'Nature-3.jpg',
+    'Nature-4.jpg',
+    'Nature-5.jpg',
+    'Nature-6.jpg',
+    'Nature-7.jpg',
+    'Nature-8.jpg',
+    'Nature-9.jpg',
+    'Nature-10.jpg',
+    'Nature-11.jpg',
+    'Nature-12.jpg',
+    'Nature-13.jpg',
+    'Nature-14.jpg',
+    'Nature-15.jpg',
+    'Nature-16.jpg',
+    'Nature-17.jpg',
+    'Nature-18.jpg',
+    'Nature-19.jpg',
+    'Nature-20.jpg',
+    'Nature-21.jpg',
+    'Nature-22.jpg',
+    'Nature-23.jpg',
+    'Portraits-1.jpg',
+    'Portraits-2.jpg',
+    'Portraits-3.jpg',
+    'Portraits-4.jpg',
+    'Portraits-5.jpg',
+    'Portraits-6.jpg',
+    'Portraits-7.jpg',
+    'Portraits-8.jpg',
+    'Portraits-9.jpg',
+    'Portraits-10.jpg',
+    'Portraits-11.jpg',
+    'Portraits-12.jpg',
+    'Portraits-13.jpg',
+    'Portraits-14.jpg',
+    'Portraits-15.jpg',
+    'Sports-1.jpg',
+    'Sports-2.jpg',
+    'Sports-3.jpg',
+    'Sports-4.jpg',
+    'Sports-5.jpg',
+    'Sports-6.jpg',
+    'Sports-7.jpg',
+    'Sports-8.jpg',
+    'Sports-9.jpg',
+    'Sports-10.jpg',
+    'Sports-11.jpg',
+    'Sports-12.jpg',
+    'Sports-13.jpg',
+    'Sports-14.jpg',
+    'Sports-15.jpg',
+    'Sports-16.jpg',
+    'Sports-17.jpg',
+    'Sports-18.jpg',
+    'Sports-19.jpg',
+    'Sports-20.jpg',
+    'Sports-21.jpg',
+    'Sports-22.jpg',
+    'Sports-23.jpg',
+    'Urban-1.jpg',
+    'Urban-2.jpg',
+    'Urban-3.jpg',
+    'Urban-4.jpg',
+    'Urban-5.jpg',
+    'Urban-6.jpg',
+    'Urban-7.jpg',
+    'Urban-8.jpg',
+    'Urban-9.jpg',
+    'Urban-10.jpg',
+    'Urban-11.jpg',
+    'Urban-12.jpg',
+    'Urban-13.jpg',
+    'Urban-14.jpg',
+    'Urban-15.jpg',
+    'Urban-16.jpg',
+    'Urban-17.jpg',
+    'Urban-18.jpg',
+    'Urban-19.jpg',
+    'Urban-20.jpg',
+    'Urban-21.jpg',
+    'Urban-22.jpg',
+    'Urban-23.jpg',
+    'Urban-24.jpg',
+    'Urban-25.jpg',
+    'Urban-26.jpg',
+    'Urban-27.jpg',
+    'Urban-28.jpg',
+    'Urban-29.jpg',
+    'Urban-30.jpg',
+    'Urban-31.jpg',
+    'Urban-32.jpg',
+    'Urban-33.jpg',
+    'Urban-34.jpg',
+    'Urban-35.jpg',
+    'Urban-36.jpg',
+    'Urban-37.jpg',
+    'Urban-38.jpg',
+    'Urban-39.jpg',
+    'Urban-40.jpg',
+    'Urban-41.jpg',
+    'Urban-42.jpg',
+    'Vehicles-1.jpg',
+    'Vehicles-2.jpg',
+    'Vehicles-3.jpg',
+    'Vehicles-4.jpg',
+    'Vehicles-5.jpg',
+    'Vehicles-6.jpg',
+    'Vehicles-7.jpg',
+    'Vehicles-8.jpg',
+    'Vehicles-9.jpg',
+    'Vehicles-10.jpg',
+    'Vehicles-11.jpg',
+    'Vehicles-12.jpg',
+    'Vehicles-13.jpg',
+    'Vehicles-14.jpg',
+    'Vehicles-15.jpg',
+    'Vehicles-16.jpg',
+    'Vehicles-17.jpg',
+    'Vehicles-18.jpg',
+    'Vehicles-19.jpg'
   ],
+
+  imageMetadata: {
+    'Animals-1.jpg': { aspectRatio: 1.500000, rating: 4 },
+    'Animals-2.jpg': { aspectRatio: 0.666667, rating: 5 },
+    'Animals-3.jpg': { aspectRatio: 0.666667, rating: null },
+    'Animals-4.jpg': { aspectRatio: 0.666667, rating: null },
+    'Animals-5.jpg': { aspectRatio: 0.666667, rating: null },
+    'Animals-6.jpg': { aspectRatio: 0.666667, rating: 4 },
+    'Animals-7.jpg': { aspectRatio: 0.666667, rating: null },
+    'Animals-8.jpg': { aspectRatio: 1.500000, rating: 4 },
+    'Animals-9.jpg': { aspectRatio: 0.666667, rating: null },
+    'Animals-10.jpg': { aspectRatio: 1.500000, rating: null },
+    'Animals-11.jpg': { aspectRatio: 0.666667, rating: 4 },
+    'Animals-12.jpg': { aspectRatio: 0.666609, rating: 5 },
+    'Animals-13.jpg': { aspectRatio: 1.500000, rating: null },
+    'Animals-14.jpg': { aspectRatio: 0.666607, rating: null },
+    'Animals-15.jpg': { aspectRatio: 0.666667, rating: 4 },
+    'Animals-16.jpg': { aspectRatio: 1.500000, rating: 4 },
+    'Animals-17.jpg': { aspectRatio: 0.666725, rating: 5 },
+    'Animals-18.jpg': { aspectRatio: 1.500000, rating: null },
+    'Animals-19.jpg': { aspectRatio: 0.666667, rating: null },
+    'Events-1.jpg': { aspectRatio: 1.500000, rating: null },
+    'Events-2.jpg': { aspectRatio: 1.500000, rating: null },
+    'Events-3.jpg': { aspectRatio: 0.800079, rating: null },
+    'Events-4.jpg': { aspectRatio: 0.800000, rating: null },
+    'Events-5.jpg': { aspectRatio: 1.500000, rating: null },
+    'Events-6.jpg': { aspectRatio: 0.666667, rating: null },
+    'Events-7.jpg': { aspectRatio: 0.666715, rating: null },
+    'Events-8.jpg': { aspectRatio: 1.500000, rating: 5 },
+    'Events-9.jpg': { aspectRatio: 0.666667, rating: 4 },
+    'Events-10.jpg': { aspectRatio: 0.666667, rating: null },
+    'Events-11.jpg': { aspectRatio: 1.500000, rating: null },
+    'Events-12.jpg': { aspectRatio: 0.666667, rating: null },
+    'Events-13.jpg': { aspectRatio: 1.500000, rating: 4 },
+    'Events-14.jpg': { aspectRatio: 1.500000, rating: 5 },
+    'Events-15.jpg': { aspectRatio: 0.666610, rating: null },
+    'Events-16.jpg': { aspectRatio: 1.500139, rating: 4 },
+    'Events-17.jpg': { aspectRatio: 1.500000, rating: null },
+    'Events-18.jpg': { aspectRatio: 1.500127, rating: null },
+    'Events-19.jpg': { aspectRatio: 1.500000, rating: null },
+    'Events-20.jpg': { aspectRatio: 1.500000, rating: null },
+    'Events-21.jpg': { aspectRatio: 0.666667, rating: 4 },
+    'Events-22.jpg': { aspectRatio: 1.500000, rating: null },
+    'Events-23.jpg': { aspectRatio: 0.666608, rating: null },
+    'Events-24.jpg': { aspectRatio: 1.500000, rating: 5 },
+    'Events-25.jpg': { aspectRatio: 1.500000, rating: null },
+    'Events-26.jpg': { aspectRatio: 0.666667, rating: 5 },
+    'Events-27.jpg': { aspectRatio: 1.499871, rating: null },
+    'Events-28.jpg': { aspectRatio: 0.666667, rating: 4 },
+    'Events-29.jpg': { aspectRatio: 0.666667, rating: 4 },
+    'Events-30.jpg': { aspectRatio: 1.500000, rating: null },
+    'Events-31.jpg': { aspectRatio: 1.500000, rating: 5 },
+    'Events-32.jpg': { aspectRatio: 0.666667, rating: null },
+    'Events-33.jpg': { aspectRatio: 1.500126, rating: 5 },
+    'Events-34.jpg': { aspectRatio: 1.500000, rating: 4 },
+    'Events-35.jpg': { aspectRatio: 0.666667, rating: null },
+    'Miscellaneous-1.jpg': { aspectRatio: 1.500000, rating: null },
+    'Miscellaneous-2.jpg': { aspectRatio: 0.666667, rating: null },
+    'Miscellaneous-3.jpg': { aspectRatio: 0.666667, rating: 4 },
+    'Miscellaneous-4.jpg': { aspectRatio: 1.500000, rating: 5 },
+    'Miscellaneous-5.jpg': { aspectRatio: 0.666667, rating: null },
+    'Miscellaneous-6.jpg': { aspectRatio: 0.666667, rating: null },
+    'Miscellaneous-7.jpg': { aspectRatio: 1.499885, rating: null },
+    'Miscellaneous-8.jpg': { aspectRatio: 1.500000, rating: null },
+    'Miscellaneous-9.jpg': { aspectRatio: 1.500000, rating: null },
+    'Miscellaneous-10.jpg': { aspectRatio: 0.666667, rating: 5 },
+    'Miscellaneous-11.jpg': { aspectRatio: 1.500000, rating: 4 },
+    'Miscellaneous-12.jpg': { aspectRatio: 1.500000, rating: 4 },
+    'Miscellaneous-13.jpg': { aspectRatio: 1.500000, rating: 4 },
+    'Miscellaneous-14.jpg': { aspectRatio: 1.500000, rating: null },
+    'Miscellaneous-15.jpg': { aspectRatio: 0.666667, rating: null },
+    'Miscellaneous-16.jpg': { aspectRatio: 1.500000, rating: null },
+    'Miscellaneous-17.jpg': { aspectRatio: 1.500000, rating: null },
+    'Miscellaneous-18.jpg': { aspectRatio: 0.666667, rating: null },
+    'Miscellaneous-19.jpg': { aspectRatio: 1.500000, rating: null },
+    'Miscellaneous-20.jpg': { aspectRatio: 1.500000, rating: null },
+    'Miscellaneous-21.jpg': { aspectRatio: 0.666667, rating: null },
+    'Miscellaneous-22.jpg': { aspectRatio: 1.500000, rating: 4 },
+    'Miscellaneous-23.jpg': { aspectRatio: 0.666667, rating: null },
+    'Miscellaneous-24.jpg': { aspectRatio: 0.666667, rating: null },
+    'Miscellaneous-25.jpg': { aspectRatio: 1.500000, rating: null },
+    'Miscellaneous-26.jpg': { aspectRatio: 0.666667, rating: 5 },
+    'Miscellaneous-27.jpg': { aspectRatio: 1.500000, rating: null },
+    'Miscellaneous-28.jpg': { aspectRatio: 0.666667, rating: null },
+    'Miscellaneous-29.jpg': { aspectRatio: 0.666667, rating: null },
+    'Miscellaneous-30.jpg': { aspectRatio: 1.500000, rating: null },
+    'Miscellaneous-31.jpg': { aspectRatio: 0.666667, rating: null },
+    'Miscellaneous-32.jpg': { aspectRatio: 1.500000, rating: null },
+    'Miscellaneous-33.jpg': { aspectRatio: 0.666667, rating: null },
+    'Miscellaneous-34.jpg': { aspectRatio: 1.500000, rating: null },
+    'Nature-1.jpg': { aspectRatio: 1.500000, rating: null },
+    'Nature-2.jpg': { aspectRatio: 1.499861, rating: null },
+    'Nature-3.jpg': { aspectRatio: 0.666667, rating: null },
+    'Nature-4.jpg': { aspectRatio: 0.750000, rating: null },
+    'Nature-5.jpg': { aspectRatio: 0.666715, rating: 5 },
+    'Nature-6.jpg': { aspectRatio: 0.666667, rating: 4 },
+    'Nature-7.jpg': { aspectRatio: 1.500110, rating: null },
+    'Nature-8.jpg': { aspectRatio: 0.666730, rating: 5 },
+    'Nature-9.jpg': { aspectRatio: 0.666667, rating: null },
+    'Nature-10.jpg': { aspectRatio: 0.666667, rating: null },
+    'Nature-11.jpg': { aspectRatio: 1.500000, rating: null },
+    'Nature-12.jpg': { aspectRatio: 1.500000, rating: 4 },
+    'Nature-13.jpg': { aspectRatio: 1.500000, rating: 4 },
+    'Nature-14.jpg': { aspectRatio: 0.666667, rating: 4 },
+    'Nature-15.jpg': { aspectRatio: 1.500000, rating: 5 },
+    'Nature-16.jpg': { aspectRatio: 0.666667, rating: null },
+    'Nature-17.jpg': { aspectRatio: 1.499857, rating: 4 },
+    'Nature-18.jpg': { aspectRatio: 0.666667, rating: 5 },
+    'Nature-19.jpg': { aspectRatio: 0.666667, rating: null },
+    'Nature-20.jpg': { aspectRatio: 1.500000, rating: 4 },
+    'Nature-21.jpg': { aspectRatio: 0.666723, rating: null },
+    'Nature-22.jpg': { aspectRatio: 1.500000, rating: null },
+    'Nature-23.jpg': { aspectRatio: 1.500000, rating: null },
+    'Portraits-1.jpg': { aspectRatio: 0.666667, rating: 4 },
+    'Portraits-2.jpg': { aspectRatio: 0.666601, rating: null },
+    'Portraits-3.jpg': { aspectRatio: 0.666667, rating: null },
+    'Portraits-4.jpg': { aspectRatio: 0.666667, rating: null },
+    'Portraits-5.jpg': { aspectRatio: 0.666667, rating: null },
+    'Portraits-6.jpg': { aspectRatio: 0.666667, rating: 4 },
+    'Portraits-7.jpg': { aspectRatio: 0.666667, rating: 5 },
+    'Portraits-8.jpg': { aspectRatio: 0.666667, rating: 4 },
+    'Portraits-9.jpg': { aspectRatio: 0.666667, rating: null },
+    'Portraits-10.jpg': { aspectRatio: 0.666736, rating: null },
+    'Portraits-11.jpg': { aspectRatio: 0.666667, rating: null },
+    'Portraits-12.jpg': { aspectRatio: 0.666667, rating: 5 },
+    'Portraits-13.jpg': { aspectRatio: 0.665110, rating: 5 },
+    'Portraits-14.jpg': { aspectRatio: 0.666667, rating: null },
+    'Portraits-15.jpg': { aspectRatio: 0.666667, rating: 4 },
+    'Sports-1.jpg': { aspectRatio: 1.500000, rating: null },
+    'Sports-2.jpg': { aspectRatio: 0.666667, rating: null },
+    'Sports-3.jpg': { aspectRatio: 0.666667, rating: null },
+    'Sports-4.jpg': { aspectRatio: 0.666667, rating: null },
+    'Sports-5.jpg': { aspectRatio: 0.800000, rating: null },
+    'Sports-6.jpg': { aspectRatio: 1.500000, rating: 4 },
+    'Sports-7.jpg': { aspectRatio: 1.500000, rating: null },
+    'Sports-8.jpg': { aspectRatio: 1.500000, rating: 4 },
+    'Sports-9.jpg': { aspectRatio: 1.500000, rating: 5 },
+    'Sports-10.jpg': { aspectRatio: 1.500000, rating: 4 },
+    'Sports-11.jpg': { aspectRatio: 0.666667, rating: null },
+    'Sports-12.jpg': { aspectRatio: 0.666607, rating: 4 },
+    'Sports-13.jpg': { aspectRatio: 1.500000, rating: null },
+    'Sports-14.jpg': { aspectRatio: 0.666667, rating: null },
+    'Sports-15.jpg': { aspectRatio: 0.666667, rating: 5 },
+    'Sports-16.jpg': { aspectRatio: 0.666667, rating: null },
+    'Sports-17.jpg': { aspectRatio: 1.500000, rating: 5 },
+    'Sports-18.jpg': { aspectRatio: 0.666667, rating: 5 },
+    'Sports-19.jpg': { aspectRatio: 1.500000, rating: null },
+    'Sports-20.jpg': { aspectRatio: 0.666667, rating: null },
+    'Sports-21.jpg': { aspectRatio: 0.666667, rating: 4 },
+    'Sports-22.jpg': { aspectRatio: 1.500000, rating: null },
+    'Sports-23.jpg': { aspectRatio: 1.500000, rating: null },
+    'Urban-1.jpg': { aspectRatio: 1.500108, rating: null },
+    'Urban-2.jpg': { aspectRatio: 0.666667, rating: null },
+    'Urban-3.jpg': { aspectRatio: 0.666667, rating: 5 },
+    'Urban-4.jpg': { aspectRatio: 0.666616, rating: 4 },
+    'Urban-5.jpg': { aspectRatio: 0.666716, rating: null },
+    'Urban-6.jpg': { aspectRatio: 1.500000, rating: 4 },
+    'Urban-7.jpg': { aspectRatio: 0.666667, rating: 4 },
+    'Urban-8.jpg': { aspectRatio: 1.500000, rating: null },
+    'Urban-9.jpg': { aspectRatio: 1.499891, rating: null },
+    'Urban-10.jpg': { aspectRatio: 1.500000, rating: 5 },
+    'Urban-11.jpg': { aspectRatio: 0.666667, rating: 5 },
+    'Urban-12.jpg': { aspectRatio: 1.500000, rating: null },
+    'Urban-13.jpg': { aspectRatio: 1.500000, rating: null },
+    'Urban-14.jpg': { aspectRatio: 1.499872, rating: null },
+    'Urban-15.jpg': { aspectRatio: 0.666667, rating: 4 },
+    'Urban-16.jpg': { aspectRatio: 1.500000, rating: null },
+    'Urban-17.jpg': { aspectRatio: 0.666667, rating: 4 },
+    'Urban-18.jpg': { aspectRatio: 1.500000, rating: null },
+    'Urban-19.jpg': { aspectRatio: 1.500000, rating: null },
+    'Urban-20.jpg': { aspectRatio: 0.666667, rating: 4 },
+    'Urban-21.jpg': { aspectRatio: 0.666667, rating: 5 },
+    'Urban-22.jpg': { aspectRatio: 1.500127, rating: 4 },
+    'Urban-23.jpg': { aspectRatio: 0.666667, rating: 4 },
+    'Urban-24.jpg': { aspectRatio: 1.500000, rating: null },
+    'Urban-25.jpg': { aspectRatio: 0.666667, rating: 4 },
+    'Urban-26.jpg': { aspectRatio: 1.500129, rating: null },
+    'Urban-27.jpg': { aspectRatio: 1.500000, rating: null },
+    'Urban-28.jpg': { aspectRatio: 1.499875, rating: null },
+    'Urban-29.jpg': { aspectRatio: 1.500126, rating: null },
+    'Urban-30.jpg': { aspectRatio: 1.500128, rating: 4 },
+    'Urban-31.jpg': { aspectRatio: 0.666667, rating: null },
+    'Urban-32.jpg': { aspectRatio: 1.500000, rating: 4 },
+    'Urban-33.jpg': { aspectRatio: 1.499874, rating: null },
+    'Urban-34.jpg': { aspectRatio: 0.666667, rating: null },
+    'Urban-35.jpg': { aspectRatio: 0.666667, rating: null },
+    'Urban-36.jpg': { aspectRatio: 0.666667, rating: null },
+    'Urban-37.jpg': { aspectRatio: 1.500000, rating: null },
+    'Urban-38.jpg': { aspectRatio: 1.499869, rating: null },
+    'Urban-39.jpg': { aspectRatio: 0.666667, rating: null },
+    'Urban-40.jpg': { aspectRatio: 1.500000, rating: 4 },
+    'Urban-41.jpg': { aspectRatio: 0.666667, rating: 4 },
+    'Urban-42.jpg': { aspectRatio: 1.500000, rating: null },
+    'Vehicles-1.jpg': { aspectRatio: 0.666667, rating: 4 },
+    'Vehicles-2.jpg': { aspectRatio: 1.500150, rating: null },
+    'Vehicles-3.jpg': { aspectRatio: 0.666723, rating: null },
+    'Vehicles-4.jpg': { aspectRatio: 1.500000, rating: null },
+    'Vehicles-5.jpg': { aspectRatio: 1.500000, rating: null },
+    'Vehicles-6.jpg': { aspectRatio: 0.666667, rating: null },
+    'Vehicles-7.jpg': { aspectRatio: 1.500000, rating: 4 },
+    'Vehicles-8.jpg': { aspectRatio: 1.500000, rating: 5 },
+    'Vehicles-9.jpg': { aspectRatio: 1.500000, rating: null },
+    'Vehicles-10.jpg': { aspectRatio: 1.499871, rating: null },
+    'Vehicles-11.jpg': { aspectRatio: 1.500000, rating: 4 },
+    'Vehicles-12.jpg': { aspectRatio: 1.500000, rating: null },
+    'Vehicles-13.jpg': { aspectRatio: 0.666667, rating: 4 },
+    'Vehicles-14.jpg': { aspectRatio: 1.500000, rating: null },
+    'Vehicles-15.jpg': { aspectRatio: 1.500000, rating: null },
+    'Vehicles-16.jpg': { aspectRatio: 1.500000, rating: null },
+    'Vehicles-17.jpg': { aspectRatio: 1.500000, rating: null },
+    'Vehicles-18.jpg': { aspectRatio: 0.666667, rating: 5 },
+    'Vehicles-19.jpg': { aspectRatio: 0.666667, rating: null }
+  },
+
+  getCategoryFromFilename: function(filename) {
+    const match = filename.match(/^([A-Za-z]+)-/);
+    if (match) {
+      const englishCategory = match[1];
+      return this.categoryMap[englishCategory] || 'home';
+    }
+    return 'home';
+  },
+
+  createImageObject: function(filename) {
+    const metadata = this.imageMetadata[filename];
+    const aspectRatio = metadata?.aspectRatio || (typeof metadata === 'number' ? metadata : 4/3);
+    const rating = metadata?.rating !== undefined ? metadata.rating : (typeof metadata === 'number' ? null : null);
+    
+    return {
+      filename: filename,
+      alt: '',
+      category: this.getCategoryFromFilename(filename),
+      aspectRatio: aspectRatio,
+      rating: rating
+    };
+  },
+
+  get all() {
+    return this.imageFiles.map(filename => this.createImageObject(filename));
+  },
 
   getImagePath: function(filename, basePath = '') {
     return `${basePath}assets/images/${filename}`;
@@ -49,12 +475,25 @@ const IMAGES_CONFIG = {
   },
 
   getImagesByCategory: function(category, basePath = '') {
-    return this.all
+    const images = this.all
       .filter(img => img.category === category)
       .map(img => ({
         ...img,
         src: this.getImagePath(img.filename, basePath)
       }));
+    
+    return images.sort((a, b) => {
+      const ratingA = a.rating || 0;
+      const ratingB = b.rating || 0;
+      
+      if (ratingB !== ratingA) {
+        return ratingB - ratingA;
+      }
+      
+      const numA = parseInt(a.filename.match(/-(d+)\./)?.[1] || '0', 10);
+      const numB = parseInt(b.filename.match(/-(d+)\./)?.[1] || '0', 10);
+      return numA - numB;
+    });
   },
 
   getNatureImages: function(basePath = '') {
@@ -65,53 +504,52 @@ const IMAGES_CONFIG = {
     return this.getImagesByCategory('portraits', basePath);
   },
 
-  addImage: function(imageData) {
-    this.all.push(imageData);
+  getAnimauxImages: function(basePath = '') {
+    return this.getImagesByCategory('animaux', basePath);
   },
 
-  getTotalCount: function() {
-    return this.all.length;
+  getEvenementsImages: function(basePath = '') {
+    return this.getImagesByCategory('evenements', basePath);
   },
 
-  detectImageDimensions: function(imageSrc) {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.onload = function() {
-        const format = img.height > img.width ? 'portrait' : 'landscape';
-        const aspectRatio = img.width / img.height;
-        resolve({
-          width: img.naturalWidth,
-          height: img.naturalHeight,
-          format: format,
-          aspectRatio: aspectRatio
-        });
-      };
-      img.onerror = function() {
-        resolve({
-          width: 1920,
-          height: 1080,
-          format: 'landscape',
-          aspectRatio: 16/9
-        });
-      };
-      img.src = imageSrc;
+  getDiversImages: function(basePath = '') {
+    return this.getImagesByCategory('divers', basePath);
+  },
+
+  getUrbanImages: function(basePath = '') {
+    return this.getImagesByCategory('urban', basePath);
+  },
+
+  getVehiculesImages: function(basePath = '') {
+    return this.getImagesByCategory('vehicules', basePath);
+  },
+
+  getSportImages: function(basePath = '') {
+    return this.getImagesByCategory('sport', basePath);
+  },
+
+  getShowcaseImages: function(basePath = '') {
+    const images = this.getAllImages(basePath);
+    
+    return images.sort((a, b) => {
+      const ratingA = a.rating || 0;
+      const ratingB = b.rating || 0;
+      
+      if (ratingB !== ratingA) {
+        return ratingB - ratingA;
+      }
+      
+      const numA = parseInt(a.filename.match(/-(d+)\./)?.[1] || '0', 10);
+      const numB = parseInt(b.filename.match(/-(d+)\./)?.[1] || '0', 10);
+      return numA - numB;
     });
   },
 
-  enrichImagesWithFormat: async function(images) {
-    const enrichedImages = await Promise.all(
-      images.map(async (img) => {
-        const dimensions = await this.detectImageDimensions(img.src);
-        return {
-          ...img,
-          width: dimensions.width,
-          height: dimensions.height,
-          aspectRatio: dimensions.aspectRatio,
-          detectedFormat: dimensions.format,
-          actualFormat: dimensions.format
-        };
-      })
-    );
-    return enrichedImages;
+  addImage: function(imageData) {
+    this.imageFiles.push(imageData.filename);
+  },
+
+  getTotalCount: function() {
+    return this.imageFiles.length;
   }
 };

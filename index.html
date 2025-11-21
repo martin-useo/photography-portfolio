@@ -9,7 +9,6 @@
   <meta name="description"
     content="Hello there, I'm Martin USEO – a freelance photographer based in Paris, France. Welcome to my portfolio." />
   
-  <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://martin-useo.github.io/photography-portfolio/" />
   <meta property="og:title" content="Martin USEO - Portfolio" />
@@ -17,15 +16,11 @@
   <meta property="og:image" content="https://martin-useo.github.io/photography-portfolio/assets/Avatar.png" />
   <meta property="og:image:width" content="1200" />
   <meta property="og:image:height" content="630" />
-  
-  <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:url" content="https://martin-useo.github.io/photography-portfolio/" />
   <meta name="twitter:title" content="Martin USEO - Portfolio" />
   <meta name="twitter:description" content="Hello there, I'm Martin USEO – a freelance photographer based in Paris, France. Welcome to my portfolio." />
   <meta name="twitter:image" content="https://martin-useo.github.io/photography-portfolio/assets/Avatar.png" />
-  
-  <!-- Favicon -->
   <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
   <link rel="stylesheet" href="css/output.css" />
   <style>
@@ -35,15 +30,39 @@
       will-change: opacity;
     }
   </style>
-  <!-- Alpine.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <!-- i18n -->
   <script src="js/i18n.js"></script>
-  <!-- Start - Fonts -->
+  <script>
+    document.write('<style id="i18n-preload">body{visibility:hidden}</style>');
+  </script>
+  <script>
+    if (typeof applyTranslationsBeforeRender === 'function') {
+      applyTranslationsBeforeRender();
+    }
+    
+    function revealBody() {
+      const style = document.getElementById('i18n-preload');
+      if (style) style.remove();
+      if (document.body) document.body.style.visibility = '';
+    }
+    
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() {
+        if (typeof LanguageManager !== 'undefined') {
+          LanguageManager.applyLanguage();
+        }
+        revealBody();
+      });
+    } else {
+      if (typeof LanguageManager !== 'undefined') {
+        LanguageManager.applyLanguage();
+      }
+      revealBody();
+    }
+  </script>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Signika:wght@400;700&display=swap" rel="stylesheet">
-  <!-- End - Fonts -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -64,20 +83,17 @@
 
 <body
   class="dark:bg-black bg-white h-screen text-black dark:text-white opacity-0 animate-fade-in transition duration-500 overflow-hidden">
-  <!-- Background Canvas with Images -->
   <div class="fixed inset-0 w-full h-full z-0" id="background-canvas">
-    <div class="flex flex-wrap w-full h-full items-stretch transition-opacity duration-500" id="portfolio-grid">
-        </div>
-    <!-- Overlay for better button visibility -->
+    <div class="flex flex-wrap w-full h-full items-stretch transition-opacity duration-500" id="portfolio-grid"></div>
     <div class="absolute inset-0 bg-black/30 dark:bg-black/50"></div>
       </div>
 
-  <!-- Main Content - Title and Button -->
+  <div class="relative z-10 h-screen flex flex-col items-center justify-center overflow-hidden px-4">
   <div class="relative z-10 h-screen flex flex-col items-center justify-center overflow-hidden px-4">
     <h1 class="text-6xl md:text-8xl font-signika font-bold text-white mb-12 text-center drop-shadow-2xl">
       MARTIN USEO
     </h1>
-    <a href="pages/portfolio/showcase.html" 
+    <a href="pages/portfolio/home.html" 
        id="portfolio-button"
        class="px-8 md:px-12 py-4 md:py-6 bg-white/70 dark:bg-white/10 backdrop-blur-sm text-black dark:text-white text-xl md:text-2xl font-signika font-bold rounded-lg shadow-lg hover:bg-white/80 dark:hover:bg-white/20 transition-all duration-300 transform hover:scale-105 active:scale-100 md:hover:scale-105 border-2 border-black/20 dark:border-white/20 relative">
       <span id="button-text-fr">DÉCOUVRIR LE PORTFOLIO</span>
@@ -85,105 +101,52 @@
     </a>
   </div>
 
+    <script src="js/utils/webp-support.js"></script>
     <script src="js/image-protection.js"></script>
     <script src="js/images-config.js"></script>
     <script src="js/optimization/image-optimizer.js"></script>
     <script>
-    // Fonction de chargement direct des thumbnails pour la page d'accueil
+    // Fonction de chargement direct des images display pour la page d'accueil
     function loadThumbnailForCanvas(img) {
       if (!img.dataset.filename) return;
       if (img.dataset.loaded === 'true') return;
       
       const filename = img.dataset.filename;
-      // Sur index.html, on est à la racine, donc pas de basePath
       const basePath = '';
       
       const ext = filename.match(/\.[^.]+$/)?.[0] || '.jpg';
       const baseName = filename.replace(ext, '');
       
-      // Charger directement le thumbnail
-      const thumbUrl = `${basePath}assets/images-optimized/${baseName}-thumb${ext}`;
-      const fallbackUrl = `${basePath}assets/images/${filename}`;
+      // WebP uniquement (support 97%+ navigateurs)
+      const displayUrl = `${basePath}assets/images-optimized/${baseName}-display.webp`;
       
-      // Log de diagnostic
-      console.log('[IndexCanvas] Loading thumbnail:', {
-        filename,
-        pathname: window.location.pathname,
-        paths: {
-          thumb: thumbUrl,
-          fallback: fallbackUrl
-        }
-      });
-      
-      const thumbImg = new Image();
-      thumbImg.onload = () => {
-        console.log('[IndexCanvas] ✓ Thumbnail loaded successfully:', {
-          filename,
-          url: thumbUrl
-        });
-        img.src = thumbUrl;
+      const displayImg = new Image();
+      displayImg.onload = () => {
+        img.src = displayUrl;
         img.style.opacity = '1';
         img.dataset.loaded = 'true';
       };
       
-      thumbImg.onerror = () => {
-        // Fallback vers image originale
-        console.warn('[IndexCanvas] ✗ Thumbnail failed:', {
-          filename,
-          url: thumbUrl,
-          pathname: window.location.pathname,
-          reason: 'File may not exist or path incorrect',
-          nextAction: 'Trying full-res fallback',
-          fallbackUrl: fallbackUrl
-        });
-        const fallbackImg = new Image();
-        fallbackImg.onload = () => {
-          console.log('[IndexCanvas] ✓ Fallback (full-res) loaded:', {
-            filename,
-            url: fallbackUrl
-          });
-          img.src = fallbackUrl;
-          img.style.opacity = '1';
-          img.dataset.loaded = 'true';
-        };
-        fallbackImg.onerror = () => {
-          console.error('[IndexCanvas] ✗ All image versions failed:', {
-            filename,
-            attemptedUrls: {
-              thumb: thumbUrl,
-              fullres: fallbackUrl
-            },
-            pathname: window.location.pathname
-          });
-          img.style.opacity = '0';
-        };
-        fallbackImg.src = fallbackUrl;
+      displayImg.onerror = () => {
+        console.error('[IndexCanvas] Image failed to load:', filename);
+        img.style.opacity = '0';
       };
       
-      thumbImg.src = thumbUrl;
+      displayImg.src = displayUrl;
     }
     </script>
     <script>
     // Layouts prédéfinis pour la disposition des images
     const LAYOUTS = [
       {
-        name: 'portrait-left-landscape-right',
-        description: 'Portrait à gauche, deux paysages à droite',
+        name: 'two-left-one-right',
+        description: 'Deux images à gauche, une grande à droite',
         structure: [
-          { width: 'md:w-1/3', height: 'h-full', isLeftColumn: true }, // Portrait à gauche
-          { width: 'md:w-2/3', height: 'h-1/2', isRightColumn: true, isTop: true },  // Paysage 1 en haut à droite
-          { width: 'md:w-2/3', height: 'h-1/2', isRightColumn: true, isBottom: true }   // Paysage 2 en bas à droite
+          { width: 'md:w-1/2', height: 'h-1/2', isLeftColumn: true },
+          { width: 'md:w-1/2', height: 'h-1/2', isLeftColumn: true },
+          { width: 'md:w-1/2', height: 'h-full', isRightColumn: true }
         ],
         useColumns: true
-      },
-      {
-        name: 'landscape-top-portrait-bottom',
-        description: 'Deux paysages en haut, portrait en bas',
-        structure: [
-          { width: 'md:w-1/2', height: 'h-1/2' },  // Paysage 1 en haut gauche
-          { width: 'md:w-1/2', height: 'h-1/2' },  // Paysage 2 en haut droite
-          { width: 'w-full', height: 'h-1/2' }     // Portrait en bas pleine largeur
-        ]
       },
       {
         name: 'three-column-grid',
@@ -193,29 +156,9 @@
           { width: 'md:w-1/3', height: 'h-full' },
           { width: 'md:w-1/3', height: 'h-full' }
         ]
-      },
-      {
-        name: 'full-top-two-bottom',
-        description: 'Image pleine largeur en haut, deux images en bas',
-        structure: [
-          { width: 'w-full', height: 'h-2/3' },    // Image pleine largeur en haut
-          { width: 'md:w-1/2', height: 'h-1/3' },  // Image 1 en bas gauche
-          { width: 'md:w-1/2', height: 'h-1/3' }   // Image 2 en bas droite
-        ]
-      },
-      {
-        name: 'two-left-one-right',
-        description: 'Deux images à gauche, une grande à droite',
-        structure: [
-          { width: 'md:w-1/2', height: 'h-1/2', isLeftColumn: true },  // Image 1 en haut gauche
-          { width: 'md:w-1/2', height: 'h-1/2', isLeftColumn: true },  // Image 2 en bas gauche
-          { width: 'md:w-1/2', height: 'h-full', isRightColumn: true }  // Image 3 pleine hauteur à droite
-        ],
-        useColumns: true
       }
     ];
 
-    // Fonction pour précharger uniquement les premières images visibles
     function preloadImage(src) {
       return new Promise((resolve, reject) => {
         const img = new Image();
@@ -229,88 +172,87 @@
       return LAYOUTS[Math.floor(Math.random() * LAYOUTS.length)];
     }
 
-    function organizeImagesForLayout(images, layout) {
-      const shuffledImages = [...images].sort(() => Math.random() - 0.5);
-      
-      const portraitImages = shuffledImages.filter(img => img.format === 'portrait');
-      const landscapeImages = shuffledImages.filter(img => img.format === 'landscape');
-      const portraits = portraitImages.length > 0 ? portraitImages : shuffledImages.filter(img => img.category === 'portraits');
-      const landscapes = landscapeImages.length > 0 ? landscapeImages : shuffledImages.filter(img => img.category === 'nature');
-      
+    function organizeImagesForLayout(layout) {
       const organized = [];
       const usedImages = new Set();
+      
+      if (layout.name === 'three-column-grid') {
+        if (!cachedPortraitImages || cachedPortraitImages.length < 3) {
+          console.warn('Pas assez d\'images portrait disponibles pour three-column-grid');
+          return [];
+        }
+        
+        const shuffledPortraits = [...cachedPortraitImages].sort(() => Math.random() - 0.5);
       let portraitIndex = 0;
+        
+        layout.structure.forEach((cell, index) => {
+          while (portraitIndex < shuffledPortraits.length && usedImages.has(shuffledPortraits[portraitIndex].src)) {
+            portraitIndex++;
+          }
+          
+          if (portraitIndex < shuffledPortraits.length) {
+            const selectedImage = shuffledPortraits[portraitIndex];
+            usedImages.add(selectedImage.src);
+            organized.push({
+              ...selectedImage,
+              layoutCell: cell
+            });
+            portraitIndex++;
+          }
+        });
+      } else if (layout.name === 'two-left-one-right') {
+        if (!cachedLandscapeImages || cachedLandscapeImages.length < 2) {
+          console.warn('Pas assez d\'images paysage disponibles pour two-left-one-right (gauche)');
+          return [];
+        }
+        if (!cachedPortraitImages || cachedPortraitImages.length < 1) {
+          console.warn('Pas assez d\'images portrait disponibles pour two-left-one-right (droite)');
+          return [];
+        }
+        
+        const shuffledLandscapes = [...cachedLandscapeImages].sort(() => Math.random() - 0.5);
+        const shuffledPortraits = [...cachedPortraitImages].sort(() => Math.random() - 0.5);
+        
       let landscapeIndex = 0;
-      let allImagesIndex = 0;
+        let portraitIndex = 0;
       
       layout.structure.forEach((cell, index) => {
         let selectedImage;
         
-        if (layout.name === 'portrait-left-landscape-right') {
-          if (index === 0) {
-            if (portraits.length > 0) {
-              selectedImage = portraits[portraitIndex % portraits.length];
-              portraitIndex++;
-            } else {
-              selectedImage = shuffledImages[allImagesIndex % shuffledImages.length];
-              allImagesIndex++;
-            }
-          } else {
-            if (landscapes.length > 0) {
-              selectedImage = landscapes[landscapeIndex % landscapes.length];
-              landscapeIndex++;
-            } else {
-              selectedImage = shuffledImages[allImagesIndex % shuffledImages.length];
-              allImagesIndex++;
-            }
-          }
-        } else if (layout.name === 'landscape-top-portrait-bottom') {
           if (index < 2) {
-            if (landscapes.length > 0) {
-              selectedImage = landscapes[landscapeIndex % landscapes.length];
+            while (landscapeIndex < shuffledLandscapes.length && usedImages.has(shuffledLandscapes[landscapeIndex].src)) {
               landscapeIndex++;
-            } else {
-              selectedImage = shuffledImages[allImagesIndex % shuffledImages.length];
-              allImagesIndex++;
+            }
+            if (landscapeIndex < shuffledLandscapes.length) {
+              selectedImage = shuffledLandscapes[landscapeIndex];
+              landscapeIndex++;
             }
           } else {
-            if (portraits.length > 0) {
-              selectedImage = portraits[portraitIndex % portraits.length];
+            while (portraitIndex < shuffledPortraits.length && usedImages.has(shuffledPortraits[portraitIndex].src)) {
               portraitIndex++;
-            } else {
-              selectedImage = shuffledImages[allImagesIndex % shuffledImages.length];
-              allImagesIndex++;
             }
-          }
-        } else {
-          let foundImage = false;
-          for (let i = 0; i < shuffledImages.length; i++) {
-            const candidate = shuffledImages[(index + i) % shuffledImages.length];
-            if (!usedImages.has(candidate.src)) {
-              selectedImage = candidate;
-              usedImages.add(candidate.src);
-              foundImage = true;
-              break;
+            if (portraitIndex < shuffledPortraits.length) {
+              selectedImage = shuffledPortraits[portraitIndex];
+              portraitIndex++;
             }
           }
           
-          if (!foundImage) {
-            selectedImage = shuffledImages[index % shuffledImages.length];
-          }
-        }
-        
-        if (selectedImage) {
+          if (selectedImage && !usedImages.has(selectedImage.src)) {
+            usedImages.add(selectedImage.src);
           organized.push({
             ...selectedImage,
             layoutCell: cell
           });
         }
       });
+      }
       
       return organized;
     }
 
     let cachedImages = null;
+    let cachedPortraitImages = null;
+    let cachedLandscapeImages = null;
     let currentLayout = null;
     let currentImageIndices = [];
     let cycleInterval = null;
@@ -358,7 +300,6 @@
           imgElement.dataset.imageIndex = index;
           imageStack.appendChild(imgElement);
           
-          // Charger thumbnail directement
           loadThumbnailForCanvas(imgElement);
           
           cellContainer.appendChild(imageStack);
@@ -416,7 +357,6 @@
           imgElement.dataset.imageIndex = index;
           imageStack.appendChild(imgElement);
           
-          // Charger thumbnail directement
           loadThumbnailForCanvas(imgElement);
           
           cellContainer.appendChild(imageStack);
@@ -468,7 +408,6 @@
           return;
         }
         
-        // Vérifier que IMAGES_CONFIG est disponible
         if (typeof IMAGES_CONFIG === 'undefined') {
           console.error('IMAGES_CONFIG is not defined. Make sure dist/images-config.js is loaded.');
           return;
@@ -481,9 +420,22 @@
             console.error('No images found in configuration');
             return;
           }
+          
+          cachedPortraitImages = cachedImages.filter(img => {
+            const ar = img.aspectRatio;
+            if (!ar || ar === undefined) {
+              return false;
+            }
+            return ar < 1;
+          });
+          cachedLandscapeImages = cachedImages.filter(img => {
+            const ar = img.aspectRatio;
+            if (!ar || ar === undefined) {
+              return false;
+            }
+            return ar > 1;
+          });
         }
-        
-        const allImages = cachedImages;
         
         if (useTransition) {
           grid.style.opacity = '0';
@@ -494,7 +446,7 @@
         grid.innerHTML = '';
         
         const selectedLayout = getRandomLayout();
-        const organizedImages = organizeImagesForLayout(allImages, selectedLayout);
+        const organizedImages = organizeImagesForLayout(selectedLayout);
         
         if (!organizedImages || organizedImages.length === 0) {
           console.error('No images organized for layout');
@@ -503,7 +455,7 @@
         
         currentLayout = selectedLayout;
         currentImageIndices = organizedImages.map((img, idx) => 
-          allImages.findIndex(ai => ai.src === img.src)
+          cachedImages.findIndex(ai => ai.src === img.src)
         );
         
         lastChangedCell = -1;
@@ -537,22 +489,46 @@
       const currentImageIndex = currentImageIndices[cellIndex];
       
       const usedImageIndices = new Set(currentImageIndices);
+      let newImage;
       let newImageIndex;
       let attempts = 0;
-      const maxAttempts = 100;
+      const maxAttempts = 200;
       
-      do {
-        newImageIndex = Math.floor(Math.random() * cachedImages.length);
-        attempts++;
-      } while ((newImageIndex === currentImageIndex || usedImageIndices.has(newImageIndex)) && attempts < maxAttempts);
-      
-      if (attempts >= maxAttempts) {
-        do {
-          newImageIndex = Math.floor(Math.random() * cachedImages.length);
-        } while (newImageIndex === currentImageIndex);
+      let poolToUse;
+      if (currentLayout.name === 'three-column-grid') {
+        poolToUse = cachedPortraitImages;
+      } else if (currentLayout.name === 'two-left-one-right') {
+        if (cellIndex < 2) {
+          poolToUse = cachedLandscapeImages;
+        } else {
+          poolToUse = cachedPortraitImages;
+        }
+      } else {
+        poolToUse = cachedImages;
       }
       
-      const newImage = cachedImages[newImageIndex];
+      if (!poolToUse || poolToUse.length === 0) {
+        console.warn('Pool d\'images vide pour le cycle');
+        return;
+      }
+      
+      const shuffledPool = [...poolToUse].sort(() => Math.random() - 0.5);
+      
+      do {
+        newImage = shuffledPool[attempts % shuffledPool.length];
+        newImageIndex = cachedImages.findIndex(img => img.src === newImage.src);
+        attempts++;
+      } while ((newImageIndex === currentImageIndex || newImageIndex === -1 || usedImageIndices.has(newImageIndex)) && attempts < maxAttempts);
+      
+      if (attempts >= maxAttempts || newImageIndex === -1) {
+        newImage = shuffledPool[0];
+        newImageIndex = cachedImages.findIndex(img => img.src === newImage.src);
+        if (newImageIndex === -1) {
+          console.warn('Impossible de trouver l\'index de la nouvelle image');
+          return;
+        }
+      }
+      
       currentImageIndices[cellIndex] = newImageIndex;
       lastChangedCell = cellIndex;
       

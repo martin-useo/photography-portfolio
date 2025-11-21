@@ -1,6 +1,6 @@
 (function() {
-  const PORTFOLIO_PAGES = ['nature.html', 'portraits.html', 'animaux.html', 'evenements.html', 'sport.html', 'personnel.html', 'showcase.html'];
-  const CATEGORIES = ['nature', 'portraits', 'sport', 'evenements', 'animaux', 'personnel'];
+  const PORTFOLIO_PAGES = ['nature.html', 'portraits.html', 'animaux.html', 'evenements.html', 'sport.html', 'divers.html', 'urban.html', 'vehicules.html', 'home.html'];
+  const CATEGORIES = ['nature', 'portraits', 'sport', 'evenements', 'animaux', 'divers', 'urban', 'vehicules'];
   
   function isPortfolioPage(path, page) {
     return path.includes('/portfolio/') || path.includes('\\portfolio\\') || PORTFOLIO_PAGES.includes(page);
@@ -21,6 +21,14 @@
       .then(html => {
         document.getElementById(elementId).innerHTML = html;
         
+        if (elementId === 'footer-container') {
+          if (typeof LanguageManager !== 'undefined') {
+            setTimeout(() => {
+              LanguageManager.applyLanguage();
+            }, 150);
+          }
+        }
+        
         if (elementId === 'navbar-container') {
           adjustNavbarPaths();
           
@@ -40,11 +48,15 @@
                   navbarLanguageToggle.innerHTML = html;
                   setTimeout(() => {
                     if (typeof LanguageManager !== 'undefined') {
+                      const toggleText = document.getElementById('language-toggle-text');
+                      if (toggleText && LanguageManager.currentLang) {
+                        toggleText.textContent = LanguageManager.currentLang.toUpperCase();
+                      }
                       window.dispatchEvent(new CustomEvent('languageChanged', { 
                         detail: { language: LanguageManager.currentLang } 
                       }));
                     }
-                  }, 100);
+                  }, 150);
                 })
                 .catch(() => {});
             }
@@ -52,11 +64,23 @@
           
           if (typeof LanguageManager !== 'undefined') {
             setTimeout(() => {
-              LanguageManager.applyLanguage();
               const currentPage = getCurrentPage();
-              if (isPortfolioPage(window.location.pathname, currentPage)) {
+              const isInPortfolio = isPortfolioPage(window.location.pathname, currentPage);
+              
+              if (isInPortfolio) {
+                const portfolioText = document.getElementById('nav-portfolio-text');
+                if (portfolioText) {
+                  portfolioText.removeAttribute('data-i18n');
+                }
+              }
+              
+              LanguageManager.applyLanguage();
+              
+              setTimeout(() => {
+                if (isInPortfolio) {
                 updateActivePage(currentPage, true);
               }
+              }, 50);
             }, 100);
           }
           
@@ -135,42 +159,64 @@
       };
     });
     
+    function getCategorySlug(category) {
+      return category;
+    }
+    
     if (isInPortfolio) {
+      const portfolioText = document.getElementById('nav-portfolio-text');
+      if (portfolioText) {
+        portfolioText.removeAttribute('data-i18n');
+      }
+      
       if (homeLink) homeLink.href = '../../index.html';
-      if (showcaseLink) showcaseLink.href = 'showcase.html';
+      if (showcaseLink) showcaseLink.href = 'home.html';
       if (aboutLink) aboutLink.href = '../about_me.html';
       if (contactLink) contactLink.href = '../contact.html';
       
       CATEGORIES.forEach(category => {
         const link = portfolioLinks[category];
-        if (link.desktop) link.desktop.href = `${category}.html`;
-        if (link.mobile) link.mobile.href = `${category}.html`;
+        const slug = getCategorySlug(category);
+        if (link.desktop) link.desktop.href = `${slug}.html`;
+        if (link.mobile) link.mobile.href = `${slug}.html`;
       });
       
       updateActivePage(currentPage, true);
     } else if (isInPages) {
+      const portfolioText = document.getElementById('nav-portfolio-text');
+      if (portfolioText && !portfolioText.hasAttribute('data-i18n')) {
+        portfolioText.setAttribute('data-i18n', 'portfolio');
+      }
+      
       if (homeLink) homeLink.href = '../index.html';
-      if (showcaseLink) showcaseLink.href = 'portfolio/showcase.html';
+      if (showcaseLink) showcaseLink.href = 'portfolio/home.html';
       if (aboutLink) aboutLink.href = 'about_me.html';
       if (contactLink) contactLink.href = 'contact.html';
       
       CATEGORIES.forEach(category => {
         const link = portfolioLinks[category];
-        if (link.desktop) link.desktop.href = `portfolio/${category}.html`;
-        if (link.mobile) link.mobile.href = `portfolio/${category}.html`;
+        const slug = getCategorySlug(category);
+        if (link.desktop) link.desktop.href = `portfolio/${slug}.html`;
+        if (link.mobile) link.mobile.href = `portfolio/${slug}.html`;
       });
       
       updateActivePage(currentPage, false);
     } else {
+      const portfolioText = document.getElementById('nav-portfolio-text');
+      if (portfolioText && !portfolioText.hasAttribute('data-i18n')) {
+        portfolioText.setAttribute('data-i18n', 'portfolio');
+      }
+      
       if (homeLink) homeLink.href = 'index.html';
-      if (showcaseLink) showcaseLink.href = 'pages/portfolio/showcase.html';
+      if (showcaseLink) showcaseLink.href = 'pages/portfolio/home.html';
       if (aboutLink) aboutLink.href = 'pages/about_me.html';
       if (contactLink) contactLink.href = 'pages/contact.html';
       
       CATEGORIES.forEach(category => {
         const link = portfolioLinks[category];
-        if (link.desktop) link.desktop.href = `pages/portfolio/${category}.html`;
-        if (link.mobile) link.mobile.href = `pages/portfolio/${category}.html`;
+        const slug = getCategorySlug(category);
+        if (link.desktop) link.desktop.href = `pages/portfolio/${slug}.html`;
+        if (link.mobile) link.mobile.href = `pages/portfolio/${slug}.html`;
       });
       
       updateActivePage(currentPage === '' || currentPage === '/' || currentPage === 'index.html' ? 'index.html' : currentPage, false);
@@ -184,7 +230,9 @@
       const desktopLink = document.getElementById(`nav-portfolio-${category}-link`);
       const mobileLink = document.getElementById(`nav-portfolio-${category}-link-mobile`);
       
-      if (currentPage === `${category}.html` || currentPage.includes(category)) {
+      const pageMatch = currentPage === `${category}.html` || currentPage.includes(category);
+      
+      if (pageMatch) {
         if (desktopLink) desktopLink.style.display = 'none';
         if (mobileLink) mobileLink.style.display = 'none';
       } else {
@@ -201,14 +249,6 @@
     const aboutUnderline = document.getElementById('nav-about-underline');
     const contactUnderline = document.getElementById('nav-contact-underline');
     
-    if (portfolioText) {
-      if (typeof LanguageManager !== 'undefined') {
-        portfolioText.textContent = LanguageManager.get('portfolio');
-      } else {
-      portfolioText.textContent = 'PORTFOLIO';
-    }
-    }
-    
     const resetClass = 'hidden md:block max-w-0 group-hover:max-w-full transition-all duration-500 h-0.5 bg-black dark:bg-white';
     const activeClass = 'hidden md:block h-0.5 bg-black dark:bg-white';
     
@@ -217,14 +257,25 @@
     if (aboutUnderline) aboutUnderline.className = resetClass;
     if (contactUnderline) contactUnderline.className = resetClass;
     
+    const isDesktop = window.innerWidth >= 768;
+    
     if (isInPortfolio) {
-      const isDesktop = window.innerWidth >= 768;
-      
-      if (currentPage === 'showcase.html' || currentPage.includes('showcase')) {
+      if (currentPage === 'home.html' || currentPage.includes('home')) {
         if (showcaseUnderline) showcaseUnderline.className = activeClass;
+        if (portfolioText && isDesktop) {
+          if (typeof LanguageManager !== 'undefined') {
+            portfolioText.textContent = LanguageManager.get('portfolio');
+          } else {
+            portfolioText.textContent = 'PORTFOLIO';
+          }
+        }
       } else {
+        let foundCategory = false;
         for (const key of CATEGORIES) {
-          if (currentPage === `${key}.html` || currentPage.includes(key)) {
+          const pageMatch = currentPage === `${key}.html` || currentPage.includes(key);
+          
+          if (pageMatch) {
+            foundCategory = true;
             if (portfolioText && isDesktop) {
               if (typeof LanguageManager !== 'undefined') {
                 portfolioText.textContent = LanguageManager.get(key).toUpperCase();
@@ -235,7 +286,9 @@
                   'sport': 'SPORT',
                   'evenements': 'ÉVÉNEMENTS',
                   'animaux': 'ANIMAUX',
-                  'personnel': 'PERSONNEL'
+                  'divers': 'DIVERS',
+                  'urban': 'URBAIN',
+                  'vehicules': 'VÉHICULES'
                 };
                 portfolioText.textContent = pageNames[key] || 'PORTFOLIO';
               }
@@ -246,11 +299,28 @@
             break;
           }
         }
+        if (!foundCategory && portfolioText && isDesktop) {
+          if (typeof LanguageManager !== 'undefined') {
+            portfolioText.textContent = LanguageManager.get('portfolio');
+          } else {
+            portfolioText.textContent = 'PORTFOLIO';
+          }
+        }
       }
-    } else if (currentPage === 'about_me.html' || currentPage.includes('about')) {
+    } else {
+      if (portfolioText && isDesktop) {
+        if (typeof LanguageManager !== 'undefined') {
+          portfolioText.textContent = LanguageManager.get('portfolio');
+        } else {
+          portfolioText.textContent = 'PORTFOLIO';
+        }
+      }
+      
+      if (currentPage === 'about_me.html' || currentPage.includes('about')) {
       if (aboutUnderline) aboutUnderline.className = activeClass;
     } else if (currentPage === 'contact.html' || currentPage.includes('contact')) {
       if (contactUnderline) contactUnderline.className = activeClass;
+      }
     }
   }
 
@@ -270,6 +340,22 @@
     }
     });
   }
+
+  window.addEventListener('languageChanged', function() {
+    setTimeout(() => {
+      const currentPath = window.location.pathname;
+      const currentPage = getCurrentPage();
+      const isInPortfolio = isPortfolioPage(currentPath, currentPage);
+      
+      if (isInPortfolio) {
+        const portfolioText = document.getElementById('nav-portfolio-text');
+        if (portfolioText) {
+          portfolioText.removeAttribute('data-i18n');
+        }
+        updateActivePage(currentPage, true);
+      }
+    }, 50);
+  });
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', loadComponents);

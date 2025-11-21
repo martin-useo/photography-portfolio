@@ -11,51 +11,44 @@ const ImageOptimizer = (function() {
   const stats = {
     total: 0,
     lqipLoaded: 0,
-    thumbLoaded: 0,
+    displayLoaded: 0, // Renommé de thumbLoaded
     failed: 0
   };
   
   let observer = null;
   const loadingImages = new Map();
   
-  function getImagePath(filename, version = 'original') {
-    // Calculer le basePath de manière fiable basé sur le chemin actuel
+  function getImagePath(filename, version = 'display') {
     const pathname = window.location.pathname;
     const pathParts = pathname.split('/').filter(p => p && p !== 'index.html');
     let basePath = '';
-    
-    // Déterminer le nombre de niveaux à remonter
-    // index.html ou / -> 0 niveaux (basePath = '')
-    // pages/*.html -> 1 niveau (basePath = '../')
-    // pages/portfolio/*.html -> 2 niveaux (basePath = '../../')
     
     if (pathParts.length > 0) {
       const lastPart = pathParts[pathParts.length - 1];
       const secondLastPart = pathParts.length >= 2 ? pathParts[pathParts.length - 2] : null;
       
-      // Si on est dans pages/portfolio/
       if (secondLastPart === 'portfolio' || (lastPart === 'portfolio' && pathParts.length >= 2)) {
         basePath = '../../';
-      } 
-      // Si on est dans pages/ mais pas dans portfolio/
-      else if (secondLastPart === 'pages' || lastPart === 'pages') {
+      } else if (secondLastPart === 'pages' || lastPart === 'pages') {
         basePath = '../';
       }
-      // Sinon on est à la racine, basePath reste vide
     }
     
     const ext = filename.match(/\.[^.]+$/)?.[0] || '.jpg';
     const baseName = filename.replace(ext, '');
     
+    // WebP uniquement (support 97%+ navigateurs)
     switch(version) {
       case 'lqip':
-        return `${basePath}assets/images-optimized/${baseName}-lqip${ext}`;
-      case 'thumb':
-        return `${basePath}assets/images-optimized/${baseName}-thumb${ext}`;
-      case 'fullres':
-        return `${basePath}assets/images/${filename}`;
+        return `${basePath}assets/images-optimized/${baseName}-lqip.webp`;
+      case 'display':
+      case 'thumb': // Rétrocompatibilité
+        return `${basePath}assets/images-optimized/${baseName}-display.webp`;
+      case 'lightbox':
+        return `${basePath}assets/images-optimized/${baseName}-lightbox.webp`;
       default:
-        return `${basePath}assets/images/${filename}`;
+        // Par défaut, utiliser display (plus jamais full res)
+        return `${basePath}assets/images-optimized/${baseName}-display.webp`;
     }
   }
   
@@ -86,7 +79,7 @@ const ImageOptimizer = (function() {
   function loadImage(img) {
     if (loadingImages.has(img)) return;
     if (img.dataset.loaded === 'true') return;
-    if (img.dataset.loading === 'true') return; // Éviter les doubles chargements
+    if (img.dataset.loading === 'true') return;
     
     const filename = img.dataset.filename;
     if (!filename) {
@@ -100,136 +93,70 @@ const ImageOptimizer = (function() {
     stats.total++;
     
     const lqipUrl = getImagePath(filename, 'lqip');
-    const thumbUrl = getImagePath(filename, 'thumb');
-    const fullResUrl = getImagePath(filename, 'fullres');
+    const displayUrl = getImagePath(filename, 'display');
     
-    // Log de diagnostic au début du chargement
-    console.log('[ImageOptimizer] Loading image:', {
-      filename,
-      pathname: window.location.pathname,
-      paths: {
-        lqip: lqipUrl,
-        thumb: thumbUrl,
-        fullres: fullResUrl
-      }
-    });
+    const state = { displayAttempted: false };
     
-    const state = { thumbAttempted: false };
-    
-    // Charger LQIP immédiatement
     const lqipImg = new Image();
     lqipImg.onload = () => {
-      console.log('[ImageOptimizer] ✓ LQIP loaded successfully:', {
-        filename,
-        url: lqipUrl
-      });
       img.src = lqipUrl;
       img.style.opacity = '1';
       img.style.filter = 'blur(10px)';
       stats.lqipLoaded++;
       
-      // Une fois LQIP chargé, charger le thumbnail
-      if (!state.thumbAttempted) {
-        loadThumbnail(img, thumbUrl, filename, state);
+      if (!state.displayAttempted) {
+        loadDisplay(img, displayUrl, filename, state);
       }
     };
     
     lqipImg.onerror = () => {
-      // Si LQIP échoue, essayer directement le thumbnail
-      console.warn('[ImageOptimizer] ✗ LQIP failed:', {
-        filename,
-        url: lqipUrl,
-        pathname: window.location.pathname,
-        reason: 'File may not exist or path incorrect',
-        nextAction: 'Trying thumbnail directly'
-      });
-      if (!state.thumbAttempted) {
-        loadThumbnail(img, thumbUrl, filename, state);
+      // Si LQIP échoue, essayer directement display
+      if (!state.displayAttempted) {
+        loadDisplay(img, displayUrl, filename, state);
       }
     };
     
     lqipImg.src = lqipUrl;
     
-    // Fonction helper pour charger le thumbnail
-    function loadThumbnail(imgElement, thumbUrl, imgFilename, imgState) {
-      if (imgState.thumbAttempted) return;
-      imgState.thumbAttempted = true;
+    function loadDisplay(imgElement, displayUrl, imgFilename, imgState) {
+      if (imgState.displayAttempted) return;
+      imgState.displayAttempted = true;
       
-      const thumbImg = new Image();
-      thumbImg.onload = () => {
-        console.log('[ImageOptimizer] ✓ Thumbnail loaded successfully:', {
-          filename: imgFilename,
-          url: thumbUrl
-        });
-        imgElement.src = thumbUrl;
+      const displayImg = new Image();
+      displayImg.onload = () => {
+        imgElement.src = displayUrl;
         imgElement.style.filter = 'blur(0)';
         imgElement.style.transition = `filter ${config.blurTransition}ms ease-in-out`;
         imgElement.classList.remove('loading');
-        imgElement.classList.add('thumb-loaded');
+        imgElement.classList.add('display-loaded');
         imgElement.dataset.loaded = 'true';
         imgElement.dataset.loading = 'false';
-        stats.thumbLoaded++;
+        stats.displayLoaded++;
         loadingImages.delete(imgElement);
         
         imgElement.dispatchEvent(new CustomEvent('imageLoaded', {
           bubbles: true,
-          detail: { src: thumbUrl, filename: imgFilename }
+          detail: { src: displayUrl, filename: imgFilename }
         }));
       };
       
-      thumbImg.onerror = () => {
-        // Si thumbnail échoue, essayer l'image originale
-        const fallbackUrl = getImagePath(imgFilename, 'fullres');
-        console.warn('[ImageOptimizer] ✗ Thumbnail failed:', {
-          filename: imgFilename,
-          url: thumbUrl,
-          pathname: window.location.pathname,
-          reason: 'File may not exist or path incorrect',
-          nextAction: 'Trying full-res fallback',
-          fallbackUrl: fallbackUrl
-        });
-        
-        const fallbackImg = new Image();
-        fallbackImg.onload = () => {
-          console.log('[ImageOptimizer] ✓ Fallback (full-res) loaded:', {
-            filename: imgFilename,
-            url: fallbackUrl
-          });
-          imgElement.src = fallbackUrl;
-          imgElement.style.filter = 'blur(0)';
-          imgElement.classList.remove('loading');
-          imgElement.dataset.loaded = 'true';
-          imgElement.dataset.loading = 'false';
-          stats.failed++;
-          loadingImages.delete(imgElement);
-        };
-        fallbackImg.onerror = () => {
-          // Dernier recours : garder LQIP ou afficher une erreur
-          console.error('[ImageOptimizer] ✗ All image versions failed:', {
-            filename: imgFilename,
-            attemptedUrls: {
-              lqip: getImagePath(imgFilename, 'lqip'),
-              thumb: thumbUrl,
-              fullres: fallbackUrl
-            },
-            pathname: window.location.pathname
-          });
-          imgElement.style.filter = 'blur(0)';
-          imgElement.classList.remove('loading');
-          imgElement.dataset.loaded = 'true';
-          imgElement.dataset.loading = 'false';
-          stats.failed++;
-          loadingImages.delete(imgElement);
-        };
-        fallbackImg.src = fallbackUrl;
+      displayImg.onerror = () => {
+        // WebP uniquement - pas de fallback
+        console.error('[ImageOptimizer] Display image failed:', imgFilename);
+        imgElement.style.filter = 'blur(0)';
+        imgElement.classList.remove('loading');
+        imgElement.dataset.loaded = 'true';
+        imgElement.dataset.loading = 'false';
+        stats.failed++;
+        loadingImages.delete(imgElement);
       };
       
-      thumbImg.src = thumbUrl;
+      displayImg.src = displayUrl;
     }
   }
   
-  function getFullResUrl(filename) {
-    return getImagePath(filename, 'fullres');
+  function getLightboxUrl(filename) {
+    return getImagePath(filename, 'lightbox');
   }
   
   function initLazyImages(container = document) {
@@ -272,15 +199,15 @@ const ImageOptimizer = (function() {
   function getStats() {
     return {
       ...stats,
-      pending: stats.total - stats.thumbLoaded - stats.failed,
-      successRate: stats.total > 0 ? (stats.thumbLoaded / stats.total * 100).toFixed(2) + '%' : '0%'
+      pending: stats.total - stats.displayLoaded - stats.failed,
+      successRate: stats.total > 0 ? (stats.displayLoaded / stats.total * 100).toFixed(2) + '%' : '0%'
     };
   }
   
   function resetStats() {
     stats.total = 0;
     stats.lqipLoaded = 0;
-    stats.thumbLoaded = 0;
+    stats.displayLoaded = 0;
     stats.failed = 0;
   }
   
@@ -300,7 +227,7 @@ const ImageOptimizer = (function() {
     initLazyImages,
     loadImage,
     loadAllPending,
-    getFullResUrl,
+    getLightboxUrl, // Renommé de getFullResUrl
     getImagePath,
     destroy,
     getStats,

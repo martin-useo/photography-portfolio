@@ -1,10 +1,14 @@
 #!/usr/bin/env node
 
 /**
- * Script de génération de thumbnails
- * Génère 2 versions de chaque image :
- * - Thumb (70% de la taille originale, ~1-2 Mo)
- * - Full-res (conservée telle quelle, pour lightbox)
+ * Script de génération d'images optimisées
+ * Génère 3 versions de chaque image en WebP uniquement :
+ * - LQIP (400px max, qualité 50)
+ * - Display (1920px max, qualité 85)
+ * - Lightbox (2800px max, qualité 90)
+ * 
+ * Toutes les métadonnées EXIF sont supprimées (GPS, appareil photo, date, etc.)
+ * pour protéger la vie privée et réduire la taille des fichiers.
  * 
  * Usage: node scripts/generate-thumbnails.js
  */
@@ -16,17 +20,22 @@ const sharp = require('sharp');
 const IMAGES_DIR = path.join(__dirname, '../assets/images');
 const OUTPUT_DIR = path.join(__dirname, '../assets/images-optimized');
 
-// Configuration des tailles
+// Configuration optimisée (WebP uniquement)
 const SIZES = {
   lqip: {
-    scale: 0.40,  // 40% de la résolution originale
-    quality: 30,
+    maxWidth: 400,
+    quality: 50,
     suffix: '-lqip'
   },
-  thumb: {
-    scale: 0.70,  // 70% de la résolution originale
-    quality: 70,
-    suffix: '-thumb'
+  display: {
+    maxWidth: 1920,
+    quality: 85,
+    suffix: '-display'
+  },
+  lightbox: {
+    maxWidth: 2800,
+    quality: 90,
+    suffix: '-lightbox'
   }
 };
 
@@ -42,7 +51,7 @@ const colors = {
 
 console.log(`${colors.cyan}${colors.bright}
 ╔═══════════════════════════════════════════════╗
-║   📸 Génération des Thumbnails                ║
+║   📸 Génération d'Images Optimisées          ║
 ╚═══════════════════════════════════════════════╝
 ${colors.reset}\n`);
 
@@ -50,6 +59,39 @@ ${colors.reset}\n`);
 if (!fs.existsSync(OUTPUT_DIR)) {
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
   console.log(`${colors.green}✓${colors.reset} Dossier créé: ${OUTPUT_DIR}\n`);
+}
+
+// Fonction pour générer une version d'image (WebP uniquement, métadonnées EXIF supprimées)
+async function generateVersion(inputPath, outputPath, config, metadata) {
+  const { maxWidth, quality } = config;
+  
+  // Calculer les dimensions en gardant l'aspect ratio
+  let width, height;
+  if (metadata.width > metadata.height) {
+    // Paysage
+    width = Math.min(maxWidth, metadata.width);
+    height = Math.round((width / metadata.width) * metadata.height);
+  } else {
+    // Portrait
+    height = Math.min(maxWidth, metadata.height);
+    width = Math.round((height / metadata.height) * metadata.width);
+  }
+  
+  // Supprimer toutes les métadonnées EXIF (GPS, appareil photo, date, etc.)
+  // Sharp supprime automatiquement les métadonnées lors de la conversion en WebP
+  // Pas besoin de withMetadata() - c'est le comportement par défaut
+  await sharp(inputPath)
+    .resize(width, height, { 
+      fit: 'inside',
+      withoutEnlargement: true 
+    })
+    .webp({ 
+      quality: quality,
+      effort: 6 // Compression effort (0-6, 6 = meilleure compression)
+    })
+    .toFile(outputPath);
+  
+  return { width, height, size: fs.statSync(outputPath).size };
 }
 
 // Fonction pour traiter une image
@@ -61,43 +103,46 @@ async function processImage(filename) {
   console.log(`${colors.cyan}📷 ${filename}${colors.reset}`);
   
   try {
-    const image = sharp(inputPath);
-    const metadata = await image.metadata();
+    const metadata = await sharp(inputPath).metadata();
+    const originalSize = fs.statSync(inputPath).size;
     
-    console.log(`   Taille originale: ${metadata.width}x${metadata.height} (${(fs.statSync(inputPath).size / 1024 / 1024).toFixed(2)} Mo)`);
+    console.log(`   Original: ${metadata.width}x${metadata.height} (${(originalSize / 1024 / 1024).toFixed(2)} Mo)`);
     
-    // Générer LQIP (40% de la résolution originale)
-    const lqipWidth = Math.round(metadata.width * SIZES.lqip.scale);
-    const lqipHeight = Math.round(metadata.height * SIZES.lqip.scale);
-    const lqipPath = path.join(OUTPUT_DIR, `${baseName}${SIZES.lqip.suffix}${ext}`);
-    await sharp(inputPath)
-      .resize(lqipWidth, lqipHeight, { 
-        fit: 'inside',
-        withoutEnlargement: true 
-      })
-      .jpeg({ quality: SIZES.lqip.quality, progressive: true })
-      .toFile(lqipPath);
+    const results = {};
     
-    const lqipSize = (fs.statSync(lqipPath).size / 1024).toFixed(2);
-    console.log(`   ${colors.green}✓${colors.reset} LQIP: ${lqipWidth}x${lqipHeight}px (${lqipSize} Ko)`);
+    // Générer LQIP (WebP uniquement, métadonnées EXIF supprimées)
+    console.log(`   ${colors.yellow}→${colors.reset} Génération LQIP...`);
+    const lqipPath = path.join(OUTPUT_DIR, `${baseName}${SIZES.lqip.suffix}.webp`);
     
-    // Générer thumbnail (70% de la résolution originale)
-    const thumbWidth = Math.round(metadata.width * SIZES.thumb.scale);
-    const thumbHeight = Math.round(metadata.height * SIZES.thumb.scale);
-    const thumbPath = path.join(OUTPUT_DIR, `${baseName}${SIZES.thumb.suffix}${ext}`);
-    await sharp(inputPath)
-      .resize(thumbWidth, thumbHeight, { 
-        fit: 'inside',
-        withoutEnlargement: true 
-      })
-      .jpeg({ quality: SIZES.thumb.quality, progressive: true })
-      .toFile(thumbPath);
+    results.lqip = await generateVersion(inputPath, lqipPath, SIZES.lqip, metadata);
     
-    const thumbSize = (fs.statSync(thumbPath).size / 1024).toFixed(2);
-    console.log(`   ${colors.green}✓${colors.reset} Thumb: ${thumbWidth}x${thumbHeight}px (${thumbSize} Ko)`);
+    const lqipSize = (results.lqip.size / 1024).toFixed(2);
+    console.log(`   ${colors.green}✓${colors.reset} LQIP: ${results.lqip.width}x${results.lqip.height}px (${lqipSize} Ko) [WebP, EXIF supprimé]`);
     
-    console.log('');
-    return { success: true, filename };
+    // Générer Display (WebP uniquement, métadonnées EXIF supprimées)
+    console.log(`   ${colors.yellow}→${colors.reset} Génération Display...`);
+    const displayPath = path.join(OUTPUT_DIR, `${baseName}${SIZES.display.suffix}.webp`);
+    
+    results.display = await generateVersion(inputPath, displayPath, SIZES.display, metadata);
+    
+    const displaySize = (results.display.size / 1024).toFixed(2);
+    console.log(`   ${colors.green}✓${colors.reset} Display: ${results.display.width}x${results.display.height}px (${displaySize} Ko) [WebP, EXIF supprimé]`);
+    
+    // Générer Lightbox (WebP uniquement, métadonnées EXIF supprimées)
+    console.log(`   ${colors.yellow}→${colors.reset} Génération Lightbox...`);
+    const lightboxPath = path.join(OUTPUT_DIR, `${baseName}${SIZES.lightbox.suffix}.webp`);
+    
+    results.lightbox = await generateVersion(inputPath, lightboxPath, SIZES.lightbox, metadata);
+    
+    const lightboxSize = (results.lightbox.size / 1024).toFixed(2);
+    console.log(`   ${colors.green}✓${colors.reset} Lightbox: ${results.lightbox.width}x${results.lightbox.height}px (${lightboxSize} Ko) [WebP, EXIF supprimé]`);
+    
+    // Calculer l'économie
+    const totalOptimized = results.lqip.size + results.display.size + results.lightbox.size;
+    const economy = ((1 - totalOptimized / originalSize) * 100).toFixed(1);
+    console.log(`   ${colors.cyan}📊${colors.reset} Économie: ${economy}% (${(totalOptimized / 1024 / 1024).toFixed(2)} Mo vs ${(originalSize / 1024 / 1024).toFixed(2)} Mo)\n`);
+    
+    return { success: true, filename, results };
     
   } catch (error) {
     console.log(`   ${colors.red}✗ Erreur: ${error.message}${colors.reset}\n`);
@@ -108,7 +153,6 @@ async function processImage(filename) {
 // Fonction principale
 async function main() {
   try {
-    // Lire tous les fichiers du dossier images
     const files = fs.readdirSync(IMAGES_DIR)
       .filter(file => /\.(jpg|jpeg|png)$/i.test(file))
       .sort();
@@ -122,40 +166,47 @@ async function main() {
     
     const results = {
       success: [],
-      failed: []
+      failed: [],
+      totalOriginalSize: 0,
+      totalOptimizedSize: 0
     };
     
-    // Traiter chaque image
     for (const file of files) {
       const result = await processImage(file);
       if (result.success) {
         results.success.push(result.filename);
+        const originalSize = fs.statSync(path.join(IMAGES_DIR, file)).size;
+        results.totalOriginalSize += originalSize;
+        results.totalOptimizedSize += result.results.lqip.size + result.results.display.size + result.results.lightbox.size;
       } else {
         results.failed.push(result);
       }
     }
     
-    // Résumé
+    // Résumé final
     console.log(`${colors.bright}═══════════════════════════════════════════════${colors.reset}`);
-    console.log(`${colors.bright}📊 Résumé :${colors.reset}\n`);
+    console.log(`${colors.bright}📊 Résumé Final :${colors.reset}\n`);
     console.log(`${colors.green}✓ ${results.success.length} image(s) traitée(s) avec succès${colors.reset}`);
     
     if (results.failed.length > 0) {
       console.log(`${colors.red}✗ ${results.failed.length} image(s) en erreur${colors.reset}`);
-      results.failed.forEach(item => {
-        console.log(`   - ${item.filename}: ${item.error}`);
-      });
     }
+    
+    const totalEconomy = ((1 - results.totalOptimizedSize / results.totalOriginalSize) * 100).toFixed(1);
+    console.log(`\n${colors.cyan}💾 Taille totale :${colors.reset}`);
+    console.log(`   Original: ${(results.totalOriginalSize / 1024 / 1024).toFixed(2)} Mo`);
+    console.log(`   Optimisé: ${(results.totalOptimizedSize / 1024 / 1024).toFixed(2)} Mo`);
+    console.log(`   ${colors.green}Économie: ${totalEconomy}%${colors.reset}`);
     
     console.log(`\n${colors.bright}📁 Dossier de sortie :${colors.reset}`);
     console.log(`   ${OUTPUT_DIR}`);
     
-    console.log(`\n${colors.bright}💡 Prochaines étapes :${colors.reset}`);
-    console.log(`   1. Vérifier les images générées dans ${OUTPUT_DIR}`);
-    console.log(`   2. Le site utilisera automatiquement :`);
-    console.log(`      - LQIP pour le chargement immédiat (40% résolution)`);
-    console.log(`      - Thumb pour les galeries (70% résolution)`);
-    console.log(`      - Full-res originales pour la lightbox`);
+    console.log(`\n${colors.bright}💡 Utilisation :${colors.reset}`);
+    console.log(`   - LQIP: chargement immédiat (400px, ~30 Ko)`);
+    console.log(`   - Display: galeries (1920px, ~300 Ko)`);
+    console.log(`   - Lightbox: zoom (2800px, ~700 Ko)`);
+    console.log(`   - Format: WebP uniquement (support 97%+ navigateurs)`);
+    console.log(`   - Métadonnées: Toutes les métadonnées EXIF supprimées (GPS, appareil, date, etc.)`);
     
   } catch (error) {
     console.error(`${colors.red}Erreur fatale: ${error.message}${colors.reset}`);
@@ -173,4 +224,3 @@ try {
   console.log(`   npm install sharp\n`);
   process.exit(1);
 }
-

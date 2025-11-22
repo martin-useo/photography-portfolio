@@ -5,7 +5,7 @@ const IMAGES_CONFIG = {
     'Nature': 'nature',
     'Miscellaneous': 'divers',
     'Portraits': 'portraits',
-    'Sports': 'sport',
+    'Sport': 'sport',
     'Urban': 'urban',
     'Vehicles': 'vehicules'
   },

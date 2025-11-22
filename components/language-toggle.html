@@ -1,15 +1,18 @@
 <button 
-  id="language-toggle"
+  class="language-toggle-button px-2 py-1 md:px-3 md:py-1.5 text-xs md:text-sm font-signika font-medium bg-white border border-black text-black rounded transition-all duration-300 hover:scale-105 hover:shadow-md min-w-[2rem] md:min-w-[2.5rem]"
   onclick="if(typeof LanguageManager !== 'undefined') { LanguageManager.toggleLanguage(); }"
-  class="px-3 py-1.5 text-sm font-signika font-medium bg-white border border-black text-black rounded transition-all duration-300 hover:scale-105 hover:shadow-md min-w-[2.5rem]"
   aria-label="Toggle language">
-  <span id="language-toggle-text" class="inline-block transition-opacity duration-300 w-6 text-center">FR</span>
+  <span class="language-toggle-text inline-block transition-opacity duration-300 w-5 md:w-6 text-center">FR</span>
 </button>
 
 <script>
   (function() {
+    const button = document.querySelector('.language-toggle-button:not([data-initialized])');
+    if (!button) return;
+    button.setAttribute('data-initialized', 'true');
+    
     function updateToggleText() {
-      const toggleText = document.getElementById('language-toggle-text');
+      const toggleText = button.querySelector('.language-toggle-text');
       if (toggleText && typeof LanguageManager !== 'undefined' && LanguageManager.currentLang) {
         const expectedText = LanguageManager.currentLang.toUpperCase();
         // Ne mettre à jour que si le texte est différent pour éviter les boucles
@@ -30,7 +33,7 @@
       // Forcer une mise à jour après un court délai pour être sûr
       setTimeout(updateToggleText, 50);
       setTimeout(updateToggleText, 150);
-      }
+    }
     
     // Initialiser immédiatement si LanguageManager est déjà disponible
     if (typeof LanguageManager !== 'undefined' && LanguageManager.currentLang) {

@@ -33,33 +33,40 @@
           adjustNavbarPaths();
           
           setTimeout(() => {
-            const navbarLanguageToggle = document.querySelector('#navbar-container #language-toggle-container');
-            if (navbarLanguageToggle) {
-              const currentPath = window.location.pathname;
-              let languageTogglePath = 'components/language-toggle.html';
-              if (currentPath.includes('/portfolio/')) {
-                languageTogglePath = '../../components/language-toggle.html';
-              } else if (currentPath.includes('/pages/')) {
-                languageTogglePath = '../components/language-toggle.html';
-              }
-              fetch(languageTogglePath)
-                .then(response => response.text())
-                .then(html => {
-                  navbarLanguageToggle.innerHTML = html;
-                  setTimeout(() => {
-                    if (typeof LanguageManager !== 'undefined') {
-                      const toggleText = document.getElementById('language-toggle-text');
-                      if (toggleText && LanguageManager.currentLang) {
-                        toggleText.textContent = LanguageManager.currentLang.toUpperCase();
+            const loadLanguageToggle = (containerId) => {
+              const container = document.querySelector(`#navbar-container #${containerId}`);
+              if (container) {
+                const currentPath = window.location.pathname;
+                let languageTogglePath = 'components/language-toggle.html';
+                if (currentPath.includes('/portfolio/')) {
+                  languageTogglePath = '../../components/language-toggle.html';
+                } else if (currentPath.includes('/pages/')) {
+                  languageTogglePath = '../components/language-toggle.html';
+                }
+                fetch(languageTogglePath)
+                  .then(response => response.text())
+                  .then(html => {
+                    container.innerHTML = html;
+                    setTimeout(() => {
+                      if (typeof LanguageManager !== 'undefined') {
+                        const toggleTexts = container.querySelectorAll('.language-toggle-text');
+                        toggleTexts.forEach(toggleText => {
+                          if (toggleText && LanguageManager.currentLang) {
+                            toggleText.textContent = LanguageManager.currentLang.toUpperCase();
+                          }
+                        });
+                        window.dispatchEvent(new CustomEvent('languageChanged', { 
+                          detail: { language: LanguageManager.currentLang } 
+                        }));
                       }
-                      window.dispatchEvent(new CustomEvent('languageChanged', { 
-                        detail: { language: LanguageManager.currentLang } 
-                      }));
-                    }
-                  }, 150);
-                })
-                .catch(() => {});
-            }
+                    }, 150);
+                  })
+                  .catch(() => {});
+              }
+            };
+            
+            loadLanguageToggle('language-toggle-container');
+            loadLanguageToggle('language-toggle-container-mobile');
           }, 50);
           
           if (typeof LanguageManager !== 'undefined') {

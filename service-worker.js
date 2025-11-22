@@ -27,7 +27,7 @@ const STATIC_ASSETS = [
 const PAGES = [
   '/pages/about_me.html',
   '/pages/contact.html',
-  '/pages/portfolio/home.html',
+  '/pages/home.html',
   '/pages/portfolio/divers.html',
   '/pages/portfolio/urban.html',
   '/pages/portfolio/vehicules.html',

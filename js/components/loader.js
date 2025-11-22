@@ -1,5 +1,5 @@
 (function() {
-  const PORTFOLIO_PAGES = ['nature.html', 'portraits.html', 'animaux.html', 'evenements.html', 'sport.html', 'divers.html', 'urban.html', 'vehicules.html', 'home.html'];
+  const PORTFOLIO_PAGES = ['nature.html', 'portraits.html', 'animaux.html', 'evenements.html', 'sport.html', 'divers.html', 'urban.html', 'vehicules.html'];
   const CATEGORIES = ['nature', 'portraits', 'sport', 'evenements', 'animaux', 'divers', 'urban', 'vehicules'];
   
   function isPortfolioPage(path, page) {
@@ -36,33 +36,33 @@
             const loadLanguageToggle = (containerId) => {
               const container = document.querySelector(`#navbar-container #${containerId}`);
               if (container) {
-                const currentPath = window.location.pathname;
-                let languageTogglePath = 'components/language-toggle.html';
-                if (currentPath.includes('/portfolio/')) {
-                  languageTogglePath = '../../components/language-toggle.html';
-                } else if (currentPath.includes('/pages/')) {
-                  languageTogglePath = '../components/language-toggle.html';
-                }
-                fetch(languageTogglePath)
-                  .then(response => response.text())
-                  .then(html => {
+              const currentPath = window.location.pathname;
+              let languageTogglePath = 'components/language-toggle.html';
+              if (currentPath.includes('/portfolio/')) {
+                languageTogglePath = '../../components/language-toggle.html';
+              } else if (currentPath.includes('/pages/')) {
+                languageTogglePath = '../components/language-toggle.html';
+              }
+              fetch(languageTogglePath)
+                .then(response => response.text())
+                .then(html => {
                     container.innerHTML = html;
-                    setTimeout(() => {
-                      if (typeof LanguageManager !== 'undefined') {
+                  setTimeout(() => {
+                    if (typeof LanguageManager !== 'undefined') {
                         const toggleTexts = container.querySelectorAll('.language-toggle-text');
                         toggleTexts.forEach(toggleText => {
                           if (toggleText && LanguageManager.currentLang) {
                             toggleText.textContent = LanguageManager.currentLang.toUpperCase();
                           }
                         });
-                        window.dispatchEvent(new CustomEvent('languageChanged', { 
-                          detail: { language: LanguageManager.currentLang } 
-                        }));
-                      }
+                      window.dispatchEvent(new CustomEvent('languageChanged', { 
+                        detail: { language: LanguageManager.currentLang } 
+                      }));
+                    }
                     }, 150);
-                  })
-                  .catch(() => {});
-              }
+                })
+                .catch(() => {});
+            }
             };
             
             loadLanguageToggle('language-toggle-container');
@@ -196,7 +196,7 @@
       }
       
       if (homeLink) homeLink.href = '../index.html';
-      if (showcaseLink) showcaseLink.href = 'portfolio/home.html';
+      if (showcaseLink) showcaseLink.href = 'home.html';
       if (aboutLink) aboutLink.href = 'about_me.html';
       if (contactLink) contactLink.href = 'contact.html';
       
@@ -215,7 +215,7 @@
       }
       
       if (homeLink) homeLink.href = 'index.html';
-      if (showcaseLink) showcaseLink.href = 'pages/portfolio/home.html';
+      if (showcaseLink) showcaseLink.href = 'pages/home.html';
       if (aboutLink) aboutLink.href = 'pages/about_me.html';
       if (contactLink) contactLink.href = 'pages/contact.html';
       

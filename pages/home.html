@@ -8,8 +8,8 @@
   <title>Martin USEO - Portfolio Showcase</title>
   <meta name="description"
     content="Discover the photography portfolio of Martin USEO – a freelance photographer based in Paris, France." />
-  <link rel="icon" type="image/x-icon" href="../../assets/favicon.ico" />
-  <link rel="stylesheet" href="../../css/output.css" />
+  <link rel="icon" type="image/x-icon" href="../assets/favicon.ico" />
+  <link rel="stylesheet" href="../css/output.css" />
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -17,7 +17,7 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      content: ["../../**/*.{html,js}"],
+      content: ["../**/*.{html,js}"],
       theme: {
         extend: {
           fontFamily: {
@@ -31,7 +31,7 @@
   <script>
     document.write('<style id="i18n-preload">body{visibility:hidden}</style>');
   </script>
-  <script src="../../js/i18n.js"></script>
+  <script src="../js/i18n.js"></script>
   <script>
     if (typeof applyTranslationsBeforeRender === 'function') {
       applyTranslationsBeforeRender();
@@ -57,8 +57,8 @@
       revealBody();
     }
   </script>
-  <script src="../../js/components/loader.js"></script>
-  <script src="../../js/components/dropdown.js"></script>
+  <script src="../js/components/loader.js"></script>
+  <script src="../js/components/dropdown.js"></script>
   <style>
     /* Fix pour Safari iOS - garantit que les gaps fonctionnent avec support responsive */
     #categories-grid {
@@ -86,7 +86,7 @@
 <body
   class="dark:bg-black bg-white h-screen text-black dark:text-white px-5 md:px-20 opacity-0 animate-fade-in transition duration-500">
   <!-- Navbar -->
-  <div id="navbar-container" data-path="../../components/navbar.html"></div>
+  <div id="navbar-container" data-path="../components/navbar.html"></div>
   
   <!-- Content -->
   <div class="container mx-auto max-w-7xl">
@@ -108,28 +108,28 @@
   </div>
 
   <!-- Footer -->
-  <div id="footer-container" data-path="../../components/footer.html"></div>
+  <div id="footer-container" data-path="../components/footer.html"></div>
   <!-- Scroll to Top Button -->
-  <div id="scroll-to-top-container" data-path="../../components/scroll-to-top.html"></div>
+  <div id="scroll-to-top-container" data-path="../components/scroll-to-top.html"></div>
 
-  <script src="../../js/image-protection.js"></script>
-  <script src="../../js/utils/webp-support.js"></script>
-  <script src="../../js/images-config.js"></script>
-  <script src="../../js/optimization/image-optimizer.js"></script>
+  <script src="../js/image-protection.js"></script>
+  <script src="../js/utils/webp-support.js"></script>
+  <script src="../js/images-config.js"></script>
+  <script src="../js/optimization/image-optimizer.js"></script>
   <script>
     const categories = [
-      { nameKey: 'sport', slug: 'sport', path: 'sport.html' },
-      { nameKey: 'evenements', slug: 'evenements', path: 'evenements.html' },
-      { nameKey: 'animaux', slug: 'animaux', path: 'animaux.html' },
-      { nameKey: 'portraits', slug: 'portraits', path: 'portraits.html' },
-      { nameKey: 'urban', slug: 'urban', path: 'urban.html' },
-      { nameKey: 'nature', slug: 'nature', path: 'nature.html' },
-      { nameKey: 'vehicules', slug: 'vehicules', path: 'vehicules.html' },
-      { nameKey: 'divers', slug: 'divers', path: 'divers.html' }
+      { nameKey: 'sport', slug: 'sport', path: 'portfolio/sport.html' },
+      { nameKey: 'evenements', slug: 'evenements', path: 'portfolio/evenements.html' },
+      { nameKey: 'animaux', slug: 'animaux', path: 'portfolio/animaux.html' },
+      { nameKey: 'portraits', slug: 'portraits', path: 'portfolio/portraits.html' },
+      { nameKey: 'urban', slug: 'urban', path: 'portfolio/urban.html' },
+      { nameKey: 'nature', slug: 'nature', path: 'portfolio/nature.html' },
+      { nameKey: 'vehicules', slug: 'vehicules', path: 'portfolio/vehicules.html' },
+      { nameKey: 'divers', slug: 'divers', path: 'portfolio/divers.html' }
     ];
 
     function getCategoryImage(categorySlug) {
-      const basePath = '../../';
+      const basePath = '../';
       let images = [];
       
       switch(categorySlug) {
@@ -172,7 +172,16 @@
     }
 
     function getHeroImage() {
-      const allImages = IMAGES_CONFIG.getShowcaseImages('../../');
+      // Sur desktop uniquement, filtrer pour ne garder que les images paysage
+      const isDesktop = window.innerWidth >= 768;
+      
+      let allImages = IMAGES_CONFIG.getShowcaseImages('../');
+      
+      if (isDesktop) {
+        // Filtrer uniquement les images paysage (aspectRatio > 1)
+        allImages = allImages.filter(img => img.aspectRatio && img.aspectRatio > 1);
+      }
+      
       if (allImages.length > 0) {
         const fiveStarImages = allImages.filter(img => img.rating === 5);
         if (fiveStarImages.length > 0) {
@@ -255,7 +264,7 @@
           grid.appendChild(card);
         } else {
           if (index < 6) {
-            grid.appendChild(card);
+        grid.appendChild(card);
           } else {
             lastRowGrid.appendChild(card);
           }
@@ -275,9 +284,9 @@
     document.addEventListener('DOMContentLoaded', renderShowcase);
   </script>
 
-  <script src="../../js/fade_in.js"></script>
-  <script src="../../js/menu.js"></script>
-  <script src="../../js/scroll-to-top.js"></script>
+  <script src="../js/fade_in.js"></script>
+  <script src="../js/menu.js"></script>
+  <script src="../js/scroll-to-top.js"></script>
 </body>
 
 </html>

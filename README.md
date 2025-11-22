@@ -47,8 +47,10 @@ photography-portfolio/
 │       ├── animaux.html
 │       ├── divers.html
 │       ├── urban.html
-│       ├── vehicules.html
-│       └── home.html
+│       └── vehicules.html
+│   ├── home.html
+│   ├── about_me.html
+│   └── contact.html
 │
 ├── .gitignore
 ├── LICENSE

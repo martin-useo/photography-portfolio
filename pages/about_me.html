@@ -61,6 +61,16 @@
   </script>
   <script src="../js/components/loader.js"></script>
   <script src="../js/components/dropdown.js"></script>
+  <style>
+    /* Styles spécifiques pour iOS/Safari uniquement */
+    @supports (-webkit-touch-callout: none) {
+      @media (max-width: 768px) {
+        .about-photo-container {
+          padding-bottom: 1.5rem !important;
+        }
+      }
+    }
+  </style>
 </head>
 
 <body
@@ -68,11 +78,11 @@
   <!-- Navbar -->
   <div id="navbar-container" data-path="../components/navbar.html"></div>
   <!-- Content -->
-  <div class="container mx-auto max-w-7xl md:px-0" style="padding-left: 0; padding-right: 0;">
+  <div class="container mx-auto max-w-6xl md:px-0" style="padding-left: 0; padding-right: 0;">
     <h1 class="text-4xl pt-10 pb-8 md:hidden font-signika font-bold text-center" data-i18n="about.title"></h1>
-    <div class="flex items-center justify-center min-h-[calc(100vh-300px)] py-6 md:py-12">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-20 w-full max-w-6xl">
-        <div class="col-span-1 order-1 md:order-1 flex items-center justify-center md:pb-0 pb-6" style="padding-top: 0.25rem;">
+    <div class="flex items-center justify-center py-6 md:py-12">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 w-full max-w-6xl">
+        <div class="col-span-1 order-1 md:order-1 flex items-center justify-center md:pb-0 pb-6 about-photo-container" style="padding-top: 0.25rem;">
           <img src="../assets/Avatar.png" alt="Martin USEO"
             class="w-full max-w-[320px] md:max-w-[544px] aspect-square object-cover rounded-lg md:w-[544px] md:h-[544px]" />
         </div>

@@ -105,12 +105,28 @@
           setTimeout(function() {
             const menu = document.getElementById('menu');
             const ulMenu = document.getElementById('ulMenu');
+            const nav = document.getElementById('nav');
             
             if (menu && ulMenu) {
               if (window.innerWidth < 768) {
+                // Forcer la fermeture visuelle du menu sur mobile
                 menu.style.height = '0px';
                 menu.style.overflow = 'hidden';
                 ulMenu.style.opacity = '0';
+                
+                // Synchroniser l'état Alpine.js si disponible
+                if (nav && window.Alpine) {
+                  try {
+                    setTimeout(() => {
+                      const alpineData = nav._x_dataStack?.[0];
+                      if (alpineData && typeof alpineData.open !== 'undefined') {
+                        alpineData.open = false;
+                      }
+                    }, 100);
+                  } catch (e) {
+                    // Alpine.js peut ne pas être encore initialisé
+                  }
+                }
               } else {
                 menu.style.height = '';
                 menu.style.overflow = '';

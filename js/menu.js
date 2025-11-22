@@ -1,11 +1,25 @@
 function initMobileMenu() {
   const menu = document.getElementById('menu');
   const ulMenu = document.getElementById('ulMenu');
+  const nav = document.getElementById('nav');
   
   if (menu && ulMenu && window.innerWidth < 768) {
+    // Forcer la fermeture visuelle du menu
     menu.style.height = '0px';
     menu.style.overflow = 'hidden';
     ulMenu.style.opacity = '0';
+    
+    // Synchroniser l'état Alpine.js si disponible
+    if (nav && window.Alpine) {
+      try {
+        const alpineData = nav._x_dataStack?.[0];
+        if (alpineData && typeof alpineData.open !== 'undefined') {
+          alpineData.open = false;
+        }
+      } catch (e) {
+        // Alpine.js peut ne pas être encore initialisé
+      }
+    }
   }
 }
 

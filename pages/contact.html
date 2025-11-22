@@ -65,17 +65,40 @@
   </script>
   <script src="../js/components/loader.js"></script>
   <script src="../js/components/dropdown.js"></script>
+  <style>
+    /* Styles spécifiques pour iOS/Safari uniquement */
+    @supports (-webkit-touch-callout: none) {
+      @media (max-width: 768px) {
+        #contact-form > div {
+          margin-bottom: 1.5rem;
+        }
+        #contact-form #submit-btn {
+          margin-top: 1.5rem;
+        }
+        #contact-form input,
+        #contact-form textarea {
+          padding-left: 1rem !important;
+          padding-right: 1rem !important;
+        }
+      }
+    }
+  </style>
 </head>
 
 <body
   class="dark:bg-black bg-white h-screen text-black dark:text-white px-5 md:px-20 opacity-0 animate-fade-in transition duration-500">
   <div id="navbar-container" data-path="../components/navbar.html"></div>
-  <div class="container mx-auto max-w-6xl">
-    <h1 class="text-4xl pt-10 pb-8 md:hidden font-signika font-bold" data-i18n="contactPage.title"></h1>
+  <div class="container mx-auto max-w-6xl md:px-0" style="padding-left: 0; padding-right: 0;">
+    <h1 class="text-4xl pt-10 pb-6 md:hidden font-signika font-bold" data-i18n="contactPage.title"></h1>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 pt-10 md:pt-20">
-      <section class="col-span-1 order-2 md:order-1">
+      <div class="col-span-1 md:order-2 flex items-center justify-center md:flex md:items-center md:justify-center" style="padding-top: 0.25rem; padding-bottom: 1.5rem;">
+          <img
+            src="../assets/Phonebox.png"
+          alt="Phonebox" class="w-full max-w-[320px] md:max-w-full aspect-square object-cover rounded-lg" />
+      </div>
+      <section class="col-span-1 md:order-1">
         <div class="max-w-full">
-          <h2 class="text-3xl md:text-4xl font-signika font-bold mb-8 text-center md:text-left" data-i18n="contactPage.heading"></h2>
+          <h2 class="hidden md:block text-3xl md:text-4xl font-signika font-bold mb-8 text-center md:text-left" data-i18n="contactPage.heading"></h2>
           <div id="message-alert" class="hidden mb-6 p-4 rounded-lg"></div>
 
           <form class="space-y-6" onsubmit="handleContactForm(event)" id="contact-form">
@@ -105,11 +128,6 @@
           </form>
         </div>
       </section>
-      <div class="col-span-1 order-1 md:order-2">
-          <img
-            src="../assets/Phonebox.png"
-          alt="Phonebox" class="w-full aspect-square object-cover rounded-lg" />
-      </div>
     </div>
   </div>
   

@@ -177,7 +177,7 @@
       }
       
       if (homeLink) homeLink.href = '../../index.html';
-      if (showcaseLink) showcaseLink.href = 'home.html';
+      if (showcaseLink) showcaseLink.href = '../home.html';
       if (aboutLink) aboutLink.href = '../about_me.html';
       if (contactLink) contactLink.href = '../contact.html';
       

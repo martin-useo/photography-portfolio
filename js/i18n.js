@@ -20,7 +20,7 @@ const translations = {
       title: 'À PROPOS',
       greeting: 'Bonjour, je suis Martin',
       intro: 'Photographe freelance basé en Île de France,',
-      description: 'J\'aime apprendre de nouvelles techniques photographiques et expérimenter, saisir des évènements, prendre des photos qui plaisent.',
+      description: 'J\'aime apprendre de nouvelles techniques photographiques et expérimenter, saisir des instants, prendre des photos qui plaisent.',
       open: 'Je suis ouvert à tous les genres, tous les styles, n\'hésitez pas à me contacter pour me parler de vos projets :)',
       inspiration: 'J\'admire et m\'inspire des photographes sportifs contemporains les plus talentueux comme How Lao, Ashley et Jered Gruber ou encore Pauline Ballet.'
     },
@@ -69,7 +69,7 @@ const translations = {
       title: 'ABOUT ME',
       greeting: 'Hello there, I\'m Martin',
       intro: 'Freelance photographer based in Île de France,',
-      description: 'I love learning new photographic techniques and experimenting, capturing events, taking photos that please.',
+      description: 'I love learning new photographic techniques and experimenting, capturing instants, taking photos that please.',
       open: 'I am open to all genres, all styles, feel free to contact me to talk about your projects :)',
       inspiration: 'I admire and draw inspiration from the most talented contemporary sports photographers like How Lao, Ashley and Jered Gruber or Pauline Ballet.'
     },

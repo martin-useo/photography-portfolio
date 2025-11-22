@@ -137,7 +137,27 @@
     </script>
     <script>
     // Layouts prédéfinis pour la disposition des images
-    const LAYOUTS = [
+    const MOBILE_LAYOUTS = [
+      {
+        name: 'mobile-single-portrait',
+        description: 'Un unique portrait',
+        structure: [
+          { width: 'w-full', height: 'h-full', isPortrait: true }
+        ],
+        isMobile: true
+      },
+      {
+        name: 'mobile-double-landscape',
+        description: 'Deux paysages superposés',
+        structure: [
+          { width: 'w-full', height: 'h-1/2', isLandscape: true },
+          { width: 'w-full', height: 'h-1/2', isLandscape: true }
+        ],
+        isMobile: true
+      }
+    ];
+
+    const DESKTOP_LAYOUTS = [
       {
         name: 'two-left-one-right',
         description: 'Deux images à gauche, une grande à droite',
@@ -168,15 +188,51 @@
       });
     }
 
+    function isMobile() {
+      return window.innerWidth < 768;
+    }
+
     function getRandomLayout() {
-      return LAYOUTS[Math.floor(Math.random() * LAYOUTS.length)];
+      if (isMobile()) {
+        return MOBILE_LAYOUTS[Math.floor(Math.random() * MOBILE_LAYOUTS.length)];
+      } else {
+        return DESKTOP_LAYOUTS[Math.floor(Math.random() * DESKTOP_LAYOUTS.length)];
+      }
     }
 
     function organizeImagesForLayout(layout) {
       const organized = [];
       const usedImages = new Set();
       
-      if (layout.name === 'three-column-grid') {
+      if (layout.name === 'mobile-single-portrait') {
+        if (!cachedPortraitImages || cachedPortraitImages.length < 1) {
+          console.warn('Pas assez d\'images portrait disponibles pour mobile-single-portrait');
+          return [];
+        }
+        
+        const shuffledPortraits = [...cachedPortraitImages].sort(() => Math.random() - 0.5);
+        const selectedImage = shuffledPortraits[0];
+        organized.push({
+          ...selectedImage,
+          layoutCell: layout.structure[0]
+        });
+      } else if (layout.name === 'mobile-double-landscape') {
+        if (!cachedLandscapeImages || cachedLandscapeImages.length < 2) {
+          console.warn('Pas assez d\'images paysage disponibles pour mobile-double-landscape');
+          return [];
+        }
+        
+        const shuffledLandscapes = [...cachedLandscapeImages].sort(() => Math.random() - 0.5);
+        layout.structure.forEach((cell, index) => {
+          if (index < shuffledLandscapes.length) {
+            const selectedImage = shuffledLandscapes[index];
+            organized.push({
+              ...selectedImage,
+              layoutCell: cell
+            });
+          }
+        });
+      } else if (layout.name === 'three-column-grid') {
         if (!cachedPortraitImages || cachedPortraitImages.length < 3) {
           console.warn('Pas assez d\'images portrait disponibles pour three-column-grid');
           return [];
@@ -257,6 +313,7 @@
     let currentImageIndices = [];
     let cycleInterval = null;
     let lastChangedCell = -1;
+    let isCurrentlyMobile = null;
     
     function createLayoutStructure(layout, organizedImages) {
       const grid = document.getElementById('portfolio-grid');
@@ -264,7 +321,33 @@
       
       grid.innerHTML = '';
       
-      if (layout.useColumns) {
+      if (layout.isMobile) {
+        grid.className = 'flex flex-col w-full h-full';
+        
+        organizedImages.forEach((img, index) => {
+          if (!img || !img.layoutCell) return;
+          
+          const cellContainer = document.createElement('div');
+          cellContainer.className = `${img.layoutCell.width} ${img.layoutCell.height} relative overflow-hidden`;
+          cellContainer.dataset.cellIndex = index;
+          
+          const imageStack = document.createElement('div');
+          imageStack.className = 'absolute inset-0';
+          
+          const imgElement = document.createElement('img');
+          imgElement.dataset.src = img.src;
+          imgElement.dataset.filename = img.filename || img.src.split('/').pop();
+          imgElement.alt = img.alt || 'Portfolio image';
+          imgElement.className = 'block h-full w-full object-cover object-center opacity-0 transition-opacity duration-700 ease-in-out';
+          imgElement.dataset.imageIndex = index;
+          imageStack.appendChild(imgElement);
+          
+          loadThumbnailForCanvas(imgElement);
+          
+          cellContainer.appendChild(imageStack);
+          grid.appendChild(cellContainer);
+        });
+      } else if (layout.useColumns) {
         grid.className = 'flex w-full h-full';
         
         let leftWidth, rightWidth;
@@ -454,6 +537,7 @@
         }
         
         currentLayout = selectedLayout;
+        isCurrentlyMobile = isMobile();
         currentImageIndices = organizedImages.map((img, idx) => 
           cachedImages.findIndex(ai => ai.src === img.src)
         );
@@ -495,7 +579,11 @@
       const maxAttempts = 200;
       
       let poolToUse;
-      if (currentLayout.name === 'three-column-grid') {
+      if (currentLayout.name === 'mobile-single-portrait') {
+        poolToUse = cachedPortraitImages;
+      } else if (currentLayout.name === 'mobile-double-landscape') {
+        poolToUse = cachedLandscapeImages;
+      } else if (currentLayout.name === 'three-column-grid') {
         poolToUse = cachedPortraitImages;
       } else if (currentLayout.name === 'two-left-one-right') {
         if (cellIndex < 2) {
@@ -596,6 +684,20 @@
       }, initialDelay);
     }
     
+    let resizeTimeout;
+    function handleResize() {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        const newIsMobile = isMobile();
+        if (isCurrentlyMobile !== null && newIsMobile !== isCurrentlyMobile) {
+          isCurrentlyMobile = newIsMobile;
+          renderBackgroundCanvas(true);
+        }
+      }, 250);
+    }
+
+    window.addEventListener('resize', handleResize);
+
     document.addEventListener('DOMContentLoaded', function() {
       if (typeof IMAGES_CONFIG === 'undefined') {
         console.error('IMAGES_CONFIG is not defined. Make sure dist/images-config.js is loaded.');

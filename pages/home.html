@@ -113,7 +113,7 @@
   <div class="container mx-auto max-w-7xl">
     <!-- Hero Image -->
     <div class="pt-10 md:pt-20 pb-8 md:pb-16 relative" id="hero-section">
-      <div class="w-full aspect-[3/2] rounded-lg overflow-hidden">
+      <div class="w-full md:aspect-[3/2] rounded-lg overflow-hidden">
         <img id="hero-image" src="" data-i18n-alt="showcase.heroAlt" alt="Vitrine du portfolio" class="w-full h-full object-cover" />
       </div>
       <!-- Scroll indicator -->
@@ -221,12 +221,34 @@
 
     let heroImage = null;
 
+    function adjustHeroImageAspectRatio() {
+      if (!heroImage) return;
+      
+      const heroImgElement = document.getElementById('hero-image');
+      const heroContainer = heroImgElement?.parentElement;
+      
+      if (!heroImgElement || !heroContainer) return;
+      
+      // Sur mobile, ajuster le conteneur pour respecter l'aspect ratio naturel de l'image
+      if (window.innerWidth < 768 && heroImage.aspectRatio) {
+        heroContainer.style.aspectRatio = `${heroImage.aspectRatio}`;
+        heroImgElement.style.objectFit = 'contain';
+      } else {
+        heroContainer.style.aspectRatio = '';
+        heroImgElement.style.objectFit = 'cover';
+      }
+    }
+
     function renderShowcase() {
       heroImage = getHeroImage();
       if (heroImage) {
         const heroImgElement = document.getElementById('hero-image');
+        
         heroImgElement.src = heroImage.src;
         heroImgElement.alt = heroImage.alt || LanguageManager.get('showcase.heroAlt');
+        
+        // Ajuster l'aspect ratio selon la taille de l'écran
+        adjustHeroImageAspectRatio();
       }
 
       const grid = document.getElementById('categories-grid');
@@ -342,6 +364,15 @@
           heroImgElement.alt = heroImage.alt || LanguageManager.get('showcase.heroAlt');
         }
       }
+    });
+
+    // Gérer le redimensionnement de la fenêtre
+    let resizeTimeout;
+    window.addEventListener('resize', function() {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(function() {
+        adjustHeroImageAspectRatio();
+      }, 100);
     });
 
     document.addEventListener('DOMContentLoaded', function() {

@@ -62,22 +62,43 @@
   <style>
     /* Fix pour Safari iOS - garantit que les gaps fonctionnent avec support responsive */
     #categories-grid {
+      display: -webkit-grid;
       display: grid;
+      -webkit-grid-template-columns: repeat(2, 1fr);
       grid-template-columns: repeat(2, 1fr);
       gap: 1rem;
       -webkit-column-gap: 1rem;
       -moz-column-gap: 1rem;
+      column-gap: 1rem;
       row-gap: 1rem;
       -webkit-row-gap: 1rem;
+      width: 100%;
     }
     @media (min-width: 640px) {
       #categories-grid {
+        -webkit-grid-template-columns: repeat(3, 1fr);
         grid-template-columns: repeat(3, 1fr);
         gap: 2rem;
         -webkit-column-gap: 2rem;
         -moz-column-gap: 2rem;
+        column-gap: 2rem;
         row-gap: 2rem;
         -webkit-row-gap: 2rem;
+      }
+    }
+    /* Fix pour Safari iOS - garantir que l'aspect ratio fonctionne correctement */
+    @supports (-webkit-touch-callout: none) {
+      @media (max-width: 639px) {
+        #categories-grid > a {
+          /* Forcer l'aspect ratio 3:2 sur iOS */
+          aspect-ratio: 3 / 2 !important;
+          -webkit-aspect-ratio: 3 / 2;
+          /* S'assurer que la largeur est respectée */
+          width: 100% !important;
+          /* Empêcher toute contrainte de hauteur */
+          max-height: none !important;
+          min-height: 0 !important;
+        }
       }
     }
   </style>
@@ -91,16 +112,22 @@
   <!-- Content -->
   <div class="container mx-auto max-w-7xl">
     <!-- Hero Image -->
-    <div class="pt-10 md:pt-20 pb-8 md:pb-16">
-      <div class="w-full aspect-[16/9] md:aspect-[21/9] rounded-lg overflow-hidden">
+    <div class="pt-10 md:pt-20 pb-8 md:pb-16 relative" id="hero-section">
+      <div class="w-full aspect-[3/2] rounded-lg overflow-hidden">
         <img id="hero-image" src="" data-i18n-alt="showcase.heroAlt" alt="Vitrine du portfolio" class="w-full h-full object-cover" />
+      </div>
+      <!-- Scroll indicator -->
+      <div id="scroll-indicator" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 animate-bounce hidden md:block opacity-100 transition-opacity duration-500">
+        <svg class="w-6 h-6 text-black dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="filter: drop-shadow(0 2px 8px rgba(255,255,255,0.8)) drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+        </svg>
       </div>
     </div>
 
     <!-- Categories Grid -->
-    <div class="pb-20 pt-8 md:pt-0">
+    <div class="pb-20 pt-8 md:pt-0" style="position: relative; z-index: 1;">
       <h2 class="text-3xl md:text-4xl font-signika font-bold mb-6 md:mb-12 text-center" data-i18n="showcase.title">Découvrir les catégories</h2>
-      <div id="categories-grid"></div>
+      <div id="categories-grid" style="position: relative; z-index: 1;"></div>
       <div class="hidden sm:flex justify-center mt-4 md:mt-8">
         <div id="categories-grid-last-row" class="grid grid-cols-2" style="gap: 2rem; -webkit-column-gap: 2rem; -moz-column-gap: 2rem; row-gap: 2rem; -webkit-row-gap: 2rem; width: calc((100% - 2rem) * 2 / 3 + 2rem); max-width: calc((100% - 4rem) * 2 / 3 + 4rem);"></div>
       </div>
@@ -204,10 +231,20 @@
 
       const grid = document.getElementById('categories-grid');
       const lastRowGrid = document.getElementById('categories-grid-last-row');
+      
+      if (!grid) {
+        console.error('categories-grid element not found');
+        return;
+      }
+      
       grid.innerHTML = '';
       if (lastRowGrid) {
         lastRowGrid.innerHTML = '';
       }
+      
+      // Forcer l'affichage de la grille sur iOS
+      grid.style.display = '-webkit-grid';
+      grid.style.display = 'grid';
 
       function createCategoryCard(category) {
         const categoryImage = getCategoryImage(category.slug);
@@ -255,21 +292,47 @@
         return card;
       }
 
+      // Détection mobile améliorée pour iOS
+      const isMobile = window.innerWidth < 640 || /iPhone|iPad|iPod/.test(navigator.userAgent);
+      
       categories.forEach((category, index) => {
         const card = createCategoryCard(category);
         
-        const isMobile = window.innerWidth < 640;
-        
         if (isMobile) {
-          grid.appendChild(card);
+          if (grid) {
+            grid.appendChild(card);
+            // Forcer la visibilité sur iOS sans affecter l'aspect ratio
+            card.style.visibility = 'visible';
+            card.style.opacity = '1';
+          }
         } else {
           if (index < 6) {
-        grid.appendChild(card);
+            if (grid) {
+              grid.appendChild(card);
+            }
           } else {
-            lastRowGrid.appendChild(card);
+            if (lastRowGrid) {
+              lastRowGrid.appendChild(card);
+            }
           }
         }
       });
+      
+      // Vérification pour Safari iOS - forcer l'affichage si nécessaire
+      setTimeout(() => {
+        if (grid && grid.children.length === 0) {
+          console.warn('Aucun bouton de catégorie créé, réessai...');
+          categories.forEach((category, index) => {
+            const card = createCategoryCard(category);
+            const isMobileCheck = window.innerWidth < 640 || /iPhone|iPad|iPod/.test(navigator.userAgent);
+            if (isMobileCheck && grid) {
+              grid.appendChild(card);
+              card.style.visibility = 'visible';
+              card.style.opacity = '1';
+            }
+          });
+        }
+      }, 200);
     }
 
     window.addEventListener('languageChanged', () => {
@@ -281,7 +344,36 @@
       }
     });
 
-    document.addEventListener('DOMContentLoaded', renderShowcase);
+    document.addEventListener('DOMContentLoaded', function() {
+      renderShowcase();
+      
+      // Centrer la page sur l'image hero si on vient de index.html ou si le hash est présent
+      const shouldScrollToHero = document.referrer.includes('index.html') || window.location.hash === '#hero';
+      
+      if (shouldScrollToHero) {
+        setTimeout(() => {
+          const heroSection = document.getElementById('hero-section');
+          if (heroSection) {
+            heroSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            // Retirer le hash de l'URL après le scroll
+            if (window.location.hash === '#hero') {
+              history.replaceState(null, '', window.location.pathname);
+            }
+          }
+        }, 300);
+      }
+      
+      // Faire disparaître l'indicateur de scroll après quelques secondes
+      setTimeout(() => {
+        const scrollIndicator = document.getElementById('scroll-indicator');
+        if (scrollIndicator) {
+          scrollIndicator.style.opacity = '0';
+          setTimeout(() => {
+            scrollIndicator.style.display = 'none';
+          }, 500);
+        }
+      }, 5000);
+    });
   </script>
 
   <script src="../js/fade_in.js"></script>

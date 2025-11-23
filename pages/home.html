@@ -107,7 +107,7 @@
     <div class="pt-10 md:pt-20 pb-8 md:pb-16 relative" id="hero-section">
       <div id="hero-container" class="w-full md:aspect-[3/2] rounded-lg overflow-hidden">
         <img id="hero-image" src="" data-i18n-alt="showcase.heroAlt" alt="Vitrine du portfolio" class="w-full h-full object-cover" />
-        <div id="hero-three-portraits" class="hidden md:flex w-full h-full gap-0"></div>
+        <div id="hero-three-portraits" class="hidden md:flex w-full h-full gap-0" style="position: relative;"></div>
       </div>
       <div id="scroll-indicator" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 animate-bounce hidden md:block opacity-100 transition-opacity duration-500">
         <svg class="w-6 h-6 text-black dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="filter: drop-shadow(0 2px 8px rgba(255,255,255,0.8)) drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
@@ -230,6 +230,77 @@
 
     let heroImages = null;
 
+    let currentExpandedIndex = -1;
+
+    function startPortraitAnimation(container, images) {
+      const portraitDivs = container.querySelectorAll('.portrait-item');
+      if (portraitDivs.length !== 3) return;
+
+      portraitDivs.forEach((div) => {
+        const newDiv = div.cloneNode(true);
+        div.parentNode.replaceChild(newDiv, div);
+      });
+
+      const updatedPortraitDivs = container.querySelectorAll('.portrait-item');
+
+      function getContainerDimensions() {
+        return {
+          height: container.offsetHeight,
+          width: container.offsetWidth
+        };
+      }
+
+      function expandPortrait(index) {
+        const { height: containerHeight, width: containerWidth } = getContainerDimensions();
+        const aspectRatio = parseFloat(updatedPortraitDivs[index].dataset.aspectRatio) || 0.666667;
+        
+        const naturalWidth = containerHeight * aspectRatio;
+        const maxExpandedWidth = containerWidth * 0.55;
+        const expandedWidth = Math.min(naturalWidth, maxExpandedWidth);
+        const remainingWidth = containerWidth - expandedWidth;
+        const otherPortraitWidth = remainingWidth / 2;
+
+        updatedPortraitDivs[index].style.width = `${(expandedWidth / containerWidth) * 100}%`;
+        
+        updatedPortraitDivs.forEach((div, i) => {
+          if (i !== index) {
+            div.style.width = `${(otherPortraitWidth / containerWidth) * 100}%`;
+          }
+        });
+
+        currentExpandedIndex = index;
+      }
+
+      function resetToBase() {
+        updatedPortraitDivs.forEach((div) => {
+          div.style.width = '33.333%';
+        });
+        currentExpandedIndex = -1;
+      }
+
+      updatedPortraitDivs.forEach((div, index) => {
+        div.addEventListener('mouseenter', () => {
+          expandPortrait(index);
+        });
+      });
+
+      container.addEventListener('mouseleave', () => {
+        resetToBase();
+      });
+    }
+
+    function stopPortraitAnimation() {
+      currentExpandedIndex = -1;
+      
+      const heroThreePortraits = document.getElementById('hero-three-portraits');
+      if (heroThreePortraits) {
+        const portraitDivs = heroThreePortraits.querySelectorAll('.portrait-item');
+        portraitDivs.forEach((div) => {
+          div.style.width = '33.333%';
+        });
+      }
+    }
+
     function adjustHeroImageAspectRatio() {
       if (!heroImages) return;
       
@@ -238,6 +309,10 @@
       const heroContainer = document.getElementById('hero-container');
       
       if (!heroContainer) return;
+      
+      if (heroImages.type !== 'three-portraits') {
+        stopPortraitAnimation();
+      }
       
       if (window.innerWidth < 768 && heroImages.type === 'single' && heroImages.images[0]?.aspectRatio) {
         heroContainer.style.aspectRatio = `${heroImages.images[0].aspectRatio}`;
@@ -269,9 +344,16 @@
         if (heroThreePortraits) {
           heroThreePortraits.classList.remove('hidden');
           heroThreePortraits.innerHTML = '';
-          heroImages.images.forEach((img) => {
+          heroImages.images.forEach((img, index) => {
             const portraitDiv = document.createElement('div');
-            portraitDiv.className = 'w-1/3 h-full relative overflow-hidden';
+            portraitDiv.className = 'h-full relative overflow-hidden portrait-item';
+            portraitDiv.style.width = '33.333%';
+            portraitDiv.style.transition = 'width 0.7s cubic-bezier(0.4, 0, 0.2, 1)';
+            portraitDiv.style.willChange = 'width';
+            portraitDiv.style.cursor = 'pointer';
+            portraitDiv.style.flexShrink = '0';
+            portraitDiv.dataset.aspectRatio = img.aspectRatio || 0.666667;
+            portraitDiv.dataset.index = index;
             const portraitImg = document.createElement('img');
             portraitImg.src = img.src;
             portraitImg.alt = img.alt || LanguageManager.get('showcase.heroAlt');
@@ -279,6 +361,7 @@
             portraitDiv.appendChild(portraitImg);
             heroThreePortraits.appendChild(portraitDiv);
           });
+          startPortraitAnimation(heroThreePortraits, heroImages.images);
         }
       } else {
         if (heroThreePortraits) heroThreePortraits.classList.add('hidden');
@@ -398,10 +481,24 @@
         const currentWidth = window.innerWidth;
         const wasDesktop = lastWindowWidth >= 768;
         const isNowDesktop = currentWidth >= 768;
+        
         if (wasDesktop !== isNowDesktop) {
+          stopPortraitAnimation();
           renderShowcase();
         } else {
           adjustHeroImageAspectRatio();
+          if (isNowDesktop && heroImages && heroImages.type === 'three-portraits') {
+            const heroThreePortraits = document.getElementById('hero-three-portraits');
+            if (heroThreePortraits && !heroThreePortraits.classList.contains('hidden')) {
+              const portraitDivs = heroThreePortraits.querySelectorAll('.portrait-item');
+              portraitDivs.forEach((div) => {
+                div.style.width = '33.333%';
+              });
+              setTimeout(() => {
+                startPortraitAnimation(heroThreePortraits, heroImages.images);
+              }, 100);
+            }
+          }
         }
         lastWindowWidth = currentWidth;
       }, 100);

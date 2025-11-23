@@ -60,7 +60,6 @@
   <script src="../js/components/loader.js"></script>
   <script src="../js/components/dropdown.js"></script>
   <style>
-    /* Fix pour Safari iOS - garantit que les gaps fonctionnent avec support responsive */
     #categories-grid {
       display: -webkit-grid;
       display: grid;
@@ -86,16 +85,12 @@
         -webkit-row-gap: 2rem;
       }
     }
-    /* Fix pour Safari iOS - garantir que l'aspect ratio fonctionne correctement */
     @supports (-webkit-touch-callout: none) {
       @media (max-width: 639px) {
         #categories-grid > a {
-          /* Forcer l'aspect ratio 3:2 sur iOS */
           aspect-ratio: 3 / 2 !important;
           -webkit-aspect-ratio: 3 / 2;
-          /* S'assurer que la largeur est respectée */
           width: 100% !important;
-          /* Empêcher toute contrainte de hauteur */
           max-height: none !important;
           min-height: 0 !important;
         }
@@ -106,18 +101,14 @@
 
 <body
   class="dark:bg-black bg-white h-screen text-black dark:text-white px-5 md:px-20 opacity-0 animate-fade-in transition duration-500">
-  <!-- Navbar -->
   <div id="navbar-container" data-path="../components/navbar.html"></div>
   
-  <!-- Content -->
   <div class="container mx-auto max-w-7xl">
-    <!-- Hero Image -->
     <div class="pt-10 md:pt-20 pb-8 md:pb-16 relative" id="hero-section">
       <div id="hero-container" class="w-full md:aspect-[3/2] rounded-lg overflow-hidden">
         <img id="hero-image" src="" data-i18n-alt="showcase.heroAlt" alt="Vitrine du portfolio" class="w-full h-full object-cover" />
         <div id="hero-three-portraits" class="hidden md:flex w-full h-full gap-0"></div>
       </div>
-      <!-- Scroll indicator -->
       <div id="scroll-indicator" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 animate-bounce hidden md:block opacity-100 transition-opacity duration-500">
         <svg class="w-6 h-6 text-black dark:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="filter: drop-shadow(0 2px 8px rgba(255,255,255,0.8)) drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
@@ -125,7 +116,6 @@
       </div>
     </div>
 
-    <!-- Categories Grid -->
     <div class="pb-20 pt-8 md:pt-0" style="position: relative; z-index: 1;">
       <h2 class="text-3xl md:text-4xl font-signika font-bold mb-6 md:mb-12 text-center" data-i18n="showcase.title">Découvrir les catégories</h2>
       <div id="categories-grid" style="position: relative; z-index: 1;"></div>
@@ -135,9 +125,7 @@
     </div>
   </div>
 
-  <!-- Footer -->
   <div id="footer-container" data-path="../components/footer.html"></div>
-  <!-- Scroll to Top Button -->
   <div id="scroll-to-top-container" data-path="../components/scroll-to-top.html"></div>
 
   <script src="../js/image-protection.js"></script>
@@ -204,19 +192,13 @@
       let allImages = IMAGES_CONFIG.getShowcaseImages('../');
       
       if (isDesktop) {
-        // Sur desktop, on peut choisir entre une image paysage ou 3 portraits
         const landscapeImages = allImages.filter(img => img.aspectRatio && img.aspectRatio > 1);
         const portraitImages = allImages.filter(img => img.aspectRatio && img.aspectRatio <= 1);
-        
-        // Choisir aléatoirement entre paysage unique ou 3 portraits
         const useThreePortraits = Math.random() < 0.5 && portraitImages.length >= 3;
         
         if (useThreePortraits) {
-          // Prioriser les 5 étoiles
           const fiveStarPortraits = portraitImages.filter(img => img.rating === 5);
           const sourcePortraits = fiveStarPortraits.length >= 3 ? fiveStarPortraits : portraitImages;
-          
-          // Sélectionner 3 portraits différents
           const shuffled = [...sourcePortraits].sort(() => Math.random() - 0.5);
           const selected = shuffled.slice(0, 3);
           
@@ -225,7 +207,6 @@
           }
         }
         
-        // Sinon, utiliser une image paysage
         if (landscapeImages.length > 0) {
           const fiveStarLandscapes = landscapeImages.filter(img => img.rating === 5);
           const sourceLandscapes = fiveStarLandscapes.length > 0 ? fiveStarLandscapes : landscapeImages;
@@ -235,8 +216,6 @@
           };
         }
       }
-      
-      // Sur mobile, toutes les images sont possibles
       if (allImages.length > 0) {
         const fiveStarImages = allImages.filter(img => img.rating === 5);
         const sourceImages = fiveStarImages.length > 0 ? fiveStarImages : allImages;
@@ -260,7 +239,6 @@
       
       if (!heroContainer) return;
       
-      // Sur mobile, ajuster le conteneur pour respecter l'aspect ratio naturel de l'image
       if (window.innerWidth < 768 && heroImages.type === 'single' && heroImages.images[0]?.aspectRatio) {
         heroContainer.style.aspectRatio = `${heroImages.images[0].aspectRatio}`;
         if (heroImgElement) {
@@ -287,56 +265,39 @@
       const isDesktop = window.innerWidth >= 768;
       
       if (heroImages.type === 'three-portraits' && isDesktop) {
-        // Afficher 3 portraits côte à côte
-        if (heroImgElement) {
-          heroImgElement.style.display = 'none';
-        }
+        if (heroImgElement) heroImgElement.style.display = 'none';
         if (heroThreePortraits) {
           heroThreePortraits.classList.remove('hidden');
           heroThreePortraits.innerHTML = '';
-          
-          heroImages.images.forEach((img, index) => {
+          heroImages.images.forEach((img) => {
             const portraitDiv = document.createElement('div');
             portraitDiv.className = 'w-1/3 h-full relative overflow-hidden';
-            
             const portraitImg = document.createElement('img');
             portraitImg.src = img.src;
             portraitImg.alt = img.alt || LanguageManager.get('showcase.heroAlt');
             portraitImg.className = 'w-full h-full object-cover';
-            
             portraitDiv.appendChild(portraitImg);
             heroThreePortraits.appendChild(portraitDiv);
           });
         }
       } else {
-        // Afficher une image unique
-        if (heroThreePortraits) {
-          heroThreePortraits.classList.add('hidden');
-        }
+        if (heroThreePortraits) heroThreePortraits.classList.add('hidden');
         if (heroImgElement && heroImages.images[0]) {
           heroImgElement.style.display = 'block';
           heroImgElement.src = heroImages.images[0].src;
           heroImgElement.alt = heroImages.images[0].alt || LanguageManager.get('showcase.heroAlt');
         }
-        
-        // Ajuster l'aspect ratio selon la taille de l'écran
         adjustHeroImageAspectRatio();
       }
 
       const grid = document.getElementById('categories-grid');
       const lastRowGrid = document.getElementById('categories-grid-last-row');
       
-      if (!grid) {
-        console.error('categories-grid element not found');
-        return;
-      }
+      if (!grid) return;
       
       grid.innerHTML = '';
-      if (lastRowGrid) {
-        lastRowGrid.innerHTML = '';
-      }
+      if (lastRowGrid) lastRowGrid.innerHTML = '';
       
-      // Forcer l'affichage de la grille sur iOS
       grid.style.display = '-webkit-grid';
       grid.style.display = 'grid';
 
@@ -386,37 +347,28 @@
         return card;
       }
 
-      // Détection mobile améliorée pour iOS
       const isMobile = window.innerWidth < 640 || /iPhone|iPad|iPod/.test(navigator.userAgent);
       
       categories.forEach((category, index) => {
         const card = createCategoryCard(category);
-        
         if (isMobile) {
           if (grid) {
             grid.appendChild(card);
-            // Forcer la visibilité sur iOS sans affecter l'aspect ratio
             card.style.visibility = 'visible';
             card.style.opacity = '1';
           }
         } else {
           if (index < 6) {
-            if (grid) {
-              grid.appendChild(card);
-            }
+            if (grid) grid.appendChild(card);
           } else {
-            if (lastRowGrid) {
-              lastRowGrid.appendChild(card);
-            }
+            if (lastRowGrid) lastRowGrid.appendChild(card);
           }
         }
       });
       
-      // Vérification pour Safari iOS - forcer l'affichage si nécessaire
       setTimeout(() => {
         if (grid && grid.children.length === 0) {
-          console.warn('Aucun bouton de catégorie créé, réessai...');
-          categories.forEach((category, index) => {
+          categories.forEach((category) => {
             const card = createCategoryCard(category);
             const isMobileCheck = window.innerWidth < 640 || /iPhone|iPad|iPod/.test(navigator.userAgent);
             if (isMobileCheck && grid) {
@@ -438,7 +390,6 @@
       }
     });
 
-    // Gérer le redimensionnement de la fenêtre
     let resizeTimeout;
     let lastWindowWidth = window.innerWidth;
     window.addEventListener('resize', function() {
@@ -447,14 +398,11 @@
         const currentWidth = window.innerWidth;
         const wasDesktop = lastWindowWidth >= 768;
         const isNowDesktop = currentWidth >= 768;
-        
-        // Re-rendre le showcase si on passe de mobile à desktop ou vice versa
         if (wasDesktop !== isNowDesktop) {
           renderShowcase();
         } else {
           adjustHeroImageAspectRatio();
         }
-        
         lastWindowWidth = currentWidth;
       }, 100);
     });
@@ -462,15 +410,12 @@
     document.addEventListener('DOMContentLoaded', function() {
       renderShowcase();
       
-      // Centrer la page sur l'image hero si on vient de index.html ou si le hash est présent
       const shouldScrollToHero = document.referrer.includes('index.html') || window.location.hash === '#hero';
-      
       if (shouldScrollToHero) {
         setTimeout(() => {
           const heroSection = document.getElementById('hero-section');
           if (heroSection) {
             heroSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            // Retirer le hash de l'URL après le scroll
             if (window.location.hash === '#hero') {
               history.replaceState(null, '', window.location.pathname);
             }
@@ -478,7 +423,6 @@
         }, 300);
       }
       
-      // Faire disparaître l'indicateur de scroll après quelques secondes
       setTimeout(() => {
         const scrollIndicator = document.getElementById('scroll-indicator');
         if (scrollIndicator) {

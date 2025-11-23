@@ -129,7 +129,6 @@
       };
       
       displayImg.onerror = () => {
-        console.error('[IndexCanvas] Image failed to load:', filename);
           img.style.opacity = '0';
       };
       
@@ -137,7 +136,6 @@
     }
     </script>
     <script>
-    // Layouts prédéfinis pour la disposition des images
     const MOBILE_LAYOUTS = [
       {
         name: 'mobile-single-portrait',
@@ -207,7 +205,6 @@
       
       if (layout.name === 'mobile-single-portrait') {
         if (!cachedPortraitImages || cachedPortraitImages.length < 1) {
-          console.warn('Pas assez d\'images portrait disponibles pour mobile-single-portrait');
           return [];
         }
         
@@ -219,7 +216,6 @@
         });
       } else if (layout.name === 'mobile-double-landscape') {
         if (!cachedLandscapeImages || cachedLandscapeImages.length < 2) {
-          console.warn('Pas assez d\'images paysage disponibles pour mobile-double-landscape');
           return [];
         }
         
@@ -235,7 +231,6 @@
         });
       } else if (layout.name === 'three-column-grid') {
         if (!cachedPortraitImages || cachedPortraitImages.length < 3) {
-          console.warn('Pas assez d\'images portrait disponibles pour three-column-grid');
           return [];
         }
         
@@ -259,11 +254,9 @@
         });
       } else if (layout.name === 'two-left-one-right') {
         if (!cachedLandscapeImages || cachedLandscapeImages.length < 2) {
-          console.warn('Pas assez d\'images paysage disponibles pour two-left-one-right (gauche)');
           return [];
         }
         if (!cachedPortraitImages || cachedPortraitImages.length < 1) {
-          console.warn('Pas assez d\'images portrait disponibles pour two-left-one-right (droite)');
           return [];
         }
         
@@ -487,13 +480,9 @@
     async function renderBackgroundCanvas(useTransition = false) {
       try {
         const grid = document.getElementById('portfolio-grid');
-        if (!grid) {
-          console.error('Portfolio grid element not found');
-          return;
-        }
+        if (!grid) return;
         
         if (typeof IMAGES_CONFIG === 'undefined') {
-          console.error('IMAGES_CONFIG is not defined. Make sure dist/images-config.js is loaded.');
           return;
         }
         
@@ -501,7 +490,6 @@
           cachedImages = IMAGES_CONFIG.getAllImages('./');
           
           if (!cachedImages || cachedImages.length === 0) {
-            console.error('No images found in configuration');
             return;
           }
           
@@ -533,7 +521,6 @@
         const organizedImages = organizeImagesForLayout(selectedLayout);
         
         if (!organizedImages || organizedImages.length === 0) {
-          console.error('No images organized for layout');
           return;
         }
         
@@ -546,7 +533,6 @@
         lastChangedCell = -1;
         createLayoutStructure(selectedLayout, organizedImages);
       } catch (error) {
-        console.error('Error rendering background canvas:', error);
         const grid = document.getElementById('portfolio-grid');
         if (grid) {
           grid.innerHTML = '<div class="w-full h-full bg-gray-800 flex items-center justify-center text-white">Erreur de chargement des images</div>';
@@ -597,7 +583,6 @@
       }
       
       if (!poolToUse || poolToUse.length === 0) {
-        console.warn('Pool d\'images vide pour le cycle');
         return;
       }
       
@@ -613,7 +598,6 @@
         newImage = shuffledPool[0];
         newImageIndex = cachedImages.findIndex(img => img.src === newImage.src);
         if (newImageIndex === -1) {
-          console.warn('Impossible de trouver l\'index de la nouvelle image');
           return;
         }
       }
@@ -701,7 +685,6 @@
     
     document.addEventListener('DOMContentLoaded', function() {
       if (typeof IMAGES_CONFIG === 'undefined') {
-        console.error('IMAGES_CONFIG is not defined. Make sure dist/images-config.js is loaded.');
         const script = document.createElement('script');
         script.src = 'dist/images-config.js';
         script.onload = function() {
@@ -711,7 +694,6 @@
           });
         };
         script.onerror = function() {
-          console.error('Failed to load images-config.js');
         };
         document.head.appendChild(script);
       } else {

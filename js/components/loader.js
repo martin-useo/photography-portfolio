@@ -109,12 +109,9 @@
             
             if (menu && ulMenu) {
               if (window.innerWidth < 768) {
-                // Forcer la fermeture visuelle du menu sur mobile
                 menu.style.height = '0px';
                 menu.style.overflow = 'hidden';
                 ulMenu.style.opacity = '0';
-                
-                // Synchroniser l'état Alpine.js si disponible
                 if (nav && window.Alpine) {
                   try {
                     setTimeout(() => {
@@ -123,9 +120,7 @@
                         alpineData.open = false;
                       }
                     }, 100);
-                  } catch (e) {
-                    // Alpine.js peut ne pas être encore initialisé
-                  }
+                  } catch (e) {}
                 }
               } else {
                 menu.style.height = '';

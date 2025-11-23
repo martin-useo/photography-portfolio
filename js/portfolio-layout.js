@@ -35,7 +35,6 @@ const PortfolioLayout = {
       columnHeights.push(0);
     }
     
-    // Stocker l'ordre original des images pour la lightbox
     const imagesInOrder = [];
     
     images.forEach((img, originalIndex) => {
@@ -53,8 +52,6 @@ const PortfolioLayout = {
       item.className = 'relative overflow-hidden rounded-sm transition-all duration-300 hover:scale-105 hover:rounded-lg';
       item.style.width = '100%';
       item.style.aspectRatio = img.aspectRatio;
-      
-      // Stocker l'index original dans l'élément pour référence
       item.dataset.originalIndex = originalIndex;
       
       item.innerHTML = `
@@ -95,7 +92,6 @@ const PortfolioLayout = {
     
     if (typeof Fancybox !== 'undefined') {
       if (typeof LightboxOptimizer !== 'undefined') {
-        // Préparer les items dans l'ordre original des images
         const galleryItems = LightboxOptimizer.prepareGalleryItems(imagesInOrder, 'gallery');
         
         // Intercepter les clics pour utiliser l'ordre original

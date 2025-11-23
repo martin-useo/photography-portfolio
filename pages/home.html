@@ -113,8 +113,9 @@
   <div class="container mx-auto max-w-7xl">
     <!-- Hero Image -->
     <div class="pt-10 md:pt-20 pb-8 md:pb-16 relative" id="hero-section">
-      <div class="w-full md:aspect-[3/2] rounded-lg overflow-hidden">
+      <div id="hero-container" class="w-full md:aspect-[3/2] rounded-lg overflow-hidden">
         <img id="hero-image" src="" data-i18n-alt="showcase.heroAlt" alt="Vitrine du portfolio" class="w-full h-full object-cover" />
+        <div id="hero-three-portraits" class="hidden md:flex w-full h-full gap-0"></div>
       </div>
       <!-- Scroll indicator -->
       <div id="scroll-indicator" class="absolute bottom-4 left-1/2 transform -translate-x-1/2 animate-bounce hidden md:block opacity-100 transition-opacity duration-500">
@@ -198,54 +199,125 @@
       return null;
     }
 
-    function getHeroImage() {
-      // Sur desktop uniquement, filtrer pour ne garder que les images paysage
+    function getHeroImages() {
       const isDesktop = window.innerWidth >= 768;
-      
       let allImages = IMAGES_CONFIG.getShowcaseImages('../');
       
       if (isDesktop) {
-        // Filtrer uniquement les images paysage (aspectRatio > 1)
-        allImages = allImages.filter(img => img.aspectRatio && img.aspectRatio > 1);
+        // Sur desktop, on peut choisir entre une image paysage ou 3 portraits
+        const landscapeImages = allImages.filter(img => img.aspectRatio && img.aspectRatio > 1);
+        const portraitImages = allImages.filter(img => img.aspectRatio && img.aspectRatio <= 1);
+        
+        // Choisir aléatoirement entre paysage unique ou 3 portraits
+        const useThreePortraits = Math.random() < 0.5 && portraitImages.length >= 3;
+        
+        if (useThreePortraits) {
+          // Prioriser les 5 étoiles
+          const fiveStarPortraits = portraitImages.filter(img => img.rating === 5);
+          const sourcePortraits = fiveStarPortraits.length >= 3 ? fiveStarPortraits : portraitImages;
+          
+          // Sélectionner 3 portraits différents
+          const shuffled = [...sourcePortraits].sort(() => Math.random() - 0.5);
+          const selected = shuffled.slice(0, 3);
+          
+          if (selected.length === 3) {
+            return { type: 'three-portraits', images: selected };
+          }
+        }
+        
+        // Sinon, utiliser une image paysage
+        if (landscapeImages.length > 0) {
+          const fiveStarLandscapes = landscapeImages.filter(img => img.rating === 5);
+          const sourceLandscapes = fiveStarLandscapes.length > 0 ? fiveStarLandscapes : landscapeImages;
+          return { 
+            type: 'single-landscape', 
+            images: [sourceLandscapes[Math.floor(Math.random() * sourceLandscapes.length)]]
+          };
+        }
       }
       
+      // Sur mobile, toutes les images sont possibles
       if (allImages.length > 0) {
         const fiveStarImages = allImages.filter(img => img.rating === 5);
-        if (fiveStarImages.length > 0) {
-          return fiveStarImages[Math.floor(Math.random() * fiveStarImages.length)];
-        }
-        return allImages[Math.floor(Math.random() * allImages.length)];
+        const sourceImages = fiveStarImages.length > 0 ? fiveStarImages : allImages;
+        return { 
+          type: 'single', 
+          images: [sourceImages[Math.floor(Math.random() * sourceImages.length)]]
+        };
       }
+      
       return null;
     }
 
-    let heroImage = null;
+    let heroImages = null;
 
     function adjustHeroImageAspectRatio() {
-      if (!heroImage) return;
+      if (!heroImages) return;
       
       const heroImgElement = document.getElementById('hero-image');
-      const heroContainer = heroImgElement?.parentElement;
+      const heroThreePortraits = document.getElementById('hero-three-portraits');
+      const heroContainer = document.getElementById('hero-container');
       
-      if (!heroImgElement || !heroContainer) return;
+      if (!heroContainer) return;
       
       // Sur mobile, ajuster le conteneur pour respecter l'aspect ratio naturel de l'image
-      if (window.innerWidth < 768 && heroImage.aspectRatio) {
-        heroContainer.style.aspectRatio = `${heroImage.aspectRatio}`;
-        heroImgElement.style.objectFit = 'contain';
+      if (window.innerWidth < 768 && heroImages.type === 'single' && heroImages.images[0]?.aspectRatio) {
+        heroContainer.style.aspectRatio = `${heroImages.images[0].aspectRatio}`;
+        if (heroImgElement) {
+          heroImgElement.style.objectFit = 'contain';
+        }
       } else {
         heroContainer.style.aspectRatio = '';
-        heroImgElement.style.objectFit = 'cover';
+        if (heroImgElement) {
+          heroImgElement.style.objectFit = 'cover';
+        }
       }
     }
 
     function renderShowcase() {
-      heroImage = getHeroImage();
-      if (heroImage) {
-        const heroImgElement = document.getElementById('hero-image');
-        
-        heroImgElement.src = heroImage.src;
-        heroImgElement.alt = heroImage.alt || LanguageManager.get('showcase.heroAlt');
+      heroImages = getHeroImages();
+      if (!heroImages) return;
+      
+      const heroImgElement = document.getElementById('hero-image');
+      const heroThreePortraits = document.getElementById('hero-three-portraits');
+      const heroContainer = document.getElementById('hero-container');
+      
+      if (!heroContainer) return;
+      
+      const isDesktop = window.innerWidth >= 768;
+      
+      if (heroImages.type === 'three-portraits' && isDesktop) {
+        // Afficher 3 portraits côte à côte
+        if (heroImgElement) {
+          heroImgElement.style.display = 'none';
+        }
+        if (heroThreePortraits) {
+          heroThreePortraits.classList.remove('hidden');
+          heroThreePortraits.innerHTML = '';
+          
+          heroImages.images.forEach((img, index) => {
+            const portraitDiv = document.createElement('div');
+            portraitDiv.className = 'w-1/3 h-full relative overflow-hidden';
+            
+            const portraitImg = document.createElement('img');
+            portraitImg.src = img.src;
+            portraitImg.alt = img.alt || LanguageManager.get('showcase.heroAlt');
+            portraitImg.className = 'w-full h-full object-cover';
+            
+            portraitDiv.appendChild(portraitImg);
+            heroThreePortraits.appendChild(portraitDiv);
+          });
+        }
+      } else {
+        // Afficher une image unique
+        if (heroThreePortraits) {
+          heroThreePortraits.classList.add('hidden');
+        }
+        if (heroImgElement && heroImages.images[0]) {
+          heroImgElement.style.display = 'block';
+          heroImgElement.src = heroImages.images[0].src;
+          heroImgElement.alt = heroImages.images[0].alt || LanguageManager.get('showcase.heroAlt');
+        }
         
         // Ajuster l'aspect ratio selon la taille de l'écran
         adjustHeroImageAspectRatio();
@@ -358,20 +430,32 @@
     }
 
     window.addEventListener('languageChanged', () => {
-      if (heroImage) {
+      if (heroImages && heroImages.images[0]) {
         const heroImgElement = document.getElementById('hero-image');
         if (heroImgElement) {
-          heroImgElement.alt = heroImage.alt || LanguageManager.get('showcase.heroAlt');
+          heroImgElement.alt = heroImages.images[0].alt || LanguageManager.get('showcase.heroAlt');
         }
       }
     });
 
     // Gérer le redimensionnement de la fenêtre
     let resizeTimeout;
+    let lastWindowWidth = window.innerWidth;
     window.addEventListener('resize', function() {
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(function() {
-        adjustHeroImageAspectRatio();
+        const currentWidth = window.innerWidth;
+        const wasDesktop = lastWindowWidth >= 768;
+        const isNowDesktop = currentWidth >= 768;
+        
+        // Re-rendre le showcase si on passe de mobile à desktop ou vice versa
+        if (wasDesktop !== isNowDesktop) {
+          renderShowcase();
+        } else {
+          adjustHeroImageAspectRatio();
+        }
+        
+        lastWindowWidth = currentWidth;
       }, 100);
     });
 

@@ -8,16 +8,25 @@ const PortfolioLayout = {
   },
   
   async generatePortfolio(images, gridElement) {
+    if (!images || images.length === 0) return;
+    if (!gridElement) return;
+    
     gridElement.innerHTML = '';
     
     const getColumnCount = () => {
-      if (window.innerWidth >= 1024) return 3;
-      if (window.innerWidth >= 640) return 2;
+      if (window.BREAKPOINTS) {
+        if (window.innerWidth >= window.BREAKPOINTS.desktop) return 3;
+        if (window.innerWidth >= window.BREAKPOINTS.mobile) return 2;
+      } else {
+        if (window.innerWidth >= 1024) return 3;
+        if (window.innerWidth >= 640) return 2;
+      }
       return 1;
     };
     
     let columnCount = getColumnCount();
-    const gap = window.innerWidth >= 768 ? 24 : 16;
+    const desktop = window.isDesktop ? window.isDesktop() : window.innerWidth >= 768;
+    const gap = desktop ? 24 : 16;
     
     gridElement.className = 'flex gap-4 md:gap-6';
     gridElement.style.display = 'flex';

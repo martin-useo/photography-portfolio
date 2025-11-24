@@ -108,7 +108,8 @@
             const nav = document.getElementById('nav');
             
             if (menu && ulMenu) {
-              if (window.innerWidth < 768) {
+              const mobile = window.isMobile ? window.isMobile() : window.innerWidth < 768;
+              if (mobile) {
                 menu.style.height = '0px';
                 menu.style.overflow = 'hidden';
                 ulMenu.style.opacity = '0';
@@ -381,3 +382,5 @@
     loadComponents();
   }
 })();
+
+

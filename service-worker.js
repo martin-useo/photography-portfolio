@@ -15,11 +15,11 @@ const STATIC_ASSETS = [
   '/js/optimization/image-optimizer.js',
   '/js/optimization/lightbox-optimizer.js',
   '/js/optimization/sw-register.js',
-  '/js/images-config.js',
+  '/js/core/images-config.js',
   '/js/image-protection.js',
-  '/js/i18n.js',
+  '/js/core/i18n.js',
   '/js/fade_in.js',
-  '/js/menu.js',
+  '/js/components/menu.js',
   '/js/scroll-to-top.js',
   '/js/portfolio-layout.js'
 ];

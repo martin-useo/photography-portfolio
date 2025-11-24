@@ -32,7 +32,7 @@
     }
   </style>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-  <script src="js/i18n.js"></script>
+  <script src="js/core/i18n.js"></script>
   <script>
     document.write('<style id="i18n-preload">body{visibility:hidden}</style>');
   </script>
@@ -102,10 +102,25 @@
     </a>
   </div>
 
-    <script src="js/utils/webp-support.js"></script>
+    <script src="js/core/utils/webp-support.js"></script>
     <script src="js/image-protection.js"></script>
-    <script src="js/images-config.js"></script>
+    <script src="js/core/images-config.js"></script>
     <script src="js/optimization/image-optimizer.js"></script>
+    <script type="module" src="js/responsive/breakpoints-global.js"></script>
+    <script type="module">
+      import { MOBILE_LAYOUTS, DESKTOP_LAYOUTS, getRandomLayout, organizeImagesForLayout, createLayoutStructure } from './js/pages/index/layout-handler.js';
+      window.MOBILE_LAYOUTS = MOBILE_LAYOUTS;
+      window.DESKTOP_LAYOUTS = DESKTOP_LAYOUTS;
+      window.getRandomLayout = getRandomLayout;
+      window.organizeImagesForLayout = organizeImagesForLayout;
+      window.createLayoutStructure = createLayoutStructure;
+      
+      // Attendre que les modules soient chargés avant d'exécuter le script principal
+      window.layoutModulesLoaded = true;
+      if (window.onLayoutModulesLoaded) {
+        window.onLayoutModulesLoaded();
+      }
+    </script>
     <script>
     // Fonction de chargement direct des images display pour la page d'accueil
     function loadThumbnailForCanvas(img) {
@@ -136,47 +151,8 @@
     }
     </script>
     <script>
-    const MOBILE_LAYOUTS = [
-      {
-        name: 'mobile-single-portrait',
-        description: 'Un unique portrait',
-        structure: [
-          { width: 'w-full', height: 'h-full', isPortrait: true }
-        ],
-        isMobile: true
-      },
-      {
-        name: 'mobile-double-landscape',
-        description: 'Deux paysages superposés',
-        structure: [
-          { width: 'w-full', height: 'h-1/2', isLandscape: true },
-          { width: 'w-full', height: 'h-1/2', isLandscape: true }
-        ],
-        isMobile: true
-      }
-    ];
-
-    const DESKTOP_LAYOUTS = [
-      {
-        name: 'two-left-one-right',
-        description: 'Deux images à gauche, une grande à droite',
-        structure: [
-          { width: 'md:w-1/2', height: 'h-1/2', isLeftColumn: true },
-          { width: 'md:w-1/2', height: 'h-1/2', isLeftColumn: true },
-          { width: 'md:w-1/2', height: 'h-full', isRightColumn: true }
-        ],
-        useColumns: true
-      },
-      {
-        name: 'three-column-grid',
-        description: 'Trois images en colonnes égales',
-        structure: [
-          { width: 'md:w-1/3', height: 'h-full' },
-          { width: 'md:w-1/3', height: 'h-full' },
-          { width: 'md:w-1/3', height: 'h-full' }
-        ]
-      }
-    ];
+    let MOBILE_LAYOUTS = [];
+    let DESKTOP_LAYOUTS = [];
 
     function preloadImage(src) {
       return new Promise((resolve, reject) => {
@@ -188,116 +164,21 @@
     }
 
     function isMobile() {
-      return window.innerWidth < 768;
+      return window.isMobile ? window.isMobile() : window.innerWidth < 768;
     }
 
-    function getRandomLayout() {
-      if (isMobile()) {
-        return MOBILE_LAYOUTS[Math.floor(Math.random() * MOBILE_LAYOUTS.length)];
-      } else {
-        return DESKTOP_LAYOUTS[Math.floor(Math.random() * DESKTOP_LAYOUTS.length)];
+    // Utiliser directement window.getRandomLayout
+    function organizeImagesForLayout(layout, portraitImages, landscapeImages) {
+      if (!layout || !portraitImages || !landscapeImages) return [];
+      if (window.organizeImagesForLayout) {
+        if (typeof window.organizeImagesForLayout !== 'function') return [];
+        try {
+          return window.organizeImagesForLayout(layout, portraitImages, landscapeImages);
+        } catch (error) {
+          return [];
+        }
       }
-    }
-
-    function organizeImagesForLayout(layout) {
-      const organized = [];
-      const usedImages = new Set();
-      
-      if (layout.name === 'mobile-single-portrait') {
-        if (!cachedPortraitImages || cachedPortraitImages.length < 1) {
-          return [];
-        }
-        
-        const shuffledPortraits = [...cachedPortraitImages].sort(() => Math.random() - 0.5);
-        const selectedImage = shuffledPortraits[0];
-        organized.push({
-          ...selectedImage,
-          layoutCell: layout.structure[0]
-        });
-      } else if (layout.name === 'mobile-double-landscape') {
-        if (!cachedLandscapeImages || cachedLandscapeImages.length < 2) {
-          return [];
-        }
-        
-        const shuffledLandscapes = [...cachedLandscapeImages].sort(() => Math.random() - 0.5);
-        layout.structure.forEach((cell, index) => {
-          if (index < shuffledLandscapes.length) {
-            const selectedImage = shuffledLandscapes[index];
-            organized.push({
-              ...selectedImage,
-              layoutCell: cell
-            });
-          }
-        });
-      } else if (layout.name === 'three-column-grid') {
-        if (!cachedPortraitImages || cachedPortraitImages.length < 3) {
-          return [];
-        }
-        
-        const shuffledPortraits = [...cachedPortraitImages].sort(() => Math.random() - 0.5);
-      let portraitIndex = 0;
-        
-        layout.structure.forEach((cell, index) => {
-          while (portraitIndex < shuffledPortraits.length && usedImages.has(shuffledPortraits[portraitIndex].src)) {
-            portraitIndex++;
-          }
-          
-          if (portraitIndex < shuffledPortraits.length) {
-            const selectedImage = shuffledPortraits[portraitIndex];
-            usedImages.add(selectedImage.src);
-            organized.push({
-              ...selectedImage,
-              layoutCell: cell
-            });
-            portraitIndex++;
-          }
-        });
-      } else if (layout.name === 'two-left-one-right') {
-        if (!cachedLandscapeImages || cachedLandscapeImages.length < 2) {
-          return [];
-        }
-        if (!cachedPortraitImages || cachedPortraitImages.length < 1) {
-          return [];
-        }
-        
-        const shuffledLandscapes = [...cachedLandscapeImages].sort(() => Math.random() - 0.5);
-        const shuffledPortraits = [...cachedPortraitImages].sort(() => Math.random() - 0.5);
-        
-      let landscapeIndex = 0;
-        let portraitIndex = 0;
-      
-      layout.structure.forEach((cell, index) => {
-        let selectedImage;
-        
-          if (index < 2) {
-            while (landscapeIndex < shuffledLandscapes.length && usedImages.has(shuffledLandscapes[landscapeIndex].src)) {
-              landscapeIndex++;
-            }
-            if (landscapeIndex < shuffledLandscapes.length) {
-              selectedImage = shuffledLandscapes[landscapeIndex];
-              landscapeIndex++;
-            }
-          } else {
-            while (portraitIndex < shuffledPortraits.length && usedImages.has(shuffledPortraits[portraitIndex].src)) {
-              portraitIndex++;
-            }
-            if (portraitIndex < shuffledPortraits.length) {
-              selectedImage = shuffledPortraits[portraitIndex];
-              portraitIndex++;
-            }
-          }
-          
-          if (selectedImage && !usedImages.has(selectedImage.src)) {
-            usedImages.add(selectedImage.src);
-          organized.push({
-            ...selectedImage,
-            layoutCell: cell
-          });
-        }
-      });
-      }
-      
-      return organized;
+      return [];
     }
 
     let cachedImages = null;
@@ -310,135 +191,8 @@
     let isCurrentlyMobile = null;
     
     function createLayoutStructure(layout, organizedImages) {
-      const grid = document.getElementById('portfolio-grid');
-      if (!grid) return;
-      
-      grid.innerHTML = '';
-      
-      if (layout.isMobile) {
-        grid.className = 'flex flex-col w-full h-full';
-        
-        organizedImages.forEach((img, index) => {
-          if (!img || !img.layoutCell) return;
-          
-          const cellContainer = document.createElement('div');
-          cellContainer.className = `${img.layoutCell.width} ${img.layoutCell.height} relative overflow-hidden`;
-          cellContainer.dataset.cellIndex = index;
-          
-          const imageStack = document.createElement('div');
-          imageStack.className = 'absolute inset-0';
-          
-          const imgElement = document.createElement('img');
-          imgElement.dataset.src = img.src;
-          imgElement.dataset.filename = img.filename || img.src.split('/').pop();
-          imgElement.alt = img.alt || 'Portfolio image';
-          imgElement.className = 'block h-full w-full object-cover object-center opacity-0 transition-opacity duration-700 ease-in-out';
-          imgElement.dataset.imageIndex = index;
-          imageStack.appendChild(imgElement);
-          
-          loadThumbnailForCanvas(imgElement);
-          
-          cellContainer.appendChild(imageStack);
-          grid.appendChild(cellContainer);
-        });
-      } else if (layout.useColumns) {
-        grid.className = 'flex w-full h-full';
-        
-        let leftWidth, rightWidth;
-        if (layout.name === 'two-left-one-right') {
-          leftWidth = 'md:w-1/2';
-          rightWidth = 'md:w-1/2';
-        } else {
-          leftWidth = 'md:w-1/3';
-          rightWidth = 'md:w-2/3';
-        }
-        
-        const leftColumn = document.createElement('div');
-        leftColumn.className = `flex flex-col ${leftWidth} w-full h-full`;
-        
-        const rightColumn = document.createElement('div');
-        rightColumn.className = `flex flex-col ${rightWidth} w-full h-full`;
-        
-        organizedImages.forEach((img, index) => {
-          if (!img || !img.layoutCell) return;
-          
-          const cellContainer = document.createElement('div');
-          cellContainer.className = `w-full ${img.layoutCell.height} relative overflow-hidden`;
-          cellContainer.dataset.cellIndex = index;
-          
-          const imageStack = document.createElement('div');
-          imageStack.className = 'absolute inset-0';
-          
-          const imgElement = document.createElement('img');
-          imgElement.dataset.src = img.src;
-          imgElement.dataset.filename = img.filename || img.src.split('/').pop();
-          imgElement.alt = img.alt || 'Portfolio image';
-          imgElement.className = 'block h-full w-full object-cover object-center opacity-0 transition-opacity duration-700 ease-in-out';
-          imgElement.dataset.imageIndex = index;
-          imageStack.appendChild(imgElement);
-          
-          loadThumbnailForCanvas(imgElement);
-          
-          cellContainer.appendChild(imageStack);
-          
-          if (img.layoutCell.isLeftColumn) {
-            leftColumn.appendChild(cellContainer);
-          } else if (img.layoutCell.isRightColumn) {
-            rightColumn.appendChild(cellContainer);
-          }
-        });
-        
-        grid.appendChild(leftColumn);
-        grid.appendChild(rightColumn);
-      } else {
-        grid.className = 'flex flex-wrap w-full h-full items-stretch';
-        
-        const hasPartialHeights = organizedImages.some(img => 
-          img.layoutCell.height && (img.layoutCell.height.includes('1/3') || img.layoutCell.height.includes('2/3'))
-        );
-        
-        if (hasPartialHeights) {
-          grid.style.display = 'flex';
-          grid.style.flexWrap = 'wrap';
-          grid.style.height = '100%';
-        }
-        
-        organizedImages.forEach((img, index) => {
-          if (!img || !img.layoutCell) return;
-          
-          const cellContainer = document.createElement('div');
-          cellContainer.className = `w-full ${img.layoutCell.width} relative overflow-hidden`;
-          
-          if (img.layoutCell.height) {
-            if (img.layoutCell.height === 'h-full') {
-              cellContainer.style.height = '100%';
-            } else if (img.layoutCell.height === 'h-1/2') {
-              cellContainer.style.height = '50%';
-            } else if (img.layoutCell.height === 'h-1/3') {
-              cellContainer.style.height = '33.333333%';
-            } else if (img.layoutCell.height === 'h-2/3') {
-              cellContainer.style.height = '66.666667%';
-            }
-          }
-          
-          cellContainer.dataset.cellIndex = index;
-          
-          const imageStack = document.createElement('div');
-          imageStack.className = 'absolute inset-0';
-          
-          const imgElement = document.createElement('img');
-          imgElement.dataset.src = img.src;
-          imgElement.dataset.filename = img.filename || img.src.split('/').pop();
-          imgElement.alt = img.alt || 'Portfolio image';
-          imgElement.className = 'block h-full w-full object-cover object-center opacity-0 transition-opacity duration-700 ease-in-out';
-          imgElement.dataset.imageIndex = index;
-          imageStack.appendChild(imgElement);
-          
-          loadThumbnailForCanvas(imgElement);
-          
-          cellContainer.appendChild(imageStack);
-          grid.appendChild(cellContainer);
-        });
+      if (window.createLayoutStructure) {
+        return window.createLayoutStructure(layout, organizedImages, loadThumbnailForCanvas);
       }
     }
     
@@ -483,26 +237,26 @@
         if (!grid) return;
         
         if (typeof IMAGES_CONFIG === 'undefined') {
-          return;
+          throw new Error('IMAGES_CONFIG is not defined');
         }
         
         if (!cachedImages) {
           cachedImages = IMAGES_CONFIG.getAllImages('./');
           
           if (!cachedImages || cachedImages.length === 0) {
-            return;
+            throw new Error('No images found in IMAGES_CONFIG');
           }
           
           cachedPortraitImages = cachedImages.filter(img => {
             const ar = img.aspectRatio;
-            if (!ar || ar === undefined) {
+            if (ar === undefined || ar === null || isNaN(ar)) {
               return false;
             }
             return ar < 1;
           });
           cachedLandscapeImages = cachedImages.filter(img => {
             const ar = img.aspectRatio;
-            if (!ar || ar === undefined) {
+            if (ar === undefined || ar === null || isNaN(ar)) {
               return false;
             }
             return ar > 1;
@@ -517,11 +271,15 @@
         
         grid.innerHTML = '';
         
-        const selectedLayout = getRandomLayout();
-        const organizedImages = organizeImagesForLayout(selectedLayout);
+        const selectedLayout = window.getRandomLayout ? window.getRandomLayout() : null;
+        if (!selectedLayout) {
+          throw new Error('No layout available');
+        }
+        
+        const organizedImages = organizeImagesForLayout(selectedLayout, cachedPortraitImages, cachedLandscapeImages);
         
         if (!organizedImages || organizedImages.length === 0) {
-          return;
+          throw new Error('No images organized for layout');
         }
         
         currentLayout = selectedLayout;
@@ -531,11 +289,15 @@
         );
         
         lastChangedCell = -1;
-        createLayoutStructure(selectedLayout, organizedImages);
+        if (window.createLayoutStructure) {
+          window.createLayoutStructure(selectedLayout, organizedImages, loadThumbnailForCanvas);
+        } else {
+          throw new Error('createLayoutStructure function not available');
+        }
       } catch (error) {
         const grid = document.getElementById('portfolio-grid');
         if (grid) {
-          grid.innerHTML = '<div class="w-full h-full bg-gray-800 flex items-center justify-center text-white">Erreur de chargement des images</div>';
+          grid.innerHTML = `<div class="w-full h-full bg-gray-800 flex items-center justify-center text-white">Erreur de chargement des images: ${error.message}</div>`;
         }
       }
     }
@@ -683,26 +445,66 @@
 
     window.addEventListener('resize', handleResize);
     
-    document.addEventListener('DOMContentLoaded', function() {
-      if (typeof IMAGES_CONFIG === 'undefined') {
-        const script = document.createElement('script');
-        script.src = 'dist/images-config.js';
-        script.onload = function() {
-          renderBackgroundCanvas().then(() => {
-            startAutoCycle();
-            startLanguageCycle();
-          });
-        };
-        script.onerror = function() {
-        };
-        document.head.appendChild(script);
-      } else {
+    function waitForImagesConfig() {
+      return new Promise((resolve) => {
+        if (typeof IMAGES_CONFIG !== 'undefined') {
+          resolve();
+        } else {
+          let attempts = 0;
+          const checkInterval = setInterval(() => {
+            attempts++;
+            if (typeof IMAGES_CONFIG !== 'undefined') {
+              clearInterval(checkInterval);
+              resolve();
+            } else if (attempts > 50) {
+              clearInterval(checkInterval);
+              resolve();
+            }
+          }, 100);
+        }
+      });
+    }
+    
+    function waitForLayoutModules() {
+      return new Promise((resolve) => {
+        if (window.layoutModulesLoaded && window.getRandomLayout && window.organizeImagesForLayout && window.createLayoutStructure) {
+          resolve();
+        } else {
+          window.onLayoutModulesLoaded = resolve;
+          setTimeout(() => {
+            if (window.getRandomLayout && window.organizeImagesForLayout && window.createLayoutStructure) {
+              resolve();
+            } else {
+              resolve();
+            }
+          }, 1000);
+        }
+      });
+    }
+    
+    function initPage() {
+      Promise.all([waitForImagesConfig(), waitForLayoutModules()]).then(() => {
+        if (typeof IMAGES_CONFIG === 'undefined') {
+          const grid = document.getElementById('portfolio-grid');
+          if (grid) {
+            grid.innerHTML = '<div class="w-full h-full bg-gray-800 flex items-center justify-center text-white">Erreur: IMAGES_CONFIG non chargé</div>';
+          }
+          return;
+        }
+        
         renderBackgroundCanvas().then(() => {
           startAutoCycle();
           startLanguageCycle();
+        }).catch((error) => {
+          const grid = document.getElementById('portfolio-grid');
+          if (grid) {
+            grid.innerHTML = `<div class="w-full h-full bg-gray-800 flex items-center justify-center text-white">Erreur: ${error.message}</div>`;
+          }
         });
-      }
-    });
+      });
+    }
+    
+    document.addEventListener('DOMContentLoaded', initPage);
   </script>
   <script src="js/components/loader.js"></script>
   <script src="js/fade_in.js"></script>

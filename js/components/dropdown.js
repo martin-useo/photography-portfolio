@@ -18,7 +18,7 @@
     const dropdown = document.getElementById('portfolio-dropdown');
     const dropdownMobile = document.getElementById('portfolio-dropdown-mobile');
     const chevron = document.getElementById('portfolio-chevron');
-    const isMobile = window.innerWidth < 768;
+    const isMobile = window.isMobile ? window.isMobile() : window.innerWidth < 768;
     
     if (isMobile) {
       const menu = document.getElementById('menu');
@@ -94,7 +94,8 @@
     });
     
     container.addEventListener('mouseenter', function() {
-      if (window.innerWidth >= 768 && dropdown && chevron) {
+      const desktop = window.isDesktop ? window.isDesktop() : window.innerWidth >= 768;
+      if (desktop && dropdown && chevron) {
         dropdown.classList.remove('opacity-0', 'invisible');
         dropdown.style.opacity = '1';
         dropdown.style.visibility = 'visible';
@@ -105,7 +106,8 @@
     });
     
     container.addEventListener('mouseleave', function() {
-      if (window.innerWidth >= 768 && dropdown && chevron) {
+      const desktop = window.isDesktop ? window.isDesktop() : window.innerWidth >= 768;
+      if (desktop && dropdown && chevron) {
         setTimeout(function() {
           if (!container.matches(':hover') && !dropdown.matches(':hover')) {
             dropdown.classList.add('opacity-0', 'invisible');

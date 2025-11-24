@@ -31,7 +31,7 @@
   <script>
     document.write('<style id="i18n-preload">body{visibility:hidden}</style>');
   </script>
-  <script src="../js/i18n.js"></script>
+  <script src="../js/core/i18n.js"></script>
   <script>
     if (typeof applyTranslationsBeforeRender === 'function') {
       applyTranslationsBeforeRender();
@@ -59,41 +59,20 @@
   </script>
   <script src="../js/components/loader.js"></script>
   <script src="../js/components/dropdown.js"></script>
+  <link rel="stylesheet" href="../css/components/categories-mobile.css" />
+  <link rel="stylesheet" href="../css/components/categories-desktop.css" />
+  <link rel="stylesheet" href="../css/vendor/ios-fixes.css" />
   <style>
     #categories-grid {
       display: -webkit-grid;
       display: grid;
-      -webkit-grid-template-columns: repeat(2, 1fr);
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
-      -webkit-column-gap: 1rem;
-      -moz-column-gap: 1rem;
-      column-gap: 1rem;
-      row-gap: 1rem;
-      -webkit-row-gap: 1rem;
       width: 100%;
     }
-    @media (min-width: 640px) {
+    
+    @media (max-width: 767px) {
       #categories-grid {
-        -webkit-grid-template-columns: repeat(3, 1fr);
-        grid-template-columns: repeat(3, 1fr);
-        gap: 2rem;
-        -webkit-column-gap: 2rem;
-        -moz-column-gap: 2rem;
-        column-gap: 2rem;
-        row-gap: 2rem;
-        -webkit-row-gap: 2rem;
-      }
-    }
-    @supports (-webkit-touch-callout: none) {
-      @media (max-width: 639px) {
-        #categories-grid > a {
-          aspect-ratio: 3 / 2 !important;
-          -webkit-aspect-ratio: 3 / 2;
-          width: 100% !important;
-          max-height: none !important;
-          min-height: 0 !important;
-        }
+        grid-template-columns: repeat(2, 1fr) !important;
+        -webkit-grid-template-columns: repeat(2, 1fr) !important;
       }
     }
   </style>
@@ -129,9 +108,33 @@
   <div id="scroll-to-top-container" data-path="../components/scroll-to-top.html"></div>
 
   <script src="../js/image-protection.js"></script>
-  <script src="../js/utils/webp-support.js"></script>
-  <script src="../js/images-config.js"></script>
+  <script src="../js/core/utils/webp-support.js"></script>
+  <script src="../js/core/images-config.js"></script>
   <script src="../js/optimization/image-optimizer.js"></script>
+  <script type="module">
+    import('../js/responsive/breakpoints-global.js').then(() => {
+      return new Promise(resolve => setTimeout(resolve, 50));
+    }).then(() => {
+      return import('../js/pages/home/hero-handler.js');
+    }).then((heroModule) => {
+      window.getHeroImages = heroModule.getHeroImages;
+      window.renderHero = heroModule.renderHero;
+      window.adjustHeroImageAspectRatio = heroModule.adjustHeroImageAspectRatio;
+      window.stopPortraitAnimation = heroModule.stopPortraitAnimation;
+      return import('../js/pages/home/categories-handler.js');
+    }).then((categoriesModule) => {
+      window.renderCategories = categoriesModule.renderCategories;
+      window.homeModulesLoaded = true;
+      if (window.onHomeModulesLoaded) {
+        window.onHomeModulesLoaded();
+      }
+    }).catch((error) => {
+      window.homeModulesLoaded = false;
+      if (window.onHomeModulesLoaded) {
+        window.onHomeModulesLoaded();
+      }
+    });
+  </script>
   <script>
     const categories = [
       { nameKey: 'sport', slug: 'sport', path: 'portfolio/sport.html' },
@@ -187,281 +190,24 @@
       return null;
     }
 
-    function getHeroImages() {
-      const isDesktop = window.innerWidth >= 768;
-      let allImages = IMAGES_CONFIG.getShowcaseImages('../');
-      
-      if (isDesktop) {
-        const landscapeImages = allImages.filter(img => img.aspectRatio && img.aspectRatio > 1);
-        const portraitImages = allImages.filter(img => img.aspectRatio && img.aspectRatio <= 1);
-        const useThreePortraits = Math.random() < 0.5 && portraitImages.length >= 3;
-        
-        if (useThreePortraits) {
-          const fiveStarPortraits = portraitImages.filter(img => img.rating === 5);
-          const sourcePortraits = fiveStarPortraits.length >= 3 ? fiveStarPortraits : portraitImages;
-          const shuffled = [...sourcePortraits].sort(() => Math.random() - 0.5);
-          const selected = shuffled.slice(0, 3);
-          
-          if (selected.length === 3) {
-            return { type: 'three-portraits', images: selected };
-          }
-        }
-        
-        if (landscapeImages.length > 0) {
-          const fiveStarLandscapes = landscapeImages.filter(img => img.rating === 5);
-          const sourceLandscapes = fiveStarLandscapes.length > 0 ? fiveStarLandscapes : landscapeImages;
-          return { 
-            type: 'single-landscape', 
-            images: [sourceLandscapes[Math.floor(Math.random() * sourceLandscapes.length)]]
-          };
-        }
-      }
-      if (allImages.length > 0) {
-        const fiveStarImages = allImages.filter(img => img.rating === 5);
-        const sourceImages = fiveStarImages.length > 0 ? fiveStarImages : allImages;
-        return { 
-          type: 'single', 
-          images: [sourceImages[Math.floor(Math.random() * sourceImages.length)]]
-        };
-      }
-      
-      return null;
-    }
-
     let heroImages = null;
 
-    let currentExpandedIndex = -1;
-
-    function startPortraitAnimation(container, images) {
-      const portraitDivs = container.querySelectorAll('.portrait-item');
-      if (portraitDivs.length !== 3) return;
-
-      portraitDivs.forEach((div) => {
-        const newDiv = div.cloneNode(true);
-        div.parentNode.replaceChild(newDiv, div);
-      });
-
-      const updatedPortraitDivs = container.querySelectorAll('.portrait-item');
-
-      function getContainerDimensions() {
-        return {
-          height: container.offsetHeight,
-          width: container.offsetWidth
-        };
-      }
-
-      function expandPortrait(index) {
-        const { height: containerHeight, width: containerWidth } = getContainerDimensions();
-        const aspectRatio = parseFloat(updatedPortraitDivs[index].dataset.aspectRatio) || 0.666667;
-        
-        const naturalWidth = containerHeight * aspectRatio;
-        const maxExpandedWidth = containerWidth * 0.55;
-        const expandedWidth = Math.min(naturalWidth, maxExpandedWidth);
-        const remainingWidth = containerWidth - expandedWidth;
-        const otherPortraitWidth = remainingWidth / 2;
-
-        updatedPortraitDivs[index].style.width = `${(expandedWidth / containerWidth) * 100}%`;
-        
-        updatedPortraitDivs.forEach((div, i) => {
-          if (i !== index) {
-            div.style.width = `${(otherPortraitWidth / containerWidth) * 100}%`;
-          }
-        });
-
-        currentExpandedIndex = index;
-      }
-
-      function resetToBase() {
-        updatedPortraitDivs.forEach((div) => {
-          div.style.width = '33.333%';
-        });
-        currentExpandedIndex = -1;
-      }
-
-      updatedPortraitDivs.forEach((div, index) => {
-        div.addEventListener('mouseenter', () => {
-          expandPortrait(index);
-        });
-      });
-
-      container.addEventListener('mouseleave', () => {
-        resetToBase();
-      });
-    }
-
-    function stopPortraitAnimation() {
-      currentExpandedIndex = -1;
-      
-      const heroThreePortraits = document.getElementById('hero-three-portraits');
-      if (heroThreePortraits) {
-        const portraitDivs = heroThreePortraits.querySelectorAll('.portrait-item');
-        portraitDivs.forEach((div) => {
-          div.style.width = '33.333%';
-        });
-      }
-    }
-
-    function adjustHeroImageAspectRatio() {
-      if (!heroImages) return;
-      
-      const heroImgElement = document.getElementById('hero-image');
-      const heroThreePortraits = document.getElementById('hero-three-portraits');
-      const heroContainer = document.getElementById('hero-container');
-      
-      if (!heroContainer) return;
-      
-      if (heroImages.type !== 'three-portraits') {
-        stopPortraitAnimation();
-      }
-      
-      if (window.innerWidth < 768 && heroImages.type === 'single' && heroImages.images[0]?.aspectRatio) {
-        heroContainer.style.aspectRatio = `${heroImages.images[0].aspectRatio}`;
-        if (heroImgElement) {
-          heroImgElement.style.objectFit = 'contain';
-        }
-      } else {
-        heroContainer.style.aspectRatio = '';
-        if (heroImgElement) {
-          heroImgElement.style.objectFit = 'cover';
-        }
-      }
-    }
-
     function renderShowcase() {
-      heroImages = getHeroImages();
+      if (typeof IMAGES_CONFIG === 'undefined') return;
+      
+      const allImages = IMAGES_CONFIG.getShowcaseImages('../');
+      if (!allImages || allImages.length === 0) return;
+      
+      if (!window.getHeroImages) return;
+      
+      heroImages = window.getHeroImages(allImages);
       if (!heroImages) return;
       
-      const heroImgElement = document.getElementById('hero-image');
-      const heroThreePortraits = document.getElementById('hero-three-portraits');
-      const heroContainer = document.getElementById('hero-container');
-      
-      if (!heroContainer) return;
-      
-      const isDesktop = window.innerWidth >= 768;
-      
-      if (heroImages.type === 'three-portraits' && isDesktop) {
-        if (heroImgElement) heroImgElement.style.display = 'none';
-        if (heroThreePortraits) {
-          heroThreePortraits.classList.remove('hidden');
-          heroThreePortraits.innerHTML = '';
-          heroImages.images.forEach((img, index) => {
-            const portraitDiv = document.createElement('div');
-            portraitDiv.className = 'h-full relative overflow-hidden portrait-item';
-            portraitDiv.style.width = '33.333%';
-            portraitDiv.style.transition = 'width 0.7s cubic-bezier(0.4, 0, 0.2, 1)';
-            portraitDiv.style.willChange = 'width';
-            portraitDiv.style.cursor = 'pointer';
-            portraitDiv.style.flexShrink = '0';
-            portraitDiv.dataset.aspectRatio = img.aspectRatio || 0.666667;
-            portraitDiv.dataset.index = index;
-            const portraitImg = document.createElement('img');
-            portraitImg.src = img.src;
-            portraitImg.alt = img.alt || LanguageManager.get('showcase.heroAlt');
-            portraitImg.className = 'w-full h-full object-cover';
-            portraitDiv.appendChild(portraitImg);
-            heroThreePortraits.appendChild(portraitDiv);
-          });
-          startPortraitAnimation(heroThreePortraits, heroImages.images);
-        }
-      } else {
-        if (heroThreePortraits) heroThreePortraits.classList.add('hidden');
-        if (heroImgElement && heroImages.images[0]) {
-          heroImgElement.style.display = 'block';
-          heroImgElement.src = heroImages.images[0].src;
-          heroImgElement.alt = heroImages.images[0].alt || LanguageManager.get('showcase.heroAlt');
-        }
-        adjustHeroImageAspectRatio();
-      }
+      if (!window.renderHero) return;
+      window.renderHero(heroImages);
 
-      const grid = document.getElementById('categories-grid');
-      const lastRowGrid = document.getElementById('categories-grid-last-row');
-      
-      if (!grid) return;
-      
-      grid.innerHTML = '';
-      if (lastRowGrid) lastRowGrid.innerHTML = '';
-      
-      grid.style.display = '-webkit-grid';
-      grid.style.display = 'grid';
-
-      function createCategoryCard(category) {
-        const categoryImage = getCategoryImage(category.slug);
-        const categoryName = LanguageManager.get(category.nameKey);
-        
-        const card = document.createElement('a');
-        card.href = category.path;
-        card.className = 'group relative block overflow-hidden rounded-lg aspect-[3/2] sm:aspect-[4/3] transition-transform duration-300 hover:scale-105 w-full';
-        card.setAttribute('data-category', category.slug);
-        
-        if (categoryImage) {
-          card.innerHTML = `
-            <div class="absolute inset-0">
-              <img data-src="${categoryImage.src}" 
-                   data-filename="${categoryImage.filename || categoryImage.src.split('/').pop()}"
-                   alt="${categoryImage.alt || categoryName}" 
-                   class="w-full h-full object-cover lazy-load opacity-0 transition-opacity duration-500" />
-              <div class="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors duration-300"></div>
-            </div>
-            <div class="absolute inset-0 flex items-center justify-center px-2" style="display: flex; align-items: center; justify-content: center; padding-left: 0.5rem; padding-right: 0.5rem;">
-              <h3 class="text-base sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-signika font-bold text-white drop-shadow-lg" style="text-align: center; width: 100%;" data-i18n="${category.nameKey}">
-                ${categoryName}
-              </h3>
-            </div>
-          `;
-          
-          const img = card.querySelector('img');
-          if (img && typeof ImageOptimizer !== 'undefined') {
-            ImageOptimizer.loadImage(img);
-          } else if (img) {
-            img.src = img.dataset.src;
-            img.style.opacity = '1';
-          }
-        } else {
-          card.innerHTML = `
-            <div class="absolute inset-0 bg-gradient-to-br from-gray-800 to-gray-900 group-hover:from-gray-700 group-hover:to-gray-800 transition-colors duration-300"></div>
-            <div class="absolute inset-0 flex items-center justify-center px-2" style="display: flex; align-items: center; justify-content: center; padding-left: 0.5rem; padding-right: 0.5rem;">
-              <h3 class="text-base sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-signika font-bold text-white" style="text-align: center; width: 100%;" data-i18n="${category.nameKey}">
-                ${categoryName}
-              </h3>
-            </div>
-          `;
-        }
-        
-        return card;
-      }
-
-      const isMobile = window.innerWidth < 640 || /iPhone|iPad|iPod/.test(navigator.userAgent);
-      
-      categories.forEach((category, index) => {
-        const card = createCategoryCard(category);
-        if (isMobile) {
-          if (grid) {
-            grid.appendChild(card);
-            card.style.visibility = 'visible';
-            card.style.opacity = '1';
-          }
-        } else {
-          if (index < 6) {
-            if (grid) grid.appendChild(card);
-          } else {
-            if (lastRowGrid) lastRowGrid.appendChild(card);
-          }
-        }
-      });
-      
-      setTimeout(() => {
-        if (grid && grid.children.length === 0) {
-          categories.forEach((category) => {
-            const card = createCategoryCard(category);
-            const isMobileCheck = window.innerWidth < 640 || /iPhone|iPad|iPod/.test(navigator.userAgent);
-            if (isMobileCheck && grid) {
-              grid.appendChild(card);
-              card.style.visibility = 'visible';
-              card.style.opacity = '1';
-            }
-          });
-        }
-      }, 200);
+      if (!window.renderCategories) return;
+      window.renderCategories(categories, getCategoryImage);
     }
 
     window.addEventListener('languageChanged', () => {
@@ -479,61 +225,68 @@
       clearTimeout(resizeTimeout);
       resizeTimeout = setTimeout(function() {
         const currentWidth = window.innerWidth;
-        const wasDesktop = lastWindowWidth >= 768;
-        const isNowDesktop = currentWidth >= 768;
+        const wasDesktop = window.isDesktop ? window.isDesktop() : lastWindowWidth >= 768;
+        const isNowDesktop = window.isDesktop ? window.isDesktop() : currentWidth >= 768;
         
         if (wasDesktop !== isNowDesktop) {
-          stopPortraitAnimation();
+          if (window.stopPortraitAnimation) window.stopPortraitAnimation();
           renderShowcase();
         } else {
-          adjustHeroImageAspectRatio();
-          if (isNowDesktop && heroImages && heroImages.type === 'three-portraits') {
-            const heroThreePortraits = document.getElementById('hero-three-portraits');
-            if (heroThreePortraits && !heroThreePortraits.classList.contains('hidden')) {
-              const portraitDivs = heroThreePortraits.querySelectorAll('.portrait-item');
-              portraitDivs.forEach((div) => {
-                div.style.width = '33.333%';
-              });
-              setTimeout(() => {
-                startPortraitAnimation(heroThreePortraits, heroImages.images);
-              }, 100);
-            }
-          }
+          if (window.adjustHeroImageAspectRatio) window.adjustHeroImageAspectRatio(heroImages);
         }
         lastWindowWidth = currentWidth;
       }, 100);
     });
 
-    document.addEventListener('DOMContentLoaded', function() {
-      renderShowcase();
-      
-      const shouldScrollToHero = document.referrer.includes('index.html') || window.location.hash === '#hero';
-      if (shouldScrollToHero) {
-        setTimeout(() => {
-          const heroSection = document.getElementById('hero-section');
-          if (heroSection) {
-            heroSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            if (window.location.hash === '#hero') {
-              history.replaceState(null, '', window.location.pathname);
-            }
-          }
-        }, 300);
-      }
-      
-      setTimeout(() => {
-        const scrollIndicator = document.getElementById('scroll-indicator');
-        if (scrollIndicator) {
-          scrollIndicator.style.opacity = '0';
+    function waitForHomeModules() {
+      return new Promise((resolve) => {
+        if (window.homeModulesLoaded && window.getHeroImages && window.renderHero && window.renderCategories) {
+          resolve();
+        } else {
+          window.onHomeModulesLoaded = resolve;
           setTimeout(() => {
-            scrollIndicator.style.display = 'none';
-          }, 500);
+            if (window.getHeroImages && window.renderHero && window.renderCategories) {
+              resolve();
+            } else {
+              resolve();
+            }
+          }, 2000);
         }
-      }, 5000);
+      });
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      waitForHomeModules().then(() => {
+        renderShowcase();
+        
+        const shouldScrollToHero = document.referrer.includes('index.html') || window.location.hash === '#hero';
+        if (shouldScrollToHero) {
+          setTimeout(() => {
+            const heroSection = document.getElementById('hero-section');
+            if (heroSection) {
+              heroSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              if (window.location.hash === '#hero') {
+                history.replaceState(null, '', window.location.pathname);
+              }
+            }
+          }, 300);
+        }
+        
+        setTimeout(() => {
+          const scrollIndicator = document.getElementById('scroll-indicator');
+          if (scrollIndicator) {
+            scrollIndicator.style.opacity = '0';
+            setTimeout(() => {
+              scrollIndicator.style.display = 'none';
+            }, 500);
+          }
+        }, 5000);
+      });
     });
   </script>
 
   <script src="../js/fade_in.js"></script>
-  <script src="../js/menu.js"></script>
+  <script src="../js/components/menu.js"></script>
   <script src="../js/scroll-to-top.js"></script>
 </body>
 

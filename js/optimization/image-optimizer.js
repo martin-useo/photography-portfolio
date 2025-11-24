@@ -56,7 +56,6 @@ const ImageOptimizer = (function() {
     if (observer) return observer;
     
     if (!('IntersectionObserver' in window)) {
-      console.warn('IntersectionObserver not supported, falling back to immediate loading');
       return null;
     }
     
@@ -82,10 +81,7 @@ const ImageOptimizer = (function() {
     if (img.dataset.loading === 'true') return;
     
     const filename = img.dataset.filename;
-    if (!filename) {
-      console.warn('No filename found for image', img);
-      return;
-    }
+    if (!filename) return;
     
     loadingImages.set(img, true);
     img.dataset.loading = 'true';
@@ -141,8 +137,6 @@ const ImageOptimizer = (function() {
       };
       
       displayImg.onerror = () => {
-        // WebP uniquement - pas de fallback
-        console.error('[ImageOptimizer] Display image failed:', imgFilename);
         imgElement.style.filter = 'blur(0)';
         imgElement.classList.remove('loading');
         imgElement.dataset.loaded = 'true';
@@ -160,11 +154,13 @@ const ImageOptimizer = (function() {
   }
   
   function initLazyImages(container = document) {
+    if (!container) return;
+    
     initObserver();
     
     const lazyImages = container.querySelectorAll('img.lazy-load[data-filename]:not([data-loaded])');
     
-    lazyImages.forEach(img => {
+    lazyImages.forEach((img) => {
       img.style.opacity = '0';
       img.style.transition = `opacity ${config.fadeInDuration}ms ease-in-out`;
       

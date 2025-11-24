@@ -6,7 +6,7 @@ const sharp = require('sharp');
 const exifr = require('exifr');
 
 const imagesDir = path.join(__dirname, '..', 'assets', 'images');
-const configPath = path.join(__dirname, '..', 'js', 'images-config.js');
+const configPath = path.join(__dirname, '..', 'js', 'core', 'images-config.js');
 
 const imageFiles = fs.readdirSync(imagesDir)
   .filter(file => file.endsWith('.jpg'))

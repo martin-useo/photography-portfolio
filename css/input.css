@@ -1,6 +1,11 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@import './responsive/breakpoints.css';
+@import './responsive/mobile.css';
+@import './responsive/desktop.css';
+@import './vendor/ios-fixes.css';
 @layer utilities {
   .tap-highlight-transparent {
     -webkit-tap-highlight-color: transparent;
@@ -23,6 +28,16 @@
    20% { transform: rotate(-8.0deg) }
    30% { transform: rotate(14.0deg) }
    40% { transform: rotate(-4.0deg) }
+   50% { transform: rotate(10.0deg) }
+   60% { transform: rotate( 0.0deg) }
+  100% { transform: rotate( 0.0deg) }
+}
+}
+   50% { transform: rotate(10.0deg) }
+   60% { transform: rotate( 0.0deg) }
+  100% { transform: rotate( 0.0deg) }
+}
+}
    50% { transform: rotate(10.0deg) }
    60% { transform: rotate( 0.0deg) }
   100% { transform: rotate( 0.0deg) }

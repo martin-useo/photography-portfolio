@@ -24,12 +24,44 @@ photography-portfolio/
 ├── 📁 js/
 │   ├── 📁 components/
 │   │   ├── loader.js
-│   │   └── dropdown.js
-│   ├── images-config.js
+│   │   ├── dropdown.js
+│   │   └── menu.js                  # Gestion du menu mobile
+│   ├── 📁 core/
+│   │   ├── i18n.js                 # Gestion de l'internationalisation
+│   │   ├── images-config.js         # Configuration des images
+│   │   └── 📁 utils/
+│   │       └── webp-support.js     # Détection du support WebP
+│   ├── 📁 responsive/
+│   │   ├── breakpoints.js          # Constantes et fonctions de breakpoints
+│   │   ├── breakpoints-global.js   # Export global des breakpoints
+│   │   └── device-detector.js      # Détection des appareils
+│   ├── 📁 config/
+│   │   └── responsive-config.js    # Configuration responsive
+│   ├── 📁 pages/
+│   │   ├── 📁 home/
+│   │   │   ├── hero-handler.js
+│   │   │   ├── categories-handler.js
+│   │   │   ├── categories-shared.js
+│   │   │   ├── 📁 mobile/
+│   │   │   │   ├── hero-handler.js
+│   │   │   │   └── categories-grid.js
+│   │   │   └── 📁 desktop/
+│   │   │       ├── hero-handler.js
+│   │   │       └── categories-grid.js
+│   │   └── 📁 index/
+│   │       ├── layout-handler.js
+│   │       ├── 📁 mobile/
+│   │       │   └── layouts.js
+│   │       └── 📁 desktop/
+│   │           └── layouts.js
+│   ├── 📁 optimization/
+│   │   ├── image-optimizer.js
+│   │   ├── lightbox-optimizer.js
+│   │   └── sw-register.js
 │   ├── fade_in.js
-│   ├── menu.js                      # Gestion du menu mobile
-│   ├── scroll-to-top.js
-│   └── config.example.js
+│   ├── image-protection.js
+│   ├── portfolio-layout.js
+│   └── scroll-to-top.js
 │
 ├── 📁 components/
 │   ├── navbar.html

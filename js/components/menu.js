@@ -3,7 +3,8 @@ function initMobileMenu() {
   const ulMenu = document.getElementById('ulMenu');
   const nav = document.getElementById('nav');
   
-  if (menu && ulMenu && window.innerWidth < 768) {
+  const mobile = window.isMobile ? window.isMobile() : window.innerWidth < 768;
+  if (menu && ulMenu && mobile) {
     menu.style.height = '0px';
     menu.style.overflow = 'hidden';
     ulMenu.style.opacity = '0';

@@ -15,12 +15,12 @@
 
 const fs = require('fs');
 const path = require('path');
+const os = require('os');
 const sharp = require('sharp');
 
 const IMAGES_DIR = path.join(__dirname, '../assets/images');
 const OUTPUT_DIR = path.join(__dirname, '../assets/images-optimized');
 
-// Configuration optimisée (WebP uniquement)
 const SIZES = {
   lqip: {
     maxWidth: 400,
@@ -55,31 +55,23 @@ console.log(`${colors.cyan}${colors.bright}
 ╚═══════════════════════════════════════════════╝
 ${colors.reset}\n`);
 
-// Créer le dossier de sortie s'il n'existe pas
 if (!fs.existsSync(OUTPUT_DIR)) {
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
   console.log(`${colors.green}✓${colors.reset} Dossier créé: ${OUTPUT_DIR}\n`);
 }
 
-// Fonction pour générer une version d'image (WebP uniquement, métadonnées EXIF supprimées)
 async function generateVersion(inputPath, outputPath, config, metadata) {
   const { maxWidth, quality } = config;
   
-  // Calculer les dimensions en gardant l'aspect ratio
   let width, height;
   if (metadata.width > metadata.height) {
-    // Paysage
     width = Math.min(maxWidth, metadata.width);
     height = Math.round((width / metadata.width) * metadata.height);
   } else {
-    // Portrait
     height = Math.min(maxWidth, metadata.height);
     width = Math.round((height / metadata.height) * metadata.width);
   }
   
-  // Supprimer toutes les métadonnées EXIF (GPS, appareil photo, date, etc.)
-  // Sharp supprime automatiquement les métadonnées lors de la conversion en WebP
-  // Pas besoin de withMetadata() - c'est le comportement par défaut
   await sharp(inputPath)
     .resize(width, height, { 
       fit: 'inside',
@@ -87,70 +79,119 @@ async function generateVersion(inputPath, outputPath, config, metadata) {
     })
     .webp({ 
       quality: quality,
-      effort: 6 // Compression effort (0-6, 6 = meilleure compression)
+      effort: 6
     })
     .toFile(outputPath);
   
   return { width, height, size: fs.statSync(outputPath).size };
 }
 
-// Fonction pour traiter une image
-async function processImage(filename) {
+async function processImage(filename, verbose = false) {
   const inputPath = path.join(IMAGES_DIR, filename);
   const ext = path.extname(filename);
   const baseName = path.basename(filename, ext);
   
-  console.log(`${colors.cyan}📷 ${filename}${colors.reset}`);
+  if (verbose) {
+    console.log(`\n${colors.cyan}📷 ${filename}${colors.reset}`);
+  }
   
   try {
     const metadata = await sharp(inputPath).metadata();
     const originalSize = fs.statSync(inputPath).size;
     
-    console.log(`   Original: ${metadata.width}x${metadata.height} (${(originalSize / 1024 / 1024).toFixed(2)} Mo)`);
+    if (verbose) {
+      console.log(`   Original: ${metadata.width}x${metadata.height} (${(originalSize / 1024 / 1024).toFixed(2)} Mo)`);
+      console.log(`   ${colors.yellow}→${colors.reset} Génération des 3 versions en parallèle...`);
+    }
     
-    const results = {};
-    
-    // Générer LQIP (WebP uniquement, métadonnées EXIF supprimées)
-    console.log(`   ${colors.yellow}→${colors.reset} Génération LQIP...`);
     const lqipPath = path.join(OUTPUT_DIR, `${baseName}${SIZES.lqip.suffix}.webp`);
-    
-    results.lqip = await generateVersion(inputPath, lqipPath, SIZES.lqip, metadata);
-    
-    const lqipSize = (results.lqip.size / 1024).toFixed(2);
-    console.log(`   ${colors.green}✓${colors.reset} LQIP: ${results.lqip.width}x${results.lqip.height}px (${lqipSize} Ko) [WebP, EXIF supprimé]`);
-    
-    // Générer Display (WebP uniquement, métadonnées EXIF supprimées)
-    console.log(`   ${colors.yellow}→${colors.reset} Génération Display...`);
     const displayPath = path.join(OUTPUT_DIR, `${baseName}${SIZES.display.suffix}.webp`);
-    
-    results.display = await generateVersion(inputPath, displayPath, SIZES.display, metadata);
-    
-    const displaySize = (results.display.size / 1024).toFixed(2);
-    console.log(`   ${colors.green}✓${colors.reset} Display: ${results.display.width}x${results.display.height}px (${displaySize} Ko) [WebP, EXIF supprimé]`);
-    
-    // Générer Lightbox (WebP uniquement, métadonnées EXIF supprimées)
-    console.log(`   ${colors.yellow}→${colors.reset} Génération Lightbox...`);
     const lightboxPath = path.join(OUTPUT_DIR, `${baseName}${SIZES.lightbox.suffix}.webp`);
     
-    results.lightbox = await generateVersion(inputPath, lightboxPath, SIZES.lightbox, metadata);
+    const [lqipResult, displayResult, lightboxResult] = await Promise.all([
+      generateVersion(inputPath, lqipPath, SIZES.lqip, metadata),
+      generateVersion(inputPath, displayPath, SIZES.display, metadata),
+      generateVersion(inputPath, lightboxPath, SIZES.lightbox, metadata)
+    ]);
     
-    const lightboxSize = (results.lightbox.size / 1024).toFixed(2);
-    console.log(`   ${colors.green}✓${colors.reset} Lightbox: ${results.lightbox.width}x${results.lightbox.height}px (${lightboxSize} Ko) [WebP, EXIF supprimé]`);
+    const results = {
+      lqip: lqipResult,
+      display: displayResult,
+      lightbox: lightboxResult
+    };
     
-    // Calculer l'économie
-    const totalOptimized = results.lqip.size + results.display.size + results.lightbox.size;
-    const economy = ((1 - totalOptimized / originalSize) * 100).toFixed(1);
-    console.log(`   ${colors.cyan}📊${colors.reset} Économie: ${economy}% (${(totalOptimized / 1024 / 1024).toFixed(2)} Mo vs ${(originalSize / 1024 / 1024).toFixed(2)} Mo)\n`);
+    if (verbose) {
+      const lqipSize = (results.lqip.size / 1024).toFixed(2);
+      const displaySize = (results.display.size / 1024).toFixed(2);
+      const lightboxSize = (results.lightbox.size / 1024).toFixed(2);
+      
+      console.log(`   ${colors.green}✓${colors.reset} LQIP: ${results.lqip.width}x${results.lqip.height}px (${lqipSize} Ko)`);
+      console.log(`   ${colors.green}✓${colors.reset} Display: ${results.display.width}x${results.display.height}px (${displaySize} Ko)`);
+      console.log(`   ${colors.green}✓${colors.reset} Lightbox: ${results.lightbox.width}x${results.lightbox.height}px (${lightboxSize} Ko)`);
+      
+      const totalOptimized = results.lqip.size + results.display.size + results.lightbox.size;
+      const economy = ((1 - totalOptimized / originalSize) * 100).toFixed(1);
+      console.log(`   ${colors.cyan}📊${colors.reset} Économie: ${economy}%\n`);
+    }
     
     return { success: true, filename, results };
     
   } catch (error) {
-    console.log(`   ${colors.red}✗ Erreur: ${error.message}${colors.reset}\n`);
+    if (verbose) {
+      console.log(`\n   ${colors.red}✗ Erreur: ${error.message}${colors.reset}\n`);
+    }
     return { success: false, filename, error: error.message };
   }
 }
 
-// Fonction principale
+function updateProgressBar(current, total, barLength = 40) {
+  const percentage = (current / total) * 100;
+  const filled = Math.round((current / total) * barLength);
+  const empty = barLength - filled;
+  const bar = '█'.repeat(filled) + '░'.repeat(empty);
+  process.stdout.write(`\r${colors.cyan}[${bar}]${colors.reset} ${current}/${total} (${percentage.toFixed(1)}%)`);
+}
+
+async function processBatch(images, concurrency = 20) {
+  const results = {
+    success: [],
+    failed: [],
+    totalOriginalSize: 0,
+    totalOptimizedSize: 0
+  };
+
+  let processedCount = 0;
+  updateProgressBar(0, images.length);
+
+  for (let i = 0; i < images.length; i += concurrency) {
+    const batch = images.slice(i, i + concurrency);
+    const batchResults = await Promise.allSettled(
+      batch.map(file => processImage(file, false))
+    );
+
+    for (const result of batchResults) {
+      if (result.status === 'fulfilled' && result.value.success) {
+        results.success.push(result.value.filename);
+        const originalSize = fs.statSync(path.join(IMAGES_DIR, result.value.filename)).size;
+        results.totalOriginalSize += originalSize;
+        results.totalOptimizedSize += 
+          result.value.results.lqip.size + 
+          result.value.results.display.size + 
+          result.value.results.lightbox.size;
+      } else if (result.status === 'fulfilled' && !result.value.success) {
+        results.failed.push(result.value);
+      } else {
+        results.failed.push({ filename: 'unknown', error: result.reason?.message || 'Unknown error' });
+      }
+      processedCount++;
+      updateProgressBar(processedCount, images.length);
+    }
+  }
+
+  console.log('\n');
+  return results;
+}
+
 async function main() {
   try {
     const files = fs.readdirSync(IMAGES_DIR)
@@ -162,28 +203,19 @@ async function main() {
       return;
     }
     
-    console.log(`${colors.bright}Traitement de ${files.length} image(s)...${colors.reset}\n`);
+    console.log(`${colors.bright}Traitement de ${files.length} image(s) en parallèle...${colors.reset}\n`);
     
-    const results = {
-      success: [],
-      failed: [],
-      totalOriginalSize: 0,
-      totalOptimizedSize: 0
-    };
+    const cpuCount = os.cpus().length;
+    const concurrency = Math.min(40, Math.max(16, cpuCount * 2));
     
-    for (const file of files) {
-      const result = await processImage(file);
-      if (result.success) {
-        results.success.push(result.filename);
-        const originalSize = fs.statSync(path.join(IMAGES_DIR, file)).size;
-        results.totalOriginalSize += originalSize;
-        results.totalOptimizedSize += result.results.lqip.size + result.results.display.size + result.results.lightbox.size;
-      } else {
-        results.failed.push(result);
-      }
-    }
+    console.log(`${colors.cyan}⚡ CPU détectés: ${cpuCount} cœurs${colors.reset}`);
+    console.log(`${colors.cyan}⚡ Concurrence: ${concurrency} images en parallèle${colors.reset}\n`);
     
-    // Résumé final
+    const startTime = Date.now();
+    const results = await processBatch(files, concurrency);
+    const endTime = Date.now();
+    const duration = ((endTime - startTime) / 1000).toFixed(1);
+    
     console.log(`${colors.bright}═══════════════════════════════════════════════${colors.reset}`);
     console.log(`${colors.bright}📊 Résumé Final :${colors.reset}\n`);
     console.log(`${colors.green}✓ ${results.success.length} image(s) traitée(s) avec succès${colors.reset}`);
@@ -197,6 +229,9 @@ async function main() {
     console.log(`   Original: ${(results.totalOriginalSize / 1024 / 1024).toFixed(2)} Mo`);
     console.log(`   Optimisé: ${(results.totalOptimizedSize / 1024 / 1024).toFixed(2)} Mo`);
     console.log(`   ${colors.green}Économie: ${totalEconomy}%${colors.reset}`);
+    
+    console.log(`\n${colors.cyan}⏱️  Temps de traitement: ${duration}s${colors.reset}`);
+    console.log(`   ${colors.cyan}Vitesse: ${(results.success.length / duration).toFixed(1)} images/seconde${colors.reset}`);
     
     console.log(`\n${colors.bright}📁 Dossier de sortie :${colors.reset}`);
     console.log(`   ${OUTPUT_DIR}`);
@@ -214,7 +249,6 @@ async function main() {
   }
 }
 
-// Vérifier si sharp est installé
 try {
   require.resolve('sharp');
   main();

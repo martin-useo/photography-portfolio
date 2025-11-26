@@ -99,6 +99,7 @@ async function updateConfig() {
     'Nature': 'nature',
     'Miscellaneous': 'divers',
     'Portraits': 'portraits',
+    'Sport': 'sport',
     'Sports': 'sport',
     'Urban': 'urban',
     'Vehicles': 'vehicules'
